@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stephen E. Chick</title>
+<meta name="description" content="Stephen E. Chick — Professor of Technology and Operations Management at INSEAD, the Novartis Chaired Professor of Healthcare Management. Research in operations management, stochastic simulation, Bayesian decision-making, and healthcare.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfaf8;
+    --surface:#ffffff;
+    --ink:#1a1c20;
+    --muted:#5b6470;
+    --line:#e7e3dc;
+    --brand:#0f4c5c;        /* deep teal */
+    --brand-2:#117a8b;
+    --accent:#c8553d;       /* warm terracotta accent */
+    --chip:#eef3f3;
+    --shadow:0 1px 2px rgba(16,30,40,.04),0 8px 30px rgba(16,30,40,.06);
+    --radius:16px;
+    --max:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.65;-webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--brand-2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+  /* NAV */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:saturate(140%) blur(10px);
+    background:rgba(251,250,248,.82);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{font-family:'Newsreader',serif;font-weight:600;font-size:1.15rem;letter-spacing:.2px;color:var(--ink)}
+  .brand span{color:var(--brand)}
+  nav.links{display:flex;gap:26px}
+  nav.links a{color:var(--muted);font-size:.92rem;font-weight:500}
+  nav.links a:hover{color:var(--brand);text-decoration:none}
+  @media(max-width:720px){nav.links{display:none}}
+
+  /* HERO */
+  .hero{padding:72px 0 56px;position:relative;overflow:hidden}
+  .hero::before{
+    content:"";position:absolute;inset:0;z-index:0;
+    background:
+      radial-gradient(900px 380px at 78% -10%, rgba(17,122,139,.14), transparent 60%),
+      radial-gradient(700px 320px at 0% 10%, rgba(200,85,61,.08), transparent 55%);
+  }
+  .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:200px 1fr;gap:42px;align-items:center}
+  @media(max-width:720px){.hero-grid{grid-template-columns:1fr;gap:26px;text-align:center}}
+  .avatar{
+    width:200px;height:200px;border-radius:24px;object-fit:cover;
+    box-shadow:var(--shadow);border:4px solid #fff;
+    margin:0 auto;display:block;
+  }
+  .eyebrow{font-size:.82rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  h1{font-family:'Newsreader',serif;font-weight:600;font-size:clamp(2.4rem,5vw,3.4rem);line-height:1.05;margin:0 0 14px}
+  .titles{font-size:1.06rem;color:var(--muted);margin:0 0 8px}
+  .titles strong{color:var(--ink);font-weight:600}
+  .cta{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+  @media(max-width:720px){.cta{justify-content:center}}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:11px 20px;border-radius:999px;font-weight:600;font-size:.92rem;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{text-decoration:none;transform:translateY(-1px)}
+  .btn-primary{background:var(--brand);color:#fff;box-shadow:var(--shadow)}
+  .btn-primary:hover{background:var(--brand-2)}
+  .btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+
+  /* SECTIONS */
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  .sec-label{font-size:.82rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
+  h2{font-family:'Newsreader',serif;font-weight:600;font-size:1.9rem;margin:0 0 22px;line-height:1.15}
+  .lead{font-size:1.08rem;color:var(--ink)}
+  .prose p{margin:0 0 16px;color:#2b2f36}
+  .prose p:last-child{margin-bottom:0}
+
+  /* CHIP GRID */
+  .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}
+  @media(max-width:860px){.cols{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .card h3{margin:0 0 14px;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--chip);color:var(--brand);border:1px solid #dce6e6;border-radius:999px;padding:5px 12px;font-size:.85rem;font-weight:500}
+
+  /* PUBLICATIONS */
+  .pub{padding:18px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:16px}
+  .pub:last-child{border-bottom:none}
+  .pub .yr{font-family:'Newsreader',serif;font-weight:600;color:var(--accent);font-size:1.05rem;min-width:54px}
+  .pub .t{font-weight:600;color:var(--ink);margin:0 0 3px;line-height:1.4}
+  .pub .m{font-size:.9rem;color:var(--muted);margin:0}
+  .pub .m em{color:var(--brand-2);font-style:italic}
+  .pillrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+
+  /* TEACHING list */
+  .twocol{columns:2;column-gap:36px}
+  @media(max-width:720px){.twocol{columns:1}}
+  .twocol li{margin-bottom:8px;break-inside:avoid}
+  ul.clean{list-style:none;padding:0;margin:0}
+  ul.clean li{position:relative;padding-left:20px;color:#2b2f36}
+  ul.clean li::before{content:"";position:absolute;left:0;top:11px;width:7px;height:7px;border-radius:2px;background:var(--brand-2);transform:rotate(45deg)}
+
+  /* CONTACT */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.contact-grid{grid-template-columns:1fr}}
+  .contact-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+  .contact-card .k{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+  .contact-card .v{font-weight:600;color:var(--ink)}
+
+  footer{padding:40px 0 60px;color:var(--muted);font-size:.88rem;text-align:center}
+  .note{font-size:.82rem;color:var(--muted);margin-top:14px}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand">Stephen E. <span>Chick</span></div>
+    <nav class="links">
+      <a href="#about">About</a>
+      <a href="#research">Research</a>
+      <a href="#teaching">Teaching</a>
+      <a href="#publications">Publications</a>
+      <a href="#talks">Talks</a>
+      <a href="#cases">Cases</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" style="border-top:none">
+    <div class="wrap hero-grid">
+      <img class="avatar" src="https://www.insead.edu/sites/insead/files/styles/329x329/public/akdmia/profile_importer/Chick%20Stephen%20E._14370.jpg.webp" alt="Stephen E. Chick" onerror="this.style.display='none'">
+      <div>
+        <div class="eyebrow">INSEAD &middot; Technology &amp; Operations Management</div>
+        <h1>Stephen E. Chick</h1>
+        <p class="titles"><strong>Professor of Technology and Operations Management</strong>, INSEAD</p>
+        <p class="titles">The Novartis Chaired Professor of Healthcare Management</p>
+        <p class="titles">Academic Director, Healthcare Management Initiative</p>
+        <p class="titles">Honorary Visiting Research Fellow, University of Cambridge, Judge Business School (2025&ndash;26)</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#contact">Get in touch</a>
+          <a class="btn btn-ghost" href="https://sites.insead.edu/facultyresearch/faculty/cv.cfm?cid=5463" target="_blank" rel="noopener">Download CV</a>
+          <a class="btn btn-ghost" href="https://www.insead.edu/faculty/stephen-e-chick" target="_blank" rel="noopener">INSEAD profile</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap">
+      <div class="sec-label">About</div>
+      <h2>Biography</h2>
+      <div class="prose" style="max-width:760px">
+        <p class="lead">Steve Chick is a Professor of Technology and Operations Management at INSEAD. He was named Academic Director of INSEAD's Healthcare Management Initiative and Novartis Chair of Healthcare Management in 2008. He earned his MS and PhD from the University of California at Berkeley in Industrial Engineering and Operations Research and his BS in Mathematics from Stanford University.</p>
+        <p>Prior to joining INSEAD, he taught process modelling, simulation, and information systems as a faculty member at the University of Michigan and worked for five years in the automotive and software industries. In the MBA programme at INSEAD, he teaches the &lsquo;Creating Value in Health&rsquo; and &lsquo;Identifying New Business Models&rsquo; electives and has taught the Process and Operations Management core course and the Management of Services elective. He also teaches in the PhD programme. In executive education he teaches operations strategy, improvement and innovation, and has served as academic director of three Executive Education programmes: the Middle East Health Leadership Programme (MEHLP), Innovating Health for Tomorrow (IHT), and Strategic Innovation for Community Health (STICH). He continues to design customized executive development programmes in several sectors, with emphasis in health care delivery, pharmaceutical, and biopharma, where innovation and digital transformation meet execution and patient centricity.</p>
+        <p>His research brings together operations management, simulation, and statistical decision-making to improve process design and public-health decisions. Recent projects include sequential clinical-trial design and health analytics for sepsis management with several academic hospitals and EU support; work with the Universities of Sheffield and York on how the value-based health paradigm can guide clinical-trial decision making; and epidemic modelling and intervention-trial analysis funded by the US EPA and the CDC. He has also worked on cost-effective management of the influenza vaccine supply chain and on cost-benefit analysis for the control of infectious diseases.</p>
+        <p>Steve provides leadership and service to several academic journals and professional organisations. He is on the board of the INFORMS Health Application Society, was President of the INFORMS Simulation Society, and is an Associate Editor for <em>Management Science</em>. He has served in editorial capacities for <em>Operations Research</em>, <em>POMS</em>, <em>ACM TOMACS</em>, <em>Naval Research Logistics</em>, and <em>Health Care Management Science</em>. He was named a Fellow of INFORMS in 2021.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH / TEACHING / SECTORS -->
+  <section id="research">
+    <div class="wrap">
+      <div class="sec-label">Focus</div>
+      <h2>Research &amp; expertise</h2>
+      <div class="cols">
+        <div class="card">
+          <h3>Research areas</h3>
+          <div class="chips">
+            <span class="chip">Production &amp; Operations Management</span>
+            <span class="chip">Health Care</span>
+            <span class="chip">Service Operations</span>
+            <span class="chip">Stochastic Simulation</span>
+            <span class="chip">Bayesian Inference</span>
+            <span class="chip">Optimal Learning</span>
+            <span class="chip">Risk &amp; Uncertainty</span>
+            <span class="chip">Mathematical Modeling</span>
+          </div>
+        </div>
+        <div class="card" id="teaching">
+          <h3>Teaching topics</h3>
+          <div class="chips">
+            <span class="chip">Business Model Innovation</span>
+            <span class="chip">Strategy Execution</span>
+            <span class="chip">Production &amp; Operations Mgmt</span>
+            <span class="chip">Service Operations Strategy</span>
+            <span class="chip">Health Care Management</span>
+            <span class="chip">Digital Innovation in Health</span>
+            <span class="chip">Field Practicum for MBA Support of NGOs</span>
+            <span class="chip">Stochastic Modeling &amp; Inference</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Educational formats</h3>
+          <div class="chips">
+            <span class="chip">MBA</span>
+            <span class="chip">Executive MBA</span>
+            <span class="chip">Masters in Management</span>
+            <span class="chip">Customized Executive Development Programs</span>
+          </div>
+          <p class="note">Customized executive development programmes for firms in healthcare services, NGOs, pharmaceutical, manufacturing, and other service organisations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATIONS -->
+  <section id="publications">
+    <div class="wrap">
+      <div class="sec-label">Selected work</div>
+      <h2>Recent publications</h2>
+      <div style="max-width:820px">
+        <div class="pub">
+          <div class="yr">2026</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1287/mnsc.2021.02283" target="_blank" rel="noopener">Choosing Outcomes-Based Reimbursement Policies: Should We Worry About Collusion?</a></p>
+            <p class="m">Zorc S., Chick S. E., Hasija S. &middot; <em>Management Science</em> (accepted)</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2025</div>
+          <div>
+            <p class="t"><a href="https://dx.doi.org/10.1186/s12874-025-02566-6" target="_blank" rel="noopener">Value-Adaptive Clinical Trial Designs for Efficient Delivery of Publicly Funded Trials &mdash; A Discussion of Methods, Case Studies, Opportunities, and Challenges</a></p>
+            <p class="m">Flight L., Brennan A., Chick S. E., Forster M., Julious S., Tharmanathan P. &middot; <em>BMC Medical Research Methodology</em>, 25:153</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2025</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1287/mnsc.2022.02048" target="_blank" rel="noopener">Learning Personalized Treatment Strategies with Predictive and Prognostic Covariates</a></p>
+            <p class="m">Alban A., Chick S. E., Zoumpoulis S. &middot; <em>Management Science</em> (accepted)</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2024</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1287/mnsc.2022.03628" target="_blank" rel="noopener">Conditional Approval and Value-Based Pricing for New Health Technologies</a></p>
+            <p class="m">Yapar O., Chick S. E., Gans N. &middot; <em>Management Science</em>, 71(8):6793&ndash;6815</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2024</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1016/j.jval.2024.06.004" target="_blank" rel="noopener">A Tutorial on Value-Based Adaptive Designs: Could a Value-Based Sequential Two-Arm Design Have Created More Health Economic Value for the Big CACTUS Trial?</a></p>
+            <p class="m">Flight L., Brennan A., Wilson I., Chick S. E. &middot; <em>Value in Health</em>, 27(10):1328&ndash;1337</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2024</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1186/s12913-024-11161-2" target="_blank" rel="noopener">A Quality Improvement Study on How a Simulation Model Can Help Decision Making on Organization of ICU Wards</a></p>
+            <p class="m">Sent D., van der Meulen D. M., Alban A., Chick S. E., Wissink I. J. A., Vlaar A. P. J., Dongelmans D. A. &middot; <em>BMC Health Services Research</em>, 24:708</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2023</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.3389/fpsyg.2023.1257031" target="_blank" rel="noopener">Giving More Detailed Information About Health Insurance Encourages Consumers to Choose Compromise Options</a></p>
+            <p class="m">Chick S. E., Hawkins S., Soberman D. &middot; <em>Frontiers in Psychology</em>, 14:1257031</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2023</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1287/opre.2019.0498" target="_blank" rel="noopener">The When and How of Delegated Search</a></p>
+            <p class="m">Zorc S., Tsetlin I., Hasija S., Chick S. E. &middot; <em>Operations Research</em>, 73(1):461&ndash;482</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2022</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.3389/fpubh.2022.1089091" target="_blank" rel="noopener">Editorial: The Science and Art of Value in Healthcare &mdash; Measures, Voices and Methods</a></p>
+            <p class="m">Chilingerian J. A., Chick S. E., True G. &middot; <em>Frontiers in Public Health</em>, 10:1089091</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2022</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1287/mnsc.2022.4540" target="_blank" rel="noopener">Value-Based Clinical Trials: Selecting Recruitment Rates and Trial Lengths in Different Regulatory Contexts</a></p>
+            <p class="m">Alban A., Chick S. E., Forster M. &middot; <em>Management Science</em>, 69(6):3516&ndash;3535</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2022</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1287/mnsc.2021.4137" target="_blank" rel="noopener">Bayesian Sequential Learning for Clinical Trials of Multiple Correlated Medical Interventions</a></p>
+            <p class="m">Chick S. E., Gans N., Yapar O. &middot; <em>Management Science</em>, 68(7):4919&ndash;4938</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2022</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1080/17477778.2020.1785345" target="_blank" rel="noopener">Diffusion of Competing Rumors on Social Media</a></p>
+            <p class="m">Kaligotla C., Y&uuml;cesan E., Chick S. E. &middot; <em>Journal of Simulation</em>, 16(3):230&ndash;250 &middot; Tocher Medal 2023</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2021</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1177/17407745211032909" target="_blank" rel="noopener">A Bayesian Decision-Theoretic Model of a Sequential Clinical Trial: Application to the ProFHER Pragmatic Trial</a></p>
+            <p class="m">Forster M., Brealey S., Chick S. E., Keding A., Corbacho B., Alban A., Rangan A. &middot; <em>Clinical Trials</em>, 18(6):647&ndash;656</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2020</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.1007/s00134-020-06066-7" target="_blank" rel="noopener">ICU Capacity Management During the COVID-19 Pandemic Using a Process Simulation</a></p>
+            <p class="m">Alban A., Chick S. E., Dongelmans D. A., van der Sluijs A. F., Wiersinga W. J., Vlaar A. P. J., Sent D. &middot; <em>Intensive Care Medicine</em>, 46(8):1624&ndash;1626</p>
+          </div>
+        </div>
+        <div class="pub">
+          <div class="yr">2020</div>
+          <div>
+            <p class="t"><a href="https://doi.org/10.3310/hta24110" target="_blank" rel="noopener">Interventions to Reduce the Risk of Surgically Transmitted Creutzfeldt-Jakob Disease: A Cost-Effective Modelling Review</a></p>
+            <p class="m">Stevenson M. D., Uttley L., Oakley J. E., Carroll C., Chick S. E., Wong R. &middot; <em>Health Technology Assessment</em>, 24(11):1&ndash;150</p>
+          </div>
+        </div>
+      </div>
+      <div class="pillrow">
+        <a class="btn btn-ghost" href="https://www.insead.edu/faculty-personal-site/stephen-e-chick/research" target="_blank" rel="noopener">All publications</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TALKS -->
+  <section id="talks">
+    <div class="wrap">
+      <div class="sec-label">Speaking</div>
+      <h2>Selected talks &amp; invited seminars</h2>
+      <div class="cols">
+        <div class="card">
+          <h3>Keynotes &amp; plenaries</h3>
+          <ul class="clean">
+            <li>Invited speaker, INFORMS Health Applications Society Online Seminar &mdash; <em>Effective Health Technologies Faster?</em> (2025)</li>
+            <li>Plenary, PhD Colloquium, Winter Simulation Conference &mdash; <em>Methods and Applications or Applications and Methods?</em> (2023)</li>
+            <li>Plenary, Winter Simulation Conference &mdash; <em>Health Resource Allocation: Lessons for Today from Past Outbreaks</em> (2020)</li>
+            <li>Keynote, IMA Conference on Quantitative Modelling in the Management of Health and Social Care, London (2013)</li>
+            <li>Keynote, Hospital Management Asia Conference, Singapore (2006)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Recent invited seminars</h3>
+          <ul class="clean">
+            <li>Judge Business School &amp; MRC Biostatistics Unit, University of Cambridge (2025&ndash;26)</li>
+            <li>Columbia University &middot; Wharton (2024)</li>
+            <li>HEC Paris (2022) &middot; Penn State University (2022)</li>
+            <li>Naval Postgraduate School &mdash; Distinguished Operations Research Lecture (2021)</li>
+            <li>Stanford Graduate School of Business (2016) &middot; Yale School of Management (2015)</li>
+            <li>Bocconi University &mdash; de Finetti Lecture (2015)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Recent conference talks</h3>
+          <ul class="clean">
+            <li><em>Explore Then Confirm: Investment Portfolios for New Drug Therapies</em> &mdash; INFORMS International, Singapore (2025)</li>
+            <li><em>Learning Personalized Treatment Strategies with Predictive and Prognostic Covariates</em> &mdash; INFORMS MSOM, London (2025)</li>
+            <li>Multiple papers, Winter Simulation Conference (1997&ndash;2026)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASES -->
+  <section id="cases">
+    <div class="wrap">
+      <div class="sec-label">Teaching materials</div>
+      <h2>Selected case studies</h2>
+      <div style="max-width:820px">
+        <ul class="clean twocol">
+          <li><a href="https://publishing.insead.edu/publishing/case?code=42236" target="_blank" rel="noopener">Fertile Ground for Expansion: Nabta Health&rsquo;s Global Reach</a> (2024)</li>
+          <li><a href="https://publishing.insead.edu/publishing/case?code=42973" target="_blank" rel="noopener">Goodlife: Profit with Purpose</a> (2024)</li>
+          <li><a href="https://publishing.insead.edu/publishing/case?code=43401" target="_blank" rel="noopener">Access Afya: Scaling Healthcare in Kenya</a> (2024)</li>
+          <li><a href="https://publishing.insead.edu/publishing/case?code=43123" target="_blank" rel="noopener">Vaccine Manufacturing Capacity in Africa</a> (2024)</li>
+          <li><a href="https://publishing.insead.edu/publishing/case?code=43018" target="_blank" rel="noopener">Carbon27&rsquo;s Pivot: A Virtual Prototype with Generative AI</a> (2023)</li>
+          <li><a href="https://publishing.insead.edu/publishing/case?code=40895" target="_blank" rel="noopener">MiracleFeet&rsquo;s Journey toward a Global Footprint</a> (2022)</li>
+          <li><a href="https://publishing.insead.edu/publishing/case?code=40678" target="_blank" rel="noopener">The Journey to Universal Health Coverage: Kenya</a> (2021)</li>
+          <li><a href="https://publishing.insead.edu/publishing/case?code=35368" target="_blank" rel="noopener">PatientsLikeMe: Social Network Health Data</a> (2017)</li>
+        </ul>
+      </div>
+      <div class="pillrow">
+        <a class="btn btn-ghost" href="https://publishing.insead.edu/author/stephen-e-chick" target="_blank" rel="noopener">View all cases on INSEAD Publishing</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="sec-label">Contact</div>
+      <h2>Get in touch</h2>
+      <div class="contact-grid" style="max-width:760px">
+        <div class="contact-card">
+          <div class="k">Affiliation</div>
+          <div class="v">INSEAD &mdash; Europe Campus, Fontainebleau</div>
+        </div>
+        <div class="contact-card">
+          <div class="k">Phone</div>
+          <div class="v"><a href="tel:+33160724157">+33 1 60 72 41 57</a></div>
+        </div>
+        <div class="contact-card">
+          <div class="k">Email</div>
+          <div class="v">stephen dot chick (at) insead dot edu</div>
+        </div>
+        <div class="contact-card">
+          <div class="k">Profiles</div>
+          <div class="v">
+            <a href="https://www.insead.edu/faculty/stephen-e-chick" target="_blank" rel="noopener">INSEAD</a> &middot;
+            <a href="https://www.linkedin.com/in/stephen-chick-34b168" target="_blank" rel="noopener">LinkedIn</a> &middot;
+            <a href="https://orcid.org/0000-0002-8026-1571" target="_blank" rel="noopener">ORCID</a> &middot;
+            <a href="https://github.com/sechick" target="_blank" rel="noopener">GitHub</a> &middot;
+            <a href="https://sites.insead.edu/facultyresearch/faculty/cv.cfm?cid=5463" target="_blank" rel="noopener">CV</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    &copy; <span id="yr"></span> Stephen E. Chick &middot; Professor of Technology and Operations Management, INSEAD
+    <div class="note">Built using content adapted from the author&rsquo;s INSEAD faculty profile.</div>
+  </div>
+</footer>
+
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
