@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+:root{
+  --paper:#FBFAF6;--ink:#17191F;--muted:#6C6F77;--faint:#9A9A93;
+  --hair:#E6E2D8;--blue:#3F7E2A;--blueb:#4C9A2E;--amber:#A9670A;
+  --serif:'Newsreader',Georgia,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+::selection{background:rgba(63,126,42,.16)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--paper);width:100%;color:var(--ink)">
+
+  <sc-if value="{{ instructorMode }}" hint-placeholder-val="{{ false }}">
+    <div style="position:sticky;top:0;z-index:20;background:var(--blue);color:#fff;font-family:var(--mono);font-size:12px;letter-spacing:.05em;padding:11px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px">
+      <span>INSTRUCTOR MODE · students see only released decks &amp; visible handouts</span>
+      <span onClick="{{ toggleInstructor }}" role="button" style="cursor:pointer;text-decoration:underline;white-space:nowrap">Switch to student view</span>
+    </div>
+  </sc-if>
+
+  <div style="max-width:1040px;margin:0 auto;padding:76px 44px 48px">
+
+    <header>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-bottom:60px">
+        <span>GEMBA KMC · INBO</span>
+        <span>INSEAD · Oct 2026</span>
+      </div>
+      <h1 style="font-family:var(--serif);font-weight:500;font-size:62px;line-height:1.06;letter-spacing:-.012em;margin:0 0 26px;max-width:15ch">Identifying New Business Opportunities</h1>
+      <p style="font-family:var(--sans);font-size:20px;line-height:1.62;color:var(--muted);max-width:58ch;margin:0">Session slides and roadmap for the intensive — from idea generation through value creation to a validated business model.</p>
+    </header>
+
+    <main style="margin-top:60px">
+
+      <!-- MONDAY -->
+      <div style="display:grid;grid-template-columns:190px 1fr;gap:44px;padding:34px 0;border-top:1px solid var(--hair)">
+        <div style="padding-top:18px">
+          <div style="font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase">Monday</div>
+          <sc-if value="{{ showDates }}" hint-placeholder-val="{{ true }}"><div style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:7px">19 Oct 2026</div></sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <a href="{{ s.s01.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">01</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s01.titleColor }}">Course Introduction &amp; Framing</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s01.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s01.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s01.togBorder }};color:{{ s.s01.togColor }};background:{{ s.s01.togBg }}">{{ s.s01.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s01.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s01.statusLabel }} {{ s.s01.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s02.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">02</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s02.titleColor }}">Myths of Innovation &amp; Tournament Tournaments</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s02.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s02.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s02.togBorder }};color:{{ s.s02.togColor }};background:{{ s.s02.togBg }}">{{ s.s02.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s02.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s02.statusLabel }} {{ s.s02.arrow }}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- TUESDAY -->
+      <div style="display:grid;grid-template-columns:190px 1fr;gap:44px;padding:34px 0;border-top:1px solid var(--hair)">
+        <div style="padding-top:18px">
+          <div style="font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase">Tuesday</div>
+          <sc-if value="{{ showDates }}" hint-placeholder-val="{{ true }}"><div style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:7px">20 Oct 2026</div></sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <a href="{{ s.s03.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">03</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s03.titleColor }}">Idea Generation: Products and Services</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s03.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s03.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s03.togBorder }};color:{{ s.s03.togColor }};background:{{ s.s03.togBg }}">{{ s.s03.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s03.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s03.statusLabel }} {{ s.s03.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s04.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">04</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s04.titleColor }}">Idea Generation: Business Models</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s04.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s04.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s04.togBorder }};color:{{ s.s04.togColor }};background:{{ s.s04.togBg }}">{{ s.s04.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s04.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s04.statusLabel }} {{ s.s04.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s05.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">05</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s05.titleColor }}">User Needs</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s05.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s05.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s05.togBorder }};color:{{ s.s05.togColor }};background:{{ s.s05.togBg }}">{{ s.s05.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s05.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s05.statusLabel }} {{ s.s05.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s06.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">06</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s06.titleColor }}">Idea Evaluation</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s06.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s06.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s06.togBorder }};color:{{ s.s06.togColor }};background:{{ s.s06.togBg }}">{{ s.s06.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s06.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s06.statusLabel }} {{ s.s06.arrow }}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- WEDNESDAY -->
+      <div style="display:grid;grid-template-columns:190px 1fr;gap:44px;padding:34px 0;border-top:1px solid var(--hair)">
+        <div style="padding-top:18px">
+          <div style="font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase">Wednesday</div>
+          <sc-if value="{{ showDates }}" hint-placeholder-val="{{ true }}"><div style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:7px">21 Oct 2026</div></sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <a href="{{ s.s07.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">07</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s07.titleColor }}">Opportunity Pitches</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s07.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s07.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s07.togBorder }};color:{{ s.s07.togColor }};background:{{ s.s07.togBg }}">{{ s.s07.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s07.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s07.statusLabel }} {{ s.s07.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s08.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">08</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s08.titleColor }}">Business Model Articulation</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s08.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s08.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s08.togBorder }};color:{{ s.s08.togColor }};background:{{ s.s08.togBg }}">{{ s.s08.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s08.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s08.statusLabel }} {{ s.s08.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s09.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">09</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s09.titleColor }}">GenAI in Innovation Tournaments</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s09.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s09.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s09.togBorder }};color:{{ s.s09.togColor }};background:{{ s.s09.togBg }}">{{ s.s09.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s09.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s09.statusLabel }} {{ s.s09.arrow }}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- THURSDAY -->
+      <div style="display:grid;grid-template-columns:190px 1fr;gap:44px;padding:34px 0;border-top:1px solid var(--hair)">
+        <div style="padding-top:18px">
+          <div style="font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase">Thursday</div>
+          <sc-if value="{{ showDates }}" hint-placeholder-val="{{ true }}"><div style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:7px">22 Oct 2026</div></sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <a href="{{ s.s10.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">10</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s10.titleColor }}">Value Creation Analysis</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s10.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s10.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s10.togBorder }};color:{{ s.s10.togColor }};background:{{ s.s10.togBg }}">{{ s.s10.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s10.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s10.statusLabel }} {{ s.s10.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s11.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">11</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s11.titleColor }}">Risk Identification and Task Prioritization</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s11.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s11.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s11.togBorder }};color:{{ s.s11.togColor }};background:{{ s.s11.togBg }}">{{ s.s11.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s11.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s11.statusLabel }} {{ s.s11.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s12.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">12</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s12.titleColor }}">Evidence-Driven Pilot Experiments</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s12.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s12.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s12.togBorder }};color:{{ s.s12.togColor }};background:{{ s.s12.togBg }}">{{ s.s12.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s12.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s12.statusLabel }} {{ s.s12.arrow }}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- FRIDAY -->
+      <div style="display:grid;grid-template-columns:190px 1fr;gap:44px;padding:34px 0;border-top:1px solid var(--hair)">
+        <div style="padding-top:18px">
+          <div style="font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase">Friday</div>
+          <sc-if value="{{ showDates }}" hint-placeholder-val="{{ true }}"><div style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:7px">23 Oct 2026</div></sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <a href="{{ s.s13.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">13</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s13.titleColor }}">Pitch Preparation &amp; Peer Review</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s13.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s13.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s13.togBorder }};color:{{ s.s13.togColor }};background:{{ s.s13.togBg }}">{{ s.s13.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s13.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s13.statusLabel }} {{ s.s13.arrow }}</span>
+            </span>
+          </a>
+          <a href="{{ s.s14.href }}" style="display:flex;align-items:baseline;gap:20px;padding:17px 16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:14px;color:var(--faint);min-width:30px">14</span>
+            <span style="flex:1;font-family:var(--serif);font-size:23px;line-height:1.3;color:{{ s.s14.titleColor }}">Presentations &amp; Wrap-Up</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ s.s14.showToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.s14.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ s.s14.togBorder }};color:{{ s.s14.togColor }};background:{{ s.s14.togBg }}">{{ s.s14.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:{{ s.s14.statusColor }};white-space:nowrap;min-width:96px;text-align:right">{{ s.s14.statusLabel }} {{ s.s14.arrow }}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- HANDOUTS -->
+      <div style="display:grid;grid-template-columns:190px 1fr;gap:44px;padding:34px 0;border-top:1px solid var(--hair)">
+        <div style="padding-top:2px">
+          <div style="font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase">Handouts</div>
+          <div style="font-family:var(--sans);font-size:14px;color:var(--muted);margin-top:9px;line-height:1.55;max-width:20ch">Distribution files, released as the week progresses.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-if value="{{ handoutsEmptyStudent }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--sans);font-size:17px;color:var(--faint);padding:17px 16px;font-style:italic">No handouts released yet — check back during the week.</div>
+          </sc-if>
+
+          <sc-if value="{{ h.h1.show }}" hint-placeholder-val="{{ true }}">
+          <a href="handouts/inbo-handout-01.pdf" target="_blank" style="display:flex;align-items:baseline;gap:20px;padding:16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:15px;color:var(--faint);min-width:30px">↓</span>
+            <span style="flex:1;font-family:var(--serif);font-size:21px;line-height:1.3;color:{{ h.h1.titleColor }}">Torneio — Tournament Instructions</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ instructorMode }}" hint-placeholder-val="{{ false }}"><span onClick="{{ h.h1.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ h.h1.togBorder }};color:{{ h.h1.togColor }};background:{{ h.h1.togBg }}">{{ h.h1.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap">PDF ↗</span>
+            </span>
+          </a>
+          </sc-if>
+
+          <sc-if value="{{ h.h2.show }}" hint-placeholder-val="{{ true }}">
+          <a href="handouts/inbo-handout-02.pdf" target="_blank" style="display:flex;align-items:baseline;gap:20px;padding:16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:15px;color:var(--faint);min-width:30px">↓</span>
+            <span style="flex:1;font-family:var(--serif);font-size:21px;line-height:1.3;color:{{ h.h2.titleColor }}">Business Model Canvas — Worksheet</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ instructorMode }}" hint-placeholder-val="{{ false }}"><span onClick="{{ h.h2.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ h.h2.togBorder }};color:{{ h.h2.togColor }};background:{{ h.h2.togBg }}">{{ h.h2.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap">PDF ↗</span>
+            </span>
+          </a>
+          </sc-if>
+
+          <sc-if value="{{ h.h3.show }}" hint-placeholder-val="{{ true }}">
+          <a href="handouts/inbo-handout-03.pdf" target="_blank" style="display:flex;align-items:baseline;gap:20px;padding:16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:15px;color:var(--faint);min-width:30px">↓</span>
+            <span style="flex:1;font-family:var(--serif);font-size:21px;line-height:1.3;color:{{ h.h3.titleColor }}">Case Reading — Distribution Copy</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ instructorMode }}" hint-placeholder-val="{{ false }}"><span onClick="{{ h.h3.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ h.h3.togBorder }};color:{{ h.h3.togColor }};background:{{ h.h3.togBg }}">{{ h.h3.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap">PDF ↗</span>
+            </span>
+          </a>
+          </sc-if>
+
+          <sc-if value="{{ h.h4.show }}" hint-placeholder-val="{{ true }}">
+          <a href="handouts/inbo-handout-04.pdf" target="_blank" style="display:flex;align-items:baseline;gap:20px;padding:16px;border-radius:11px;text-decoration:none" style-hover="background:rgba(63,126,42,.05)">
+            <span style="font-family:var(--mono);font-size:15px;color:var(--faint);min-width:30px">↓</span>
+            <span style="flex:1;font-family:var(--serif);font-size:21px;line-height:1.3;color:{{ h.h4.titleColor }}">Top Student Pitches — Compilation</span>
+            <span style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ instructorMode }}" hint-placeholder-val="{{ false }}"><span onClick="{{ h.h4.onToggle }}" role="button" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid {{ h.h4.togBorder }};color:{{ h.h4.togColor }};background:{{ h.h4.togBg }}">{{ h.h4.toggleLabel }}</span></sc-if>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap">PDF ↗</span>
+            </span>
+          </a>
+          </sc-if>
+        </div>
+      </div>
+
+      <footer style="margin-top:64px;padding-top:34px;border-top:1px solid var(--hair);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px">
+        <div style="font-family:var(--sans);font-size:16px;color:var(--muted)">Steve Chick · INSEAD · <a href="https://sechick.github.io/" target="_blank" style="color:var(--blueb);text-decoration:none">sechick.github.io</a></div>
+        <span onClick="{{ toggleInstructor }}" role="button" style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:{{ instructorTogColor }};cursor:pointer;padding:8px 15px;border-radius:999px;white-space:nowrap;border:1px solid {{ instructorTogBorder }}" style-hover="border-color:var(--blue)">{{ instructorLabel }}</span>
+      </footer>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#3F7E2A&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#3F7E2A&quot;,&quot;#4C9A2E&quot;,&quot;#134B42&quot;,&quot;#5A1A2B&quot;],&quot;section&quot;:&quot;Theme&quot;},&quot;showDayDates&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.key = 'inbo-course-v1';
+    this.sessionIds = ['s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s11','s12','s13','s14'];
+    this.handoutIds = ['h1','h2','h3','h4'];
+    this.state = { instructorMode:false, released:{}, handouts:{}, loaded:false };
+  }
+  componentDidMount(){ this.applyAccent(); this.load(); }
+  componentDidUpdate(prev){ if(prev.accent !== this.props.accent) this.applyAccent(); }
+  applyAccent(){ if(this.props.accent){ try{ document.documentElement.style.setProperty('--blue', this.props.accent); }catch(e){} } }
+  load(){
+    try{
+      const raw = localStorage.getItem(this.key);
+      if(raw){ const d = JSON.parse(raw); this.setState({ instructorMode:!!d.instructorMode, released:d.released||{}, handouts:d.handouts||{}, loaded:true }); return; }
+    }catch(e){}
+    this.setState({ loaded:true });
+  }
+  persist(n){ try{ localStorage.setItem(this.key, JSON.stringify({ instructorMode:n.instructorMode, released:n.released, handouts:n.handouts })); }catch(e){} }
+  update(patch){ this.setState(prev=>{ const n={...prev,...patch}; this.persist(n); return n; }); }
+  toggleInstructor(){ this.update({ instructorMode:!this.state.instructorMode }); }
+  toggleRelease(id){ this.update({ released:{ ...this.state.released, [id]:!this.state.released[id] } }); }
+  toggleHandout(id){ this.update({ handouts:{ ...this.state.handouts, [id]:!this.state.handouts[id] } }); }
+  deckPath(id){ return 'decks/inbo-' + id.slice(1) + '.html'; }
+  renderVals(){
+    const im = this.state.instructorMode;
+    const s = {};
+    this.sessionIds.forEach(id=>{
+      const rel = !!this.state.released[id];
+      const open = im || rel;
+      s[id] = {
+        href: open ? this.deckPath(id) : undefined,
+        titleColor: open ? 'var(--ink)' : 'var(--faint)',
+        statusLabel: rel ? 'Open' : (im ? 'Draft' : 'Coming soon'),
+        statusColor: rel ? 'var(--blueb)' : (im ? 'var(--amber)' : 'var(--faint)'),
+        arrow: open ? '→' : '',
+        showToggle: im,
+        toggleLabel: rel ? 'Released' : 'Release',
+        togBorder: rel ? 'var(--blue)' : 'var(--hair)',
+        togColor: rel ? '#fff' : 'var(--muted)',
+        togBg: rel ? 'var(--blue)' : 'transparent',
+        onToggle: (e)=>{ if(e){e.preventDefault(); e.stopPropagation();} this.toggleRelease(id); }
+      };
+    });
+    const h = {};
+    let anyVisible = false;
+    this.handoutIds.forEach(id=>{
+      const vis = !!this.state.handouts[id];
+      if(vis) anyVisible = true;
+      h[id] = {
+        show: im || vis,
+        titleColor: vis ? 'var(--ink)' : 'var(--faint)',
+        toggleLabel: vis ? 'Visible' : 'Hidden',
+        togBorder: vis ? 'var(--blue)' : 'var(--hair)',
+        togColor: vis ? '#fff' : 'var(--muted)',
+        togBg: vis ? 'var(--blue)' : 'transparent',
+        onToggle: (e)=>{ if(e){e.preventDefault(); e.stopPropagation();} this.toggleHandout(id); }
+      };
+    });
+    return {
+      instructorMode: im,
+      toggleInstructor: ()=>this.toggleInstructor(),
+      instructorLabel: im ? 'Instructor mode · On' : 'Instructor mode · Off',
+      instructorTogColor: im ? 'var(--blue)' : 'var(--muted)',
+      instructorTogBorder: im ? 'var(--blue)' : 'var(--hair)',
+      showDates: this.props.showDayDates !== false,
+      handoutsEmptyStudent: !im && !anyVisible,
+      s: s,
+      h: h
+    };
+  }
+}
+</script>
+</body>
+</html>

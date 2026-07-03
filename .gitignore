@@ -1,0 +1,24 @@
+# Large local-only media.
+# The localvideos/ folder lives alongside the course folders (e.g. gemba-inbo/) so a
+# single copy of each clip can be reused across courses. It is present for local/
+# offline installs but intentionally NOT version-controlled (too large for GitHub
+# and not needed for the hosted site).
+localvideos/
+
+# Video files anywhere in the repo are local-only (graphics still tracked normally).
+*.mp4
+*.mov
+*.m4v
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.Rhistory
+
+# Local deck-build tooling (reusable generator/template), not published
+_deck-tools/
+
+# Scratch crop previews / one-off write tests left behind during image editing
+_tmp_*
+_bashwritetest.txt
