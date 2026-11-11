@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>INBM — Session 01: Introduction and Four Myths</title>
+<style>deck-stage:not(:defined){visibility:hidden}</style>
+<style>
+:root {
+  --paper: #FBFBFA;
+  --ink: #131312;
+  --muted: #71716A;
+  --hair: #E4E4DE;
+  --false: #C8361F;   /* semantic: myths, "or not", risk */
+  --true: #1E7A4F;    /* semantic: evidence, process, validated */
+  --sans: "Helvetica Neue", Helvetica, "Arial Nova", Arial, sans-serif;
+}
+html, body { margin: 0; padding: 0; background: #000; }
+
+/* NB: keyed on bare `section` (not `deck-stage section`) so these base
+   styles survive being deep-cloned into the thumbnail-rail shadow roots,
+   which have no <deck-stage> ancestor. All <section>s here are slides.
+   Motion/transform rules below stay `deck-stage`-scoped on purpose. */
+section {
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+section *, section *::before, section *::after { box-sizing: border-box; }
+
+.pg {
+  position: absolute; right: 64px; bottom: 52px;
+  font-size: 24px; color: var(--muted); opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+.dark .pg { color: #8B8B84; }
+.s-vista .pg, .s-ask .pg, .s-rocket .pg { color: rgba(251,251,250,0.55); opacity: 1; z-index: 3; }
+body[data-no-pg] .pg { display: none; }
+
+/* presenter blackout — press B to give the room back to the conversation */
+#blackout {
+  position: fixed; inset: 0; background: #000; z-index: 2147482000;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+#blackout[data-on] { opacity: 1; pointer-events: auto; }
+@media print { #blackout { display: none; } }
+
+.tag {
+  align-self: flex-start;
+  font-size: 26px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 14px 28px; border-radius: 4px;
+}
+.tag.false { background: var(--false); color: var(--paper); }
+.tag.ghost { border: 2.5px solid var(--ink); color: var(--ink); background: transparent; }
+
+/* ═══ LOGO ATOMS (K2) ═══ */
+.lg { height: 60px; max-width: 210px; object-fit: contain; display: block; }
+.lgchip { background: #fff; border: 2px solid var(--hair); border-radius: 10px; padding: 10px 18px; display: inline-flex; align-items: center; }
+.dark .lgchip { border-color: rgba(251,251,250,0.16); }
+
+.dark { background: var(--ink); color: var(--paper); }
+
+.kicker { font-size: 29px; font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: var(--muted); }
+.dark .kicker { color: #8B8B84; }
+
+/* print-only footnotes (sources for web-verified facts) */
+.pnote { display: none; font-size: 24px; }
+@media print {
+  .pnote { display: block; position: absolute; left: 140px; right: 140px; bottom: 14px;
+           font-size: 24px; line-height: 1.3; color: var(--muted);
+           background: rgba(251,251,250,0.94); padding: 6px 12px; border-radius: 6px; }
+  .dark .pnote { color: #8B8B84; }
+}
+
+/* entrance animations — base state is visible; print & reduced-motion safe.
+   --pace (set via Tweaks) scales every reveal: 0.7 brisk · 1 default · 1.45 slow */
+@media (prefers-reduced-motion: no-preference) {
+  [data-deck-active] .rise   { animation: rise calc(1.05s * var(--pace, 1)) cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  [data-deck-active] .rise.d1 { animation-delay: calc(0.25s * var(--pace, 1)); }
+  [data-deck-active] .rise.d2 { animation-delay: calc(0.5s * var(--pace, 1)); }
+  [data-deck-active] .rise.d3 { animation-delay: calc(0.75s * var(--pace, 1)); }
+  [data-deck-active] .late   { animation: appear calc(1.1s * var(--pace, 1)) ease-out calc(2.2s * var(--pace, 1)) both; }
+  [data-deck-active] .later  { animation: appear calc(1.1s * var(--pace, 1)) ease-out calc(3.4s * var(--pace, 1)) both; }
+
+  /* slide-to-slide: film dissolve everywhere; statements + bookends get a
+     subtle zoom-through. (Slides with data-morph elements stay transform-free
+     so morph geometry is exact.) */
+  deck-stage section { transition: opacity 0.7s ease, visibility 0.7s; }
+  deck-stage section[data-fx="zoom"] {
+    transition: opacity 0.7s ease, visibility 0.7s, transform 0.9s cubic-bezier(0.25, 0.1, 0.2, 1);
+    transform: scale(1);
+  }
+  deck-stage section[data-fx="zoom"]:not([data-deck-active]) { transform: scale(1.045); }
+}
+@keyframes rise   { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+@keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+
+/* ═══ TITLE ═══ */
+.s-title { padding: 0 140px; justify-content: center; }
+.s-title .kicker { margin-bottom: 56px; }
+.s-title h1 {
+  margin: 0; font-size: 176px; line-height: 1.0; letter-spacing: -0.035em; font-weight: 700;
+  max-width: 1640px;
+}
+.s-title .who { margin-top: 72px; font-size: 34px; color: var(--muted); line-height: 1.5; }
+.s-title .who b { color: var(--ink); font-weight: 500; }
+
+/* ═══ ABOUT ANDRE (logo grid) ═══ */
+.s-about { padding: 90px 120px 90px; flex-direction: row; gap: 80px; align-items: center; }
+.s-about .me { width: 430px; flex: none; }
+.s-about .me img { width: 360px; height: 360px; object-fit: cover; border-radius: 50%; display: block; }
+.s-about .me h2 { margin: 44px 0 0; font-size: 64px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.05; }
+.s-about .me .line { margin-top: 22px; font-size: 30px; line-height: 1.45; color: var(--muted); }
+.s-about .me .url { margin-top: 18px; font-size: 27px; color: var(--ink); font-weight: 500; }
+.s-about .logos { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 52px; }
+.s-about .group .glab { font-size: 26px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.s-about .group .strip { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; align-items: center; }
+.s-about .group .strip img {
+  height: 72px; max-width: 210px; object-fit: contain;
+  background: #fff; border: 2px solid var(--hair); border-radius: 10px; padding: 12px 18px;
+}
+/* typographic wordmark chip — K2 fallback for logos we don't have as light-background art */
+.s-about .strip .wm {
+  height: 72px; display: inline-flex; align-items: center; white-space: nowrap;
+  background: #fff; border: 2px solid var(--hair); border-radius: 10px; padding: 0 22px;
+  font-size: 31px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink);
+}
+
+/* ═══ MENTOR / VENTURES (three columns) ═══ */
+.s-mentor { padding: 96px 140px 84px; }
+.s-mentor h2 { margin: 20px 0 0; font-size: 84px; font-weight: 700; letter-spacing: -0.03em; max-width: 1640px; line-height: 1.06; }
+.s-mentor .cols { margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 64px; align-items: start; }
+.s-mentor .col { border-top: 3px solid var(--hair); padding-top: 30px; }
+.s-mentor .col h3 { margin: 0; font-size: 38px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.18; min-height: 96px; }
+.s-mentor .col p { margin: 14px 0 0; font-size: 29px; line-height: 1.45; color: var(--muted); min-height: 132px; }
+.s-mentor .clogo { margin-top: 10px; }
+.s-mentor .clogo img.wide { display: block; width: 100%; max-width: 480px; height: auto; }
+.s-mentor .clogo img.tall { display: block; height: 170px; width: auto; }
+.s-mentor .lstrip { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+.s-mentor .chip { background: #fff; border: 2px solid var(--hair); border-radius: 10px; padding: 8px 16px; height: 60px; display: inline-flex; align-items: center; }
+.s-mentor .chip img { height: 40px; max-width: 160px; object-fit: contain; display: block; }
+.s-mentor .lstack { display: inline-flex; flex-direction: column; gap: 6px; align-items: center; }
+.s-mentor .acq { font-size: 24px; color: var(--muted); }
+.s-mentor .foot { margin-top: auto; font-size: 32px; color: var(--muted); }
+.s-mentor .foot b { color: var(--ink); font-weight: 700; }
+
+/* ═══ TWO-PHOTO PAIR (dentist vs capitalist) ═══ */
+.s-pair { padding: 84px 140px 80px; }
+.s-pair h2 { margin: 0; font-size: 80px; font-weight: 700; letter-spacing: -0.03em; }
+.s-pair .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; flex: 1; min-height: 0; margin-top: 44px; }
+.s-pair .panel { display: flex; flex-direction: column; min-height: 0; }
+.s-pair .ph { flex: 1; min-height: 0; border-radius: 12px; overflow: hidden; background: var(--hair); }
+.s-pair .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.s-pair .cap { margin-top: 24px; font-size: 54px; font-weight: 700; letter-spacing: -0.02em; }
+.s-pair .cap span { font-size: 38px; font-weight: 400; color: var(--muted); margin-left: 20px; }
+.s-pair .both { margin-top: 30px; font-size: 40px; line-height: 1.35; color: var(--ink); }
+.s-pair .both b { color: var(--ink); font-weight: 700; }
+.s-pair .credit { margin: 14px 0 0; font-size: 26px; line-height: 1.4; color: var(--muted); }
+
+/* ═══ STATEMENT (definitions) ═══ */
+.s-startup { align-items: center; justify-content: center; text-align: center; padding: 0 120px; }
+.s-startup h2 { margin: 0; font-size: 168px; letter-spacing: -0.035em; font-weight: 700; line-height: 1; }
+.s-startup .def {
+  margin-top: 80px; font-size: 54px; line-height: 1.45; color: var(--muted);
+  max-width: 1520px; font-weight: 400;
+}
+.s-startup .def em { font-style: normal; color: var(--ink); font-weight: 700; }
+.s-startup .coda { margin-top: 60px; font-size: 40px; line-height: 1.5; color: var(--muted); max-width: 1420px; }
+.s-startup .coda em { font-style: normal; color: var(--ink); font-weight: 700; }
+/* ═══ THE GOAL (Goldratt) — built on .s-startup centering ═══ */
+.s-goal h2 { font-size: 156px; }
+.s-goal .sw { position: relative; display: inline-block; }
+.s-goal .your {
+  position: absolute; left: 50%; bottom: 88%; transform: translateX(-50%);
+  color: var(--false); font-weight: 700; font-size: 0.62em; line-height: 1; white-space: nowrap;
+}
+.s-goal .struck { position: relative; }
+.s-goal .struck::after {
+  content: ""; position: absolute; left: -9%; right: -9%; top: 53%;
+  height: 12px; background: var(--ink); border-radius: 6px; transform: translateY(-50%);
+}
+.s-goal .cover {
+  position: absolute; right: 110px; bottom: 120px; width: 296px;
+  border-radius: 10px; border: 3px solid var(--hair); box-shadow: 0 18px 50px rgba(31,41,55,0.20);
+}
+
+/* S5 · scoped: guarantee the def sits on one line */
+.s-bm .def { white-space: nowrap; max-width: none; }
+
+/* ═══ PRESS CUTOUTS (full replacement of the .s-press block) ═══ */
+.s-press { padding: 84px 120px 100px; }
+.s-press h2 { margin: 18px 0 0; font-size: 76px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; max-width: 1640px; }
+.s-press .clips { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 44px; margin-top: 38px; align-items: start; }
+.s-press .clip {
+  background: #fff; border: 3px solid var(--hair); border-radius: 6px; padding: 28px 38px 26px;
+}
+.s-press .clip:nth-child(1) { transform: rotate(-1.1deg); }
+.s-press .clip:nth-child(2) { transform: rotate(0.7deg); margin-top: 14px; }
+.s-press .clip:nth-child(3) { transform: rotate(0.6deg); }
+.s-press .clip:nth-child(4) { transform: rotate(-0.8deg); margin-top: 10px; }
+.s-press .clip .top { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.s-press .clip .lg { height: 40px; max-width: 250px; }
+.s-press .clip .lg.ft { height: 48px; }
+.s-press .clip .lg.espn { height: 44px; }
+.s-press .clip .lg.nyt { height: 42px; }
+.s-press .clip .date { font-size: 24px; color: var(--muted); white-space: nowrap; }
+.s-press .clip h3 { margin: 18px 0 0; font-size: 34px; line-height: 1.28; font-weight: 700; letter-spacing: -0.015em; }
+.s-press .clip h3 mark { background: none; color: var(--ink); border-bottom: 6px solid var(--true); }
+.s-press .clip .inq { margin: 12px 0 0; font-size: 26px; line-height: 1.38; color: var(--muted); }
+.s-press .clip .inq mark { background: none; color: var(--ink); font-weight: 700; border-bottom: 4px solid var(--true); }
+.s-press .foot { margin-top: auto; font-size: 34px; color: var(--muted); }
+
+/* ═══ THE DEFINITION (full replacement of the .s-def block) ═══ */
+.s-def { justify-content: center; padding: 0 140px; }
+.s-def .wrap { display: flex; align-items: center; gap: 76px; }
+.s-def .qcol { flex: 1; min-width: 0; }
+.s-def .q {
+  margin: 44px 0 0; font-size: 54px; line-height: 1.42; font-weight: 400; color: var(--muted);
+  text-wrap: pretty;
+}
+.s-def .q em { font-style: normal; color: var(--ink); font-weight: 700; }
+.s-def .photo { flex: none; width: 620px; margin: 0; }
+.s-def .photo img { width: 620px; height: 620px; object-fit: contain; background: #F4F4F2; border: 1px solid var(--hair); border-radius: 14px; padding: 48px; display: block; }
+.s-def .photo figcaption { margin-top: 16px; font-size: 24px; color: var(--muted); }
+
+/* ═══ FULL-BLEED VISTA (mountain · lake · rocket) ═══ */
+.s-vista { padding: 0; }
+.s-vista .bg { position: absolute; inset: 0; }
+.s-vista .bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.s-vista .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(12,12,11,0.88) 0%, rgba(12,12,11,0.30) 55%, rgba(12,12,11,0.12) 100%); }
+.s-vista .content { position: absolute; left: 140px; right: 140px; bottom: 96px; color: var(--paper); }
+.s-vista .content .kicker { color: rgba(251,251,250,0.78); }
+.s-vista h2 { margin: 32px 0 0; font-size: 116px; line-height: 1.04; letter-spacing: -0.03em; font-weight: 700; max-width: 1560px; }
+.s-vista .sub { margin: 38px 0 0; font-size: 40px; line-height: 1.45; color: rgba(251,251,250,0.88); max-width: 1460px; }
+.s-vista .sub b { color: #fff; font-weight: 700; }
+.s-vista .mchips { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 40px; }
+.s-vista .mchip {
+  border: 3px solid rgba(251,251,250,0.85); border-radius: 999px; padding: 16px 30px;
+  font-size: 30px; font-weight: 700; color: #fff; background: rgba(12,12,11,0.38);
+}
+.s-vista .deepest { margin-top: 36px; font-size: 40px; line-height: 1.4; font-weight: 700; color: #fff; max-width: 1460px; }
+.s-vista .deepest b { color: #7ED9A7; }
+/* S18 — light veil so the peaks read; text block stays legible bottom-left */
+.s-peak .veil { background: linear-gradient(to top, rgba(12, 12, 11, 0.84) 0%, rgba(12, 12, 11, 0.30) 38%, rgba(12, 12, 11, 0) 78%); }
+/* S19 — same photo zoomed into open water; stronger veil; sounding inset */
+.s-lake .bg { overflow: hidden; }
+.s-lake .bg img { transform: scale(2.8); transform-origin: 19% 89%; }
+.s-lake .veil { background: linear-gradient(to top, rgba(12, 12, 11, 0.93) 0%, rgba(12, 12, 11, 0.55) 50%, rgba(12, 12, 11, 0.30) 100%); }
+.s-lake .finding { display: flex; align-items: flex-end; gap: 56px; margin-top: 36px; }
+.s-lake .finding .deepest { margin-top: 0; flex: 1; max-width: none; }
+.s-lake .sound { width: 480px; height: 231px; flex: none; display: block; }
+
+/* ═══ ROCKET REVEAL (what is a startup) ═══ */
+.s-rocket { padding: 0; background: var(--ink); }
+.s-rocket .bg { position: absolute; inset: 0; }
+.s-rocket .bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.s-rocket .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(12,12,11,0.85) 0%, rgba(12,12,11,0.30) 60%, rgba(12,12,11,0.20) 100%); }
+.s-rocket .content { position: absolute; left: 140px; right: 140px; bottom: 120px; color: var(--paper); }
+.s-rocket h2 { margin: 0; font-size: 158px; line-height: 1.0; letter-spacing: -0.035em; font-weight: 700; }
+.s-rocket .def { margin: 54px 0 0; font-size: 56px; line-height: 1.4; color: rgba(251,251,250,0.92); max-width: 1560px; }
+.s-rocket .def em { font-style: normal; color: #fff; font-weight: 700; border-bottom: 6px solid var(--true); }
+.s-rocket .coda { margin: 36px 0 0; font-size: 34px; color: rgba(251,251,250,0.7); }
+
+/* ═══ ASK (full-bleed photo + question) ═══ */
+.s-ask { padding: 0; }
+.s-ask .bg { position: absolute; inset: 0; }
+.s-ask .bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.s-ask .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(12,12,11,0.88) 0%, rgba(12,12,11,0.35) 55%, rgba(12,12,11,0.15) 100%); }
+.s-ask .content { position: absolute; left: 140px; right: 140px; bottom: 110px; color: var(--paper); }
+.s-ask .content .kicker { color: rgba(251,251,250,0.75); }
+.s-ask h2 { margin: 36px 0 0; font-size: 124px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 700; max-width: 1500px; }
+.s-ask .sub { margin: 44px 0 0; font-size: 42px; line-height: 1.45; color: rgba(251,251,250,0.85); max-width: 1380px; }
+.s-ask .sub b { color: #fff; font-weight: 700; }
+
+/* ═══ DORIOT (dark juxtapose) ═══ */
+.s-doriot { padding: 0 140px; flex-direction: row; align-items: center; gap: 100px; }
+.s-doriot .txt { flex: 1; }
+.s-doriot h2 { margin: 38px 0 0; font-size: 84px; line-height: 1.08; letter-spacing: -0.03em; font-weight: 700; max-width: 1000px; }
+.s-doriot .facts { margin-top: 48px; max-width: 980px; }
+.s-doriot .f { padding: 20px 0; border-top: 2px solid #2C2C2A; font-size: 31px; line-height: 1.4; color: #B9B9B2; }
+.s-doriot .f b { color: var(--paper); font-weight: 700; }
+.s-doriot .q { margin-top: 40px; font-size: 33px; line-height: 1.45; color: #B9B9B2; font-style: italic; max-width: 960px; }
+.s-doriot figure { margin: 0; width: 480px; flex: none; }
+.s-doriot img { width: 100%; height: 640px; object-fit: cover; object-position: top; border-radius: 10px; display: block; filter: grayscale(1); }
+.s-doriot figcaption { margin-top: 18px; font-size: 25px; color: #8B8B84; }
+/* Doriot fact rows: text + optional logo chip (DEC, INSEAD) */
+.s-doriot .f { display: flex; align-items: center; justify-content: space-between; gap: 36px; }
+.s-doriot .f > span:first-child { flex: 1; }
+.s-doriot .f .lgchip { flex: none; padding: 8px 16px; }
+.s-doriot .f .lg { height: 48px; max-width: 170px; }
+
+/* ═══ AI DATA TILES ═══ */
+.s-aidata { padding: 84px 140px 70px; }
+.s-aidata h2 { margin: 22px 0 0; font-size: 84px; font-weight: 700; letter-spacing: -0.03em; max-width: 1640px; }
+.s-aidata .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px; margin-top: 52px; }
+.s-aidata .tile { border-top: 6px solid var(--ink); padding-top: 22px; }
+.s-aidata .tile .co { font-size: 33px; font-weight: 700; letter-spacing: -0.01em; }
+.s-aidata .tile .stat { margin-top: 12px; font-size: 46px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+.s-aidata .tile .sub { margin-top: 10px; font-size: 26px; color: var(--muted); line-height: 1.35; }
+.s-aidata .quote { margin: 56px 0 0; border-left: 6px solid var(--ink); padding: 6px 0 6px 48px; max-width: 1560px; }
+.s-aidata .quote .src { font-size: 25px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.s-aidata .quote p { margin: 14px 0 0; font-size: 36px; line-height: 1.45; color: var(--ink); }
+/* tile logos (light slide: bare marks, no chips) */
+.s-aidata .tile .lg { height: 48px; max-width: 190px; margin: 0 0 16px; }
+.s-aidata .tile .co { min-height: 80px; }
+.s-aidata .tile img[alt="Safe Superintelligence"] { max-width: 250px; }
+
+/* ═══ SECTION DIVIDER / BRIDGE ═══ */
+.s-myths { padding: 120px 140px; }
+.s-myths .part { align-self: flex-start; }
+.s-myths h2 {
+  margin: auto 0 0; font-size: 210px; line-height: 0.96; letter-spacing: -0.04em;
+  font-weight: 700; max-width: 1640px;
+}
+.s-myths .count { position: absolute; top: 116px; right: 140px; font-size: 28px; color: #8B8B84; letter-spacing: 0.1em; }
+.s-myths .below { margin-top: 56px; font-size: 40px; color: #8B8B84; line-height: 1.5; max-width: 1460px; }
+.s-myths .below b { color: var(--paper); font-weight: 700; }
+
+/* ═══ MYTH claim-strike ═══ */
+.s-myth1 { padding: 0 140px; justify-content: center; }
+.s-myth1 h2 {
+  margin: 64px 0 0; font-size: 140px; line-height: 1.06; letter-spacing: -0.035em;
+  font-weight: 700; max-width: 1640px;
+}
+.s-myth1 .struck { position: relative; }
+/* SHARED: .s-myth1 strike mechanic (used by all four myth slides) — K3, verbatim.
+   Replaces the old timed .strike-anim / .struck::after strike on myth slides. */
+.s-myth1 .strikeline { position: absolute; left: -1.5%; right: -1.5%; top: 53%; height: 11px;
+  background: var(--false); transform: scaleX(0); transform-origin: left center;
+  transition: transform 0.65s cubic-bezier(0.6, 0, 0.3, 1) 0.05s; }
+.s-myth1 .strikeline[data-reveal-shown] { transform: scaleX(1); }
+.s-myth1 .truth[data-reveal] { transition-delay: 0.55s; }
+@media print { .s-myth1 .strikeline { transform: scaleX(1) !important; } }
+.s-myth1 .first { margin: 44px 0 0; font-size: 38px; line-height: 1.4; color: var(--muted); max-width: 1500px; }
+.s-myth1 .first b { color: var(--false); font-weight: 700; }
+.s-myth1 .truth {
+  margin-top: 64px; font-size: 56px; line-height: 1.35; font-weight: 700;
+  color: var(--true); max-width: 1560px;
+}
+
+/* ═══ EPIPHANY TRIO ═══ */
+.s-trio { padding: 90px 140px 84px; }
+.s-trio h2 { margin: 22px 0 0; font-size: 84px; font-weight: 700; letter-spacing: -0.03em; }
+.s-trio .figs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; margin-top: 48px; flex: 1; min-height: 0; }
+.s-trio figure { margin: 0; display: flex; flex-direction: column; min-height: 0; }
+.s-trio .ph { flex: 1; min-height: 0; border-radius: 12px; overflow: hidden; background: var(--hair); position: relative; }
+.s-trio .ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-trio .ph.fit img { object-fit: contain; background: #fff; padding: 18px; }
+.s-trio figcaption { margin-top: 20px; font-size: 30px; color: var(--muted); line-height: 1.3; }
+.s-trio figcaption { min-height: 80px; }
+.s-trio figcaption b { color: var(--ink); font-weight: 700; }
+/* S17 — expectation label + reality band (append AFTER the existing .s-trio block) */
+.s-trio .explab { margin: 24px 0 0; font-size: 26px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--false); }
+.s-trio .figs { margin-top: 24px; }
+.s-trio .reality { margin-top: 28px; border-left: 10px solid var(--true); border-radius: 0 10px 10px 0; background: rgba(30, 122, 79, 0.08); padding: 22px 40px; }
+.s-trio .reality p { margin: 0; font-size: 37px; line-height: 1.35; color: var(--ink); max-width: 1500px; }
+.s-trio .reality .rlab { font-size: 26px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--true); margin-right: 22px; }
+.s-trio .reality p b { color: var(--true); font-weight: 700; }
+.s-trio .caplg { height: 40px; display: inline-block; vertical-align: -11px; margin-left: 4px; }
+
+/* ═══ DREAM VS REALITY (two-panel exhibit) ═══ */
+.s-duo { padding: 90px 140px 100px; }
+.s-duo h2 { margin: 24px 0 0; font-size: 78px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; max-width: 1640px; }
+.s-duo .sub { margin: 20px 0 0; font-size: 36px; color: var(--muted); }
+.s-duo .panels { display: flex; gap: 36px; flex: 1; min-height: 0; margin-top: 36px; }
+.s-duo .panel { flex: 1; position: relative; border-radius: 12px; overflow: hidden; background: var(--hair); }
+.s-duo .panel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-duo .panel.fit img { object-fit: contain; background: #fff; }
+.s-duo .lab {
+  position: absolute; top: 26px; left: 26px; z-index: 2;
+  font-size: 26px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 12px 24px; border-radius: 4px; color: var(--paper);
+}
+.s-duo .lab.dream { background: var(--false); }
+.s-duo .lab.real { background: var(--true); }
+
+/* ═══ S20 · ZOCOR (search funnel) ═══ */
+.s-zocor { padding: 80px 140px 100px; }
+.s-zocor h2 { font-size: 74px; margin-top: 20px; }
+.s-zocor .sub { margin-top: 16px; }
+.s-zocor .panels { margin-top: 28px; }
+.s-zocor .panel.dreamp { flex: 0 0 560px; }
+.s-zocor .dreamp img { object-position: 69% 45%; }
+.s-zocor .panel.realp { background: #fff; border: 2px solid var(--hair); }
+.s-zocor .realp .lgchip { position: absolute; top: 22px; right: 22px; z-index: 2; }
+.s-zocor .realp .lgchip .lg { position: static; inset: auto; width: auto; height: 48px; max-width: 230px; object-fit: contain; }
+.s-zocor .fwrap { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 96px 30px 22px; }
+.s-zocor .fsvg { width: 100%; height: 100%; }
+.s-zocor .fsvg .cnt { font-size: 38px; font-weight: 700; fill: var(--ink); text-anchor: middle; letter-spacing: -0.01em; }
+.s-zocor .fsvg .one { font-size: 60px; font-weight: 700; fill: var(--true); text-anchor: middle; }
+.s-zocor .fsvg .flab { font-size: 24px; fill: var(--muted); text-anchor: middle; }
+.s-zocor .fsvg .zlab { font-size: 31px; font-weight: 700; fill: var(--true); text-anchor: middle; }
+.s-zocor .fsvg .wall { stroke: var(--ink); stroke-width: 3.5; stroke-linecap: round; fill: none; }
+.s-zocor .fsvg .tick { stroke: #C2C2BA; stroke-width: 2.5; }
+.s-zocor .fsvg .dots circle { fill: var(--muted); opacity: 0.55; }
+.s-zocor .fsvg .win { fill: var(--true); }
+.s-zocor .fsvg .tl { stroke: var(--muted); stroke-width: 2.5; }
+.s-zocor .fsvg .tlab { font-size: 29px; fill: var(--muted); text-anchor: middle; }
+
+/* ═══ EXHIBIT (Nemo · engine) ═══ */
+.s-exhibit { padding: 100px 140px 80px; }
+.s-exhibit h2 { margin: 24px 0 0; font-size: 104px; font-weight: 700; letter-spacing: -0.03em; }
+.s-exhibit .sub { margin: 22px 0 0; font-size: 40px; color: var(--muted); line-height: 1.4; max-width: 1500px; }
+.s-exhibit .art { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; margin-top: 26px; }
+.s-exhibit .art img { max-width: 1500px; max-height: 100%; object-fit: contain; }
+.s-exhibit .art img.round { border-radius: 12px; }
+
+/* S8 · scoped additions on top of .s-exhibit */
+.s-engine { padding-bottom: 100px; }
+.s-engine .sub { max-width: none; }
+.s-engine .art { margin-top: 24px; }
+.s-engine .ask { margin: 24px 0 0; font-size: 42px; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); }
+.s-engine .answer { margin: 10px 0 0; font-size: 58px; font-weight: 700; letter-spacing: -0.02em; color: var(--true); }
+.s-engine .ask, .s-engine .answer { text-align: center; }
+
+/* ═══ S21 · NEMO (Pixar pitch funnel) ═══ */
+.s-nemo .subrow { display: flex; align-items: center; gap: 28px; margin: 22px 0 0; }
+.s-nemo .subrow .sub { margin: 0; }
+.s-nemo .subrow .lg { height: 42px; max-width: 270px; }
+.s-nemo .fwrap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.s-nemo .fsvg { width: 1500px; max-width: 100%; max-height: 100%; }
+.s-nemo .fsvg .cnt { font-size: 64px; font-weight: 700; fill: var(--ink); text-anchor: middle; letter-spacing: -0.01em; }
+.s-nemo .fsvg .one { font-size: 64px; font-weight: 700; fill: var(--true); text-anchor: middle; }
+.s-nemo .fsvg .flab { font-size: 28px; fill: var(--muted); text-anchor: middle; }
+.s-nemo .fsvg .zlab { font-size: 30px; font-weight: 700; fill: var(--true); text-anchor: middle; }
+.s-nemo .fsvg .wall { stroke: var(--ink); stroke-width: 4; stroke-linecap: round; fill: none; }
+.s-nemo .fsvg .tick { stroke: #C2C2BA; stroke-width: 2.5; }
+.s-nemo .fsvg .dots circle { fill: var(--muted); opacity: 0.55; }
+.s-nemo .fsvg .win { fill: var(--true); }
+
+/* ═══ REFINEMENT CARDS (Dyson · Reframe) ═══ */
+.s-ref { padding: 96px 140px 90px; }
+.s-ref h2 { margin: 24px 0 0; font-size: 84px; font-weight: 700; letter-spacing: -0.03em; }
+.s-ref .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 56px; flex: 1; align-content: start; }
+.s-ref .card { border-top: 6px solid var(--ink); padding-top: 26px; }
+.s-ref .card .co { font-size: 27px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.s-ref .card h3 { margin: 14px 0 0; font-size: 46px; font-weight: 700; letter-spacing: -0.015em; }
+.s-ref .card .r { padding: 14px 0; border-bottom: 2px solid var(--hair); font-size: 31px; line-height: 1.35; color: var(--muted); }
+.s-ref .card .r b { color: var(--ink); font-weight: 700; }
+.s-ref .card .r:last-of-type { border-bottom: none; }
+/* S22 · Refinement — card header chips */
+.s-ref .card .head { display: flex; align-items: center; gap: 24px; }
+.s-ref .card .head .lg { height: 48px; max-width: 200px; }
+.s-ref .card .head + h3 { margin-top: 20px; }
+
+/* ═══ FOUR LEVERS / FOUR WAYS (card grid) ═══ */
+.s-levers { padding: 96px 140px 100px; }
+.s-levers h2 { margin: 24px 0 0; font-size: 92px; font-weight: 700; letter-spacing: -0.03em; }
+.s-levers .cards { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 40px; margin-top: 80px; }
+.s-levers .card { border-top: 6px solid var(--ink); padding-top: 28px; }
+.s-levers .card .n { font-size: 28px; font-weight: 700; color: var(--muted); }
+.s-levers .card h3 { margin: 12px 0 0; font-size: 42px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.12; }
+.s-levers .card p { margin: 16px 0 0; font-size: 28px; color: var(--muted); line-height: 1.45; }
+.s-levers .tail { margin-top: auto; font-size: 52px; line-height: 1.3; font-weight: 400; color: var(--ink); }
+.s-levers .tail b { color: var(--true); font-weight: 700; }
+.s-levers .cite { margin-top: 18px; font-size: 25px; color: var(--muted); }
+/* tighter variant for the four-ways slide (longer card copy) */
+.s-levers.tight { padding: 84px 140px 80px; }
+.s-levers.tight h2 { font-size: 84px; }
+.s-levers.tight .cards { margin-top: 44px; }
+.s-levers.tight .tail { font-size: 42px; }
+/* S32 four ways — logo chips anchored to card bottoms */
+.s-levers.tight .card { display: flex; flex-direction: column; }
+.s-levers.tight .card p { margin-bottom: 30px; }
+.s-levers.tight .card .lgchip { margin-top: auto; align-self: flex-start; }
+.s-levers.tight .lg { height: 44px; max-width: 200px; }
+.s-levers.tight .lg.tall { height: 64px; }
+.s-levers.tight .lgchip.wordmark { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); min-height: 64px; }
+
+/* ═══ FOUR LEVERS + WALKTHROUGH (merged 23+24) ═══ */
+.s-levers2 { padding: 76px 140px 100px; }
+.s-levers2 h2 { margin: 22px 0 0; font-size: 84px; font-weight: 700; letter-spacing: -0.03em; }
+.s-levers2 .row { display: flex; gap: 56px; margin-top: 36px; flex: 1; min-height: 0; }
+.s-levers2 .lcol { width: 560px; flex: none; display: flex; flex-direction: column; }
+.s-levers2 .card { border-top: 5px solid var(--ink); padding: 16px 0 20px; }
+.s-levers2 .card .top { display: flex; align-items: baseline; gap: 18px; }
+.s-levers2 .card .n { font-size: 26px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.s-levers2 .card h3 { margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.1; }
+.s-levers2 .card p { margin: 8px 0 0; font-size: 26px; color: var(--muted); line-height: 1.35; }
+.s-levers2 .tail { margin: 26px 0 0; font-size: 33px; line-height: 1.3; color: var(--ink); }
+.s-levers2 .tail b { color: var(--true); font-weight: 700; }
+.s-levers2 .cite { margin-top: auto; font-size: 25px; color: var(--muted); line-height: 1.35; }
+.s-levers2 .stage { flex: 1; min-width: 0; position: relative; }
+.s-levers2 iframe { width: 100%; height: 100%; border: 3px solid var(--hair); border-radius: 14px; background: #fff; display: block; }
+.s-levers2 .pfig { display: none; }
+@media print {
+  .s-levers2 iframe { display: none; }
+  .s-levers2 .pfig { display: flex; height: 100%; align-items: center; justify-content: center; }
+  .s-levers2 .pfig img { max-width: 100%; max-height: 100%; object-fit: contain; }
+}
+
+/* ═══ ANIMATION SLIDES (iframe exhibits) ═══ */
+.s-anim { padding: 70px 140px 60px; }
+.s-anim h2 { margin: 18px 0 0; font-size: 72px; font-weight: 700; letter-spacing: -0.025em; }
+.s-anim .holder { flex: 1; min-height: 0; margin-top: 28px; display: flex; align-items: center; justify-content: center; }
+.s-anim iframe { width: 1640px; height: 100%; border: 3px solid var(--hair); border-radius: 14px; background: #fff; }
+.s-anim.side .holder { gap: 56px; }
+.s-anim.side .txt { flex: 1; align-self: center; }
+.s-anim.side .txt .sub { font-size: 38px; line-height: 1.5; color: var(--muted); }
+.s-anim.side .txt .sub b { color: var(--ink); font-weight: 700; }
+.s-anim.side iframe { width: 960px; height: 100%; flex: none; }
+.s-anim .pfig { display: none; }
+@media print {
+  .s-anim iframe { display: none; }
+  .s-anim .pfig { display: flex; flex: 1; align-items: center; justify-content: center; text-align: center;
+                  font-size: 54px; font-weight: 700; line-height: 1.4; color: var(--ink); }
+  .s-anim .pfig img { max-width: 1100px; max-height: 640px; object-fit: contain; }
+}
+
+/* ═══ WEEK-AT-A-GLANCE CALENDAR (dense №1) ═══ */
+.s-cal { padding: 84px 110px 100px; }
+.s-cal .kicker { margin-bottom: 16px; }
+.s-cal h2 { margin: 0; font-size: 72px; font-weight: 700; letter-spacing: -0.025em; }
+.s-cal .grid { display: grid; grid-template-columns: 1fr 1.25fr 1fr 1fr; gap: 26px; margin-top: 36px; flex: 1; min-height: 0; }
+.s-cal .col { border: 3px solid var(--hair); border-radius: 14px; padding: 30px 28px 22px; position: relative; display: flex; flex-direction: column; }
+.s-cal .col.here { border: 4px solid var(--ink); }
+.s-cal .you {
+  position: absolute; top: -24px; left: 24px; background: var(--ink); color: var(--paper);
+  font-size: 24px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 9px 18px; border-radius: 4px;
+}
+.s-cal .d { font-size: 26px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.s-cal .stage { margin-top: 8px; font-size: 42px; font-weight: 700; letter-spacing: -0.015em; }
+.s-cal .chip { border-top: 2px solid var(--hair); margin-top: 18px; padding-top: 16px; font-size: 26px; line-height: 1.35; color: var(--muted); }
+.s-cal .chip b { color: var(--ink); font-weight: 700; }
+.s-cal .chip .due { color: var(--ink); font-weight: 700; white-space: nowrap; }
+.s-cal .chip.win { color: var(--true); font-weight: 700; font-size: 30px; }
+.s-cal .foot { margin-top: 22px; font-size: 26px; color: var(--muted); }
+
+/* ═══ AI × IDEATION (Wharton tournament dot chart) ═══ */
+.s-aiwin { padding: 76px 140px 90px; }
+.s-aiwin .chips { position: absolute; top: 76px; right: 140px; display: flex; gap: 16px; }
+.s-aiwin .lg { height: 46px; max-width: 190px; }
+.s-aiwin h2 { margin: 18px 0 0; font-size: 88px; font-weight: 700; letter-spacing: -0.03em; max-width: 1400px; }
+.s-aiwin .sub { margin: 24px 0 0; font-size: 34px; line-height: 1.4; color: var(--muted); max-width: 1560px; }
+.s-aiwin .sub b { color: var(--ink); font-weight: 700; }
+.s-aiwin .chart { margin-top: 38px; }
+.s-aiwin .clab { font-size: 25px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+.s-aiwin .crow { display: grid; grid-template-columns: 470px 1fr 130px; gap: 36px; align-items: center; padding: 16px 0; border-top: 2px solid var(--hair); }
+.s-aiwin .crow .lab b { display: block; font-size: 31px; font-weight: 700; letter-spacing: -0.01em; }
+.s-aiwin .crow .lab span { display: block; margin-top: 5px; font-size: 24px; color: var(--muted); line-height: 1.3; }
+.s-aiwin .dots { display: flex; gap: 10px; align-items: center; }
+.s-aiwin .dots i { width: 34px; height: 34px; border-radius: 50%; background: #B9B9B1; flex: none; }
+.s-aiwin .crow.r2 .dots i { background: var(--ink); }
+.s-aiwin .crow.r3 .dots i { background: var(--true); }
+.s-aiwin .cnt { font-size: 54px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.s-aiwin .crow.r2 .cnt { color: var(--ink); }
+.s-aiwin .crow.r3 .cnt { color: var(--true); }
+.s-aiwin .caveat { margin: 32px 0 0; font-size: 30px; line-height: 1.45; color: var(--muted); max-width: 1620px; }
+.s-aiwin .caveat b { color: var(--ink); font-weight: 700; }
+.s-aiwin .close { margin: 18px 0 0; font-size: 38px; line-height: 1.35; color: var(--ink); }
+.s-aiwin .close b { color: var(--true); font-weight: 700; }
+
+/* ═══ PHOTO TILES (real things) ═══ */
+.s-tiles { align-items: center; justify-content: center; text-align: center; padding: 80px 140px; }
+.s-tiles h2 { margin: 24px 0 0; font-size: 92px; letter-spacing: -0.03em; font-weight: 700; line-height: 1.05; }
+.s-tiles .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 56px; width: 1640px; flex: 1; min-height: 0; }
+.s-tiles .tile { display: flex; flex-direction: column; min-height: 0; border: 3px solid var(--hair); border-radius: 14px; overflow: hidden; }
+.s-tiles .tile .ph { flex: 1; min-height: 0; position: relative; background: #fff; }
+.s-tiles .tile .ph > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-tiles .ph .words img.lg { position: static; inset: auto; width: auto; height: 48px; object-fit: contain; }
+.s-tiles .tile .ph.fit img { object-fit: contain; padding: 14px; }
+.s-tiles .tile .ph .words { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: var(--ink); color: var(--paper); font-size: 44px; font-weight: 700; letter-spacing: -0.01em; }
+.s-tiles .note { margin-top: 44px; font-size: 40px; color: var(--muted); }
+.s-tiles .note b { color: var(--ink); font-weight: 700; }
+/* S29 famous door — caps become name + micro-label rows; word tile holds logo chips */
+.s-tiles .cap { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 18px 20px; font-size: 30px; font-weight: 700; text-align: left; }
+.s-tiles .cap .mlab { font-size: 24px; font-weight: 700; letter-spacing: 0.16em; color: var(--muted); white-space: nowrap; }
+.s-tiles .words { gap: 22px; }
+.s-tiles .words .lgchip { padding: 12px 22px; }
+.s-tiles .words .lg { height: 48px; max-width: 270px; }
+
+/* ═══ BMI VENN ═══ */
+.s-venn { padding: 80px 140px 100px; }
+.s-venn h2 { margin: 18px 0 0; font-size: 72px; font-weight: 700; letter-spacing: -0.025em; max-width: 1640px; line-height: 1.1; }
+.s-venn .row { display: flex; gap: 100px; align-items: center; margin-top: 30px; flex: 1; min-height: 0; }
+.s-venn .box { position: relative; width: 650px; height: 580px; flex: none; }
+.s-venn .c { position: absolute; width: 400px; height: 400px; border-radius: 50%; border: 4px solid rgba(19,19,18,0.4); }
+.s-venn .c1 { left: 0; top: 0; }
+.s-venn .c2 { left: 250px; top: 0; }
+.s-venn .c3 { left: 125px; top: 180px; }
+.s-venn .clab { position: absolute; width: 180px; text-align: center; font-size: 29px; font-weight: 700; line-height: 1.2; }
+.s-venn .cl1 { left: 10px; top: 165px; }
+.s-venn .cl2 { left: 460px; top: 165px; }
+.s-venn .cl3 { left: 235px; top: 445px; }
+.s-venn .bmi {
+  position: absolute; left: 325px; top: 265px; transform: translate(-50%, -50%);
+  background: var(--true); color: var(--paper); font-size: 31px; font-weight: 700;
+  letter-spacing: 0.12em; padding: 15px 25px; border-radius: 8px;
+}
+.s-venn .txt { flex: 1; }
+.s-venn .trio { font-size: 36px; line-height: 1.35; padding: 16px 0; border-bottom: 2px solid var(--hair); color: var(--muted); }
+.s-venn .trio b { color: var(--ink); font-weight: 700; }
+.s-venn .note { margin-top: 34px; font-size: 35px; line-height: 1.35; color: var(--ink); font-weight: 700; }
+.s-venn .books { margin-top: 18px; font-size: 25px; color: var(--muted); }
+
+/* ═══ BMI WORDMARK WALL ═══ */
+.s-wall { padding: 90px 140px 90px; }
+.s-wall h2 { margin: 22px 0 0; font-size: 84px; font-weight: 700; letter-spacing: -0.03em; }
+.s-wall .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 60px; flex: 1; align-content: start; }
+.s-wall .co { border: 3px solid var(--hair); border-radius: 14px; padding: 30px 30px 26px; }
+/* S31 hall of fame — logo cards */
+.s-wall .lgrow { height: 88px; display: flex; align-items: center; }
+.s-wall .lg { height: 56px; max-width: 280px; object-fit: contain; object-position: left center; }
+.s-wall .lg.big { height: 88px; }
+.s-wall .co p { margin: 16px 0 0; font-size: 26px; line-height: 1.35; color: var(--muted); }
+.s-wall .foot { margin-top: auto; font-size: 34px; color: var(--muted); }
+.s-wall .foot b { color: var(--ink); font-weight: 700; }
+
+/* ═══ BEST-TECH PAIRS (logo chips + lost-to label) ═══ */
+.s-pairs { padding: 84px 140px 100px; }
+.s-pairs h2 { margin: 18px 0 0; font-size: 76px; font-weight: 700; letter-spacing: -0.03em; }
+.s-pairs .rows { margin-top: 34px; }
+.s-pairs .row { display: grid; grid-template-columns: 1fr 150px 1fr; gap: 30px; align-items: center; padding: 14px 0; border-top: 2px solid var(--hair); }
+.s-pairs .side { display: flex; align-items: center; gap: 26px; min-width: 0; }
+.s-pairs .side .lgchip { flex: none; }
+.s-pairs .lg { height: 44px; max-width: 150px; }
+.s-pairs .side .t b { display: block; font-size: 40px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.1; }
+.s-pairs .side .t span { display: block; margin-top: 6px; font-size: 26px; color: var(--muted); line-height: 1.3; }
+.s-pairs .side.l .t b { color: var(--false); }
+.s-pairs .side.w .t b { color: var(--ink); }
+.s-pairs .mid { text-align: center; font-size: 25px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.s-pairs .note { margin-top: auto; font-size: 38px; color: var(--muted); line-height: 1.4; }
+.s-pairs .note b { color: var(--ink); font-weight: 700; }
+
+/* ═══ VC SKEW WAFFLE (replaces the s-bars chart) ═══ */
+.s-waffle { padding: 90px 140px 80px; }
+.s-waffle h2 { margin: 20px 0 0; font-size: 76px; font-weight: 700; letter-spacing: -0.03em; }
+.s-waffle .wrap { display: flex; gap: 80px; margin-top: 40px; flex: 1; min-height: 0; align-items: stretch; }
+.s-waffle .wcol { flex: none; }
+.s-waffle .waffle { display: grid; grid-template-columns: repeat(10, 56px); grid-auto-rows: 56px; gap: 6px; }
+.s-waffle .q { display: block; border-radius: 6px; }
+.s-waffle .q.lose, .s-waffle .sq.lose { background: var(--false); }
+.s-waffle .q.mid, .s-waffle .sq.mid { background: #BDBDB5; }
+.s-waffle .q.win, .s-waffle .sq.win { background: var(--true); }
+.s-waffle .wcap { margin: 18px 0 0; font-size: 26px; color: var(--muted); line-height: 1.35; max-width: 614px; }
+.s-waffle .side { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.s-waffle .leg { display: flex; gap: 24px; align-items: flex-start; padding: 22px 0; border-top: 2px solid var(--hair); }
+.s-waffle .leg:first-child { border-top: none; padding-top: 0; }
+.s-waffle .sq { width: 44px; height: 44px; border-radius: 8px; flex: none; margin-top: 4px; }
+.s-waffle .ltxt b { display: block; font-size: 44px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.s-waffle .ltxt span { display: block; margin-top: 8px; font-size: 27px; color: var(--muted); line-height: 1.35; }
+.s-waffle .land { margin: 30px 0 0; margin-top: auto; font-size: 32px; line-height: 1.5; color: var(--muted); max-width: 900px; }
+.s-waffle .land b { color: var(--ink); font-weight: 700; }
+
+/* ═══ ANTI-PORTFOLIO (dark, 2x3 logo cards) ═══ */
+.s-anti { padding: 84px 140px 84px; }
+.s-anti .lgchip.bvp { position: absolute; top: 70px; right: 140px; }
+.s-anti .lgchip.bvp .lg { height: 56px; max-width: 280px; }
+.s-anti h2 { margin: 18px 0 0; font-size: 68px; font-weight: 700; letter-spacing: -0.03em; max-width: 1340px; line-height: 1.1; }
+.s-anti .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 44px; margin-top: 38px; flex: 1; min-height: 0; }
+.s-anti .card { border-top: 3px solid #2C2C2A; padding-top: 20px; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.s-anti .card .lg { height: 40px; max-width: 170px; }
+.s-anti .card .quote { margin: 16px 0 0; font-size: 26px; line-height: 1.35; color: #EDEDEA; }
+.s-anti .card .who { margin-top: 8px; font-size: 24px; color: #8B8B84; line-height: 1.3; }
+.s-anti .card .gain { margin-top: auto; padding-top: 12px; font-size: 30px; font-weight: 700; color: #7ED9A7; font-variant-numeric: tabular-nums; }
+
+/* ═══ CUSTOMER JUDGES (paper question, photo reveal) ═══ */
+.s-cust { padding: 0; }
+.s-cust .bg { position: absolute; inset: 0; }
+.s-cust .bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.s-cust .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(12,12,11,0.85) 0%, rgba(12,12,11,0.58) 55%, rgba(12,12,11,0.45) 100%); }
+.s-cust .content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 150px; }
+.s-cust h2 { margin: 0; font-size: 96px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 700; max-width: 1500px; color: var(--ink); transition: color 0.7s ease; }
+.s-cust .bg[data-reveal-shown] ~ .content h2 { color: var(--paper); }
+.s-cust .ans { margin-top: 64px; font-size: 170px; font-weight: 700; letter-spacing: -0.035em; line-height: 1; color: #7ED9A7; }
+.s-cust .note { margin: 70px 0 0; font-size: 38px; line-height: 1.5; color: rgba(251,251,250,0.85); max-width: 1340px; }
+.s-cust .note b { color: #fff; font-weight: 700; }
+.s-cust .pg { z-index: 3; }
+.s-cust .bg[data-reveal-shown] ~ .pg { color: rgba(251,251,250,0.55); opacity: 1; }
+@media print {
+  .s-cust h2 { color: var(--paper); }
+  .s-cust .pg { color: rgba(251,251,250,0.55); opacity: 1; }
+  .s-cust .pnote { color: rgba(251,251,250,0.7); }
+}
+
+/* ═══ SEGWAY — fallacy of the plan ═══ */
+.s-segway { padding: 80px 140px 70px; }
+.s-segway h2 { margin: 20px 0 0; font-size: 76px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; max-width: 1640px; text-wrap: balance; }
+.s-segway .cols { display: flex; gap: 44px; margin-top: 32px; height: 410px; }
+.s-segway .side { margin: 0; display: flex; flex-direction: column; flex: none; }
+.s-segway .side .ph { width: 500px; flex: 1; min-height: 0; border-radius: 12px; overflow: hidden; background: var(--hair); position: relative; }
+.s-segway .side .ph > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-segway .side .ph .lgchip { position: absolute; top: 18px; left: 18px; background: #fff; border: 2px solid var(--hair); border-radius: 10px; padding: 8px 16px; display: inline-flex; align-items: center; }
+.s-segway .side .ph .lg { height: 40px; max-width: 180px; object-fit: contain; display: block; }
+.s-segway .side figcaption { margin-top: 12px; font-size: 24px; color: var(--muted); }
+.s-segway .slab { font-size: 25px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+.s-segway .hypelab { color: var(--false); }
+.s-segway .reallab { color: var(--true); margin-bottom: 12px; }
+.s-segway .quotes { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; }
+.s-segway .quotes blockquote { margin: 36px 0 0; font-size: 46px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.18; }
+.s-segway .quotes blockquote cite { display: block; margin-top: 12px; font-style: normal; font-weight: 400; font-size: 25px; letter-spacing: 0; color: var(--muted); }
+.s-segway .poster { width: 250px; border-radius: 8px; overflow: hidden; border: 3px solid var(--hair); background: #fff; }
+.s-segway .poster img { width: 100%; display: block; }
+.s-segway .rline { margin: 26px 0 0; font-size: 32px; line-height: 1.35; font-weight: 700; color: var(--ink); max-width: 1640px; }
+.s-segway .rcite { margin: 8px 0 0; font-size: 26px; color: var(--muted); }
+.s-segway .lesson { margin: 20px 0 0; font-size: 32px; line-height: 1.4; color: var(--muted); max-width: 1640px; text-wrap: pretty; }
+.s-segway .lesson b { color: var(--ink); font-weight: 700; }
+
+/* ═══ EVIDENCE LOOP ═══ */
+.s-loop { padding: 96px 140px 80px; }
+.s-loop h2 { margin: 24px 0 0; font-size: 86px; font-weight: 700; letter-spacing: -0.03em; max-width: 1640px; }
+.s-loop .def { margin: 26px 0 0; font-size: 38px; line-height: 1.45; color: var(--muted); max-width: 1600px; }
+.s-loop .def b { color: var(--ink); font-weight: 700; }
+.s-loop .chain { display: flex; align-items: center; gap: 14px; margin-top: 52px; }
+.s-loop .chip { border: 3px solid var(--ink); border-radius: 999px; padding: 20px 30px; font-size: 30px; font-weight: 700; white-space: nowrap; }
+.s-loop .chip.ev { background: var(--true); border-color: var(--true); color: var(--paper); }
+.s-loop .arr { font-size: 36px; color: var(--muted); flex: none; }
+.s-loop .back { width: 1280px; height: 54px; margin: 34px auto 0; border: 3px solid var(--muted); border-top: none; border-radius: 0 0 22px 22px; }
+.s-loop .backlab { text-align: center; margin-top: 18px; font-size: 28px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.s-loop .lean { margin: 40px auto 0; font-size: 28px; line-height: 1.45; color: var(--muted); max-width: 1520px; text-align: center; }
+.s-loop .lean b { color: var(--ink); font-weight: 700; }
+
+/* ═══ TALK TO CUSTOMERS — Mom Test card ═══ */
+.s-talk .book { margin-top: 64px; display: flex; align-items: center; justify-content: center; gap: 44px; text-align: left; }
+.s-talk .book .cover { width: 180px; border-radius: 10px; border: 3px solid var(--hair); display: block; }
+.s-talk .book p { margin: 0; font-size: 34px; line-height: 1.5; color: var(--muted); max-width: 720px; text-wrap: pretty; }
+.s-talk .book p b { color: var(--ink); font-weight: 700; }
+
+/* ═══ FRAME THE PROBLEM (literal frame) ═══ */
+.s-frameq { align-items: center; justify-content: center; text-align: center; padding: 0 210px; }
+.s-frameq .framebox {
+  width: 1500px; height: 620px; border: 6px solid var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+}
+.s-frameq .framebox p { margin: 0; font-size: 96px; letter-spacing: -0.03em; line-height: 1.08; }
+.s-frameq .framebox .l1 { font-weight: 500; color: var(--ink); }
+.s-frameq .framebox .l2 { font-weight: 700; color: var(--true); }
+.s-frameq .under { margin: 56px 0 0; font-size: 44px; line-height: 1.4; color: var(--ink); max-width: 1500px; }
+.s-frameq .ai { margin: 26px 0 0; font-size: 32px; line-height: 1.4; color: var(--muted); max-width: 1500px; }
+
+/* ═══ FRAMING CASES (Swiffer · Herman Miller) ═══ */
+.s-frame2 { padding: 84px 140px 80px; }
+.s-frame2 h2 { margin: 20px 0 0; font-size: 78px; font-weight: 700; letter-spacing: -0.03em; max-width: 1640px; }
+.s-frame2 .row { display: grid; grid-template-columns: 560px 1fr; gap: 64px; flex: 1; min-height: 0; margin-top: 38px; }
+.s-frame2 .ph { position: relative; border-radius: 12px; overflow: hidden; background: var(--hair); }
+.s-frame2 .ph > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-frame2 .ph img.swap { z-index: 2; object-fit: contain; background: #fff; }
+.s-frame2 .frames { display: flex; flex-direction: column; gap: 30px; min-height: 0; }
+.s-frame2 .fc { border: 3px solid var(--hair); border-radius: 14px; padding: 30px 38px; }
+.s-frame2 .fc.new { border-color: var(--true); border-width: 4px; }
+.s-frame2 .fc .flab { font-size: 25px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.s-frame2 .fc.new .flab { color: var(--true); }
+.s-frame2 .fc .fq { margin-top: 14px; font-size: 40px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.2; }
+.s-frame2 .fc .fto { margin-top: 12px; font-size: 29px; color: var(--muted); }
+.s-frame2 .result { margin-top: auto; font-size: 42px; font-weight: 700; color: var(--true); }
+/* s-frame2 additions (S45 + S46 only use this class; shared base rules untouched) */
+.s-frame2 .khead { display: flex; align-items: center; gap: 30px; }
+.s-frame2 .khead .lgchip { padding: 7px 16px; }
+.s-frame2 .khead .lg { height: 48px; max-width: 180px; }
+.s-frame2 .ph .pchip { position: absolute; left: 24px; bottom: 24px; z-index: 3; }
+.s-frame2 .ph .pchip .lg { height: 44px; max-width: 160px; }
+.s-swiffer .endcap { margin-top: auto; padding-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
+.s-swiffer .endcap .result { margin: 0; font-size: 40px; color: var(--ink); }
+.s-swiffer .endcap .punch { margin: 0; font-size: 42px; font-weight: 700; letter-spacing: -0.015em; color: var(--true); }
+.s-hm .result { margin-bottom: 24px; max-width: 860px; line-height: 1.25; }
+
+/* ═══ FIVE FRAMING STEPS ═══ */
+.s-steps { padding: 90px 140px 84px; }
+.s-steps h2 { margin: 22px 0 0; font-size: 88px; font-weight: 700; letter-spacing: -0.03em; }
+.s-steps ol { list-style: none; margin: 52px 0 0; padding: 0; counter-reset: fs; }
+.s-steps ol li {
+  counter-increment: fs; display: grid; grid-template-columns: 76px 640px 1fr; gap: 34px;
+  padding: 22px 0; border-top: 2px solid var(--hair); align-items: baseline;
+}
+.s-steps ol li::before {
+  content: counter(fs);
+  width: 56px; height: 56px; border-radius: 50%; background: var(--ink); color: var(--paper);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 29px; font-weight: 700; align-self: center;
+}
+.s-steps ol li b { font-size: 38px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; text-wrap: balance; }
+.s-steps ol li span { font-size: 29px; color: var(--muted); line-height: 1.4; }
+
+/* ═══ FISHBONE + FIVE WHYS ═══ */
+.s-fish { padding: 80px 140px 70px; }
+.s-fish h2 { margin: 18px 0 0; font-size: 76px; font-weight: 700; letter-spacing: -0.03em; }
+.s-fish .art { flex: 1; min-height: 0; margin-top: 16px; display: flex; align-items: center; justify-content: center; }
+.s-fish svg { width: 1640px; height: 100%; }
+.s-fish svg text { font-family: var(--sans); }
+.s-fish .whys { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+.s-fish .whys .chip { border: 3px solid var(--ink); border-radius: 999px; padding: 14px 28px; font-size: 28px; font-weight: 700; white-space: nowrap; }
+.s-fish .whys .chip.root { background: var(--true); border-color: var(--true); color: var(--paper); }
+.s-fish .whys .arr { font-size: 32px; color: var(--muted); }
+.s-fish .whys .wlab { font-size: 27px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-right: 16px; }
+
+/* ═══ WORKED FISHBONE + FIVE-WHYS TREE (extend .s-fish; showcase pair) ═══ */
+.s-fishb svg { height: 700px; }
+.s-fishc { padding-bottom: 104px; }
+.s-fishc svg { height: 600px; }
+.s-fishc .insight { margin: 10px 0 0; font-size: 30px; font-weight: 700; color: var(--true); }
+.s-fishc .frameline { margin: 12px 0 0; font-size: 33px; font-weight: 400; color: var(--ink); }
+.s-fishc .frameline b { font-weight: 700; }
+
+/* ═══ RECAP: FOUR ANSWERS ═══ */
+.s-recap { padding: 96px 140px 80px; }
+.s-recap h2 { margin: 24px 0 0; font-size: 96px; font-weight: 700; letter-spacing: -0.03em; }
+.s-recap .rows { margin-top: 56px; }
+.s-recap .row { display: grid; grid-template-columns: 1.05fr 90px 1fr; gap: 28px; align-items: center; padding: 26px 0; border-bottom: 2px solid var(--hair); }
+.s-recap .row:last-child { border-bottom: none; }
+.s-recap .myth { font-size: 34px; line-height: 1.3; color: var(--false); }
+.s-recap .myth .claim { text-decoration: line-through; text-decoration-thickness: 4px; }
+.s-recap .myth small { display: block; font-size: 24px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; margin-bottom: 6px; }
+.s-recap .mid { text-align: center; font-size: 40px; color: var(--muted); }
+.s-recap .ans { font-size: 38px; line-height: 1.25; font-weight: 700; color: var(--true); text-wrap: balance; }
+
+/* ═══ ACTIVITY (A1 brief — dense №2) ═══ */
+.s-act { padding: 64px 110px 64px; }
+.s-act .frame {
+  flex: 1; border: 4px solid var(--ink); border-radius: 20px;
+  padding: 38px 70px 30px; display: flex; flex-direction: column; position: relative;
+}
+.s-act .tag { position: absolute; top: -30px; left: 70px; background: var(--paper); }
+.s-act h2 { margin: 14px 0 0; font-size: 70px; font-weight: 700; letter-spacing: -0.025em; }
+.s-act .cols { display: grid; grid-template-columns: 1.45fr 1fr; gap: 90px; margin-top: 24px; flex: 1; min-height: 0; align-content: start; }
+.s-act ol { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+.s-act ol li {
+  counter-increment: s; display: grid; grid-template-columns: 72px 1fr; gap: 26px;
+  padding: 14px 0; border-bottom: 2px solid var(--hair); align-items: baseline;
+  font-size: 30px; line-height: 1.32;
+}
+.s-act ol li:last-child { border-bottom: none; }
+.s-act ol li::before {
+  content: counter(s);
+  width: 50px; height: 50px; border-radius: 50%; background: var(--ink); color: var(--paper);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 27px; font-weight: 700;
+}
+.s-act ol li b { font-weight: 700; }
+.s-act ol li span { color: var(--muted); }
+.s-act .crit { border-left: 4px solid var(--true); padding-left: 48px; align-self: start; }
+.s-act .crit .k { font-size: 26px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--true); }
+.s-act .crit .list { margin-top: 12px; }
+.s-act .crit .li2 { display: block; font-size: 28px; line-height: 1.32; padding: 11px 0; border-bottom: 2px solid var(--hair); }
+.s-act .crit .li2:last-of-type { border-bottom: none; }
+.s-act .crit .li2 span { color: var(--muted); }
+.s-act .crit .why { margin-top: 14px; font-size: 24px; color: var(--muted); }
+.s-act .rule { border-top: 3px solid var(--ink); margin-top: 14px; padding-top: 14px; font-size: 29px; line-height: 1.38; }
+.s-act .rule b { font-weight: 700; }
+.s-act .rule span { color: var(--muted); }
+
+/* ═══ BRIDGE TO BREAK (dark divider) ═══ */
+.s-bridge { padding: 120px 140px; }
+.s-bridge h2 { margin: auto 0 0; font-size: 150px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; max-width: 1640px; }
+.s-bridge .sub { margin-top: 56px; font-size: 40px; color: #8B8B84; line-height: 1.5; max-width: 1500px; }
+.s-bridge .sub b { color: var(--paper); font-weight: 700; }
+
+/* ═══ THREE WAYS AI IS CHANGING ENTREPRENEURSHIP (rebuilt S14) ═══ */
+.s-ai3 { padding: 96px 150px 80px; }
+.s-ai3 h2 { margin: 20px 0 0; font-size: 80px; line-height: 1.08; letter-spacing: -0.03em; font-weight: 700; max-width: 1620px; }
+.s-ai3 .items { margin-top: 40px; }
+.s-ai3 .item { display: grid; grid-template-columns: 90px 1fr 270px; gap: 40px; align-items: center; padding: 20px 0; border-top: 2px solid var(--hair); }
+.s-ai3 .item .n { font-size: 40px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.s-ai3 .item p { margin: 0; font-size: 33px; line-height: 1.4; color: var(--muted); }
+.s-ai3 .item p b { color: var(--ink); font-weight: 700; }
+.s-ai3 .item .src { margin-top: 8px; font-size: 25px; color: var(--muted); }
+.s-ai3 .item .lgchip { justify-self: end; min-height: 76px; }
+.s-ai3 .lg { height: 52px; max-width: 220px; }
+.s-ai3 .close { margin: 44px 0 0; font-size: 42px; font-weight: 700; letter-spacing: -0.015em; }
+.s-ai3 .close em { font-style: normal; color: var(--true); }
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- 01 · TITLE -->
+  <section data-label="Title" class="s-title" data-fx="zoom">
+    <div class="kicker rise">INSEAD MBA · Identifying New Business Models · Session 01</div>
+    <h1 class="rise d1">Introduction and Four&nbsp;Myths</h1>
+    <div class="who rise d2"><b>Stephen Chick</b> · Technology and Operations Management · stephen.chick@insead.edu</div>
+  </section>
+
+  <!-- 02 · About Andre -->
+<section data-label="About Andre" class="s-about">
+  <div class="me">
+    <img class="rise" src="images/steve/photo-steve-chick.jpg" alt="Steve Chick" />
+    <h2 class="rise d1">About Steve Chick</h2>
+    <p class="line rise d2">Research, teaching, and advising in analytics, sustainability, and entrepreneurship.</p>
+    <p class="url rise d2">sechick.github.io</p>
+  </div>
+  <div class="logos">
+    <div class="group rise d1">
+      <div class="glab">Taught · studied</div>
+      <div class="strip">
+        <img src="images/steve/logo-stanford.png" alt="Stanford" />
+        <img src="images/steve/logo-berkeley.png" alt="UC Berkeley" />
+        <img src="images/steve/logo-michigan.png" alt="UM Ann Arbor" />
+        <img src="images/steve/logo-insead.svg" alt="INSEAD" />
+      </div>
+    </div>
+    <div class="group rise d2">
+      <div class="glab">Worked · built · advised · invested</div>
+      <div class="strip">
+        <img src="images/logos/logo-amazon.svg" alt="Amazon" />
+        <img src="images/andre/logo-ibm.png" alt="IBM" />
+        <img src="images/andre/logo-verizon.png" alt="Verizon" />
+        <img src="images/andre/logo-coca-cola.png" alt="Coca-Cola" />
+        <img src="images/andre/logo-nestle.png" alt="Nestlé" />
+        <img src="images/andre/logo-interface.jpg" alt="Interface" />
+        <img src="images/andre/logo-soko.png" alt="Soko" />
+        <!-- FALLBACK PATH A/B: see NOTES, these three use the re-fetched light marks if present -->
+        <img src="images/logos/logo-msurvey-light.png" alt="mSurvey" />
+        <img src="images/andre/logo-essmart.jpg" alt="Essmart" />
+        <img src="images/andre/logo-flare-emergency-response.jpg" alt="Flare Emergency Response" />
+        <img src="images/andre/logo-stanplus.png" alt="StanPlus" />
+        <img src="images/andre/logo-project-repat.png" alt="Project Repat" />
+        <img src="images/logos/logo-libring-light.png" alt="Libring" />
+        <img src="images/logos/logo-quant5-light.png" alt="Quant5" />
+        <img src="images/andre/logo-tcpn.jpg" alt="TCPN" />
+        <img src="images/logos/logo-lamarr-ai.svg" alt="Lamarr.AI" />
+      </div>
+    </div>
+  </div>
+  <div class="pg">02</div>
+</section>
+
+  <!-- 03 · Ventures and mentoring -->
+<section data-label="Ventures and mentoring" class="s-mentor">
+  <div class="kicker rise">The lab and the field</div>
+  <h2 class="rise d1">I work on the operations of innovation.</h2>
+  <div class="cols">
+    <div class="col rise d1">
+      <h3>Ray C. Anderson Center for Sustainable Business</h3>
+      <p>Faculty Director, Georgia Tech Scheller.</p>
+      <div class="clogo"><img class="wide" src="images/ACSB Center Logos/Scheller_Ray_Anderson_Center_RGB.png" alt="Ray C. Anderson Center for Sustainable Business, Georgia Tech Scheller College of Business" /></div>
+    </div>
+    <div class="col rise d2">
+      <h3>CREATE-X</h3>
+      <p>Georgia Tech&rsquo;s startup launchpad. You&rsquo;ll meet one of its ventures this afternoon.</p>
+      <div class="clogo"><img class="tall" src="images/logos/logo-create-x.png" alt="CREATE-X, built at Georgia Tech" /></div>
+    </div>
+    <div class="col rise d3">
+      <h3>Startup mentor</h3>
+      <p>Founders from INSEAD, MIT, and Georgia Tech.</p>
+      <div class="clogo lstrip">
+        <span class="chip"><img src="images/logos/logo-red-health.png" alt="RED.Health" /></span>
+        <span class="chip"><img src="images/logos/logo-ful-foods.svg" alt="Ful Foods" /></span>
+        <span class="lstack">
+          <span class="chip"><img src="images/logos/logo-inseact.png" alt="INSEACT" /></span>
+          <span class="acq">acquired 2023</span>
+        </span>
+        <span class="chip"><img src="images/andre/logo-soko.png" alt="Soko" /></span>
+        <span class="chip"><img src="images/logos/logo-lamarr-ai.svg" alt="Lamarr.AI" /></span>
+      </div>
+    </div>
+  </div>
+  <p class="foot late">Several of those founders sat where you&rsquo;re sitting. <b>This week runs the same playbook they used.</b></p>
+  <div class="pg">03</div>
+</section>
+
+  <!-- 04 · What is the Goal -->
+<section data-label="What is the Goal" class="s-startup s-goal" data-fx="zoom">
+  <h2 class="rise">What is the Goal?</h2>
+  <img class="cover rise d1" src="images/the-goal-cover.jpg" alt="Book cover: The Goal by Eliyahu M. Goldratt and Jeff Cox" />
+  <div class="pnote">Cover: Eliyahu M. Goldratt &amp; Jeff Cox, The Goal: A Process of Ongoing Improvement (30th Anniversary Edition). Shown for classroom identification.</div>
+  <div class="pg">04</div>
+</section>
+
+  <!-- 05 · What is your Goal -->
+<section data-label="What is your goal" class="s-startup s-goal" data-fx="zoom">
+  <h2 class="rise">What is <span class="sw"><span class="your">YOUR</span><span class="struck">the</span></span> Goal?</h2>
+  <div class="pg">05</div>
+</section>
+
+  <!-- 06 · Doriot -->
+<section data-label="Doriot" class="s-doriot dark">
+  <div class="txt">
+    <div class="kicker rise">INSEAD and entrepreneurship</div>
+    <h2 class="rise d1">INSEAD was founded by the father of venture capital.</h2>
+    <div class="facts">
+      <div class="f rise d2"><span><b>ARD, 1946:</b> the first publicly funded venture capital firm.</span></div>
+      <div class="f rise d2"><span><b>$70,000 into DEC, 1957:</b> worth &asymp; $355 million at the 1968 IPO, roughly 500&times;.</span><span class="lgchip"><img class="lg" src="images/logos/logo-dec.svg" alt="Digital Equipment Corporation" /></span></div>
+      <div class="f rise d3"><span><b>Harvard Business School professor:</b> ~7,000 students; WWII Brigadier General.</span></div>
+      <div class="f rise d3"><span><b>INSEAD, founded 1957:</b> first MBA class, 1959, at Fontainebleau.</span><span class="lgchip"><img class="lg" src="images/logos/logo-insead-wordmark.svg" alt="INSEAD" /></span></div>
+    </div>
+    <p class="q later">&ldquo;An average idea in the hands of an able man is worth much more than an outstanding idea in the possession of a person with only average ability.&rdquo;</p>
+  </div>
+  <figure class="rise d2">
+    <img src="images/doriot-portrait.jpg" alt="Studio portrait of Georges Doriot" />
+    <figcaption>Georges F. Doriot, c. 1962.</figcaption>
+  </figure>
+  <div class="pnote">Sources: HBS Baker Library, Georges F. Doriot Collection &middot; Wikipedia: ARD (inc. June 1946), DEC ($70k, 1957; &asymp;$355M at 1968 IPO) &middot; insead.edu: founded 1957, first class 12 Sept 1959. Quote: ARD annual report, 1949.</div>
+  <div class="pg">06</div>
+</section>
+
+  <!-- 07 · Dentist vs Capitalist -->
+<section data-label="Dentist vs Capitalist" class="s-pair">
+  <h2 class="rise">There are two kinds of managers.</h2>
+  <div class="panels">
+    <div class="panel rise d1">
+      <div class="ph"><img src="images/dentist-duo.jpg" alt="Two masked dentists seen from the patient's chair" /></div>
+      <div class="cap">Dentist<span data-reveal="1">(service provider)</span></div>
+    </div>
+    <div class="panel rise d1">
+      <div class="ph"><img src="images/engine-assembly.jpg" alt="A complete automobile engine with its belts, pulleys, and accessories: many interacting parts" /></div>
+      <div class="cap">Capitalist<span data-reveal="1">(system designer)</span></div>
+    </div>
+  </div>
+  <p class="both" data-reveal="2">You need to be a bit of both. <b>This week, you are capitalists.</b></p>
+  <p class="credit" data-reveal="2">A story from James Stone, one of Georges Doriot&rsquo;s students.</p>
+  <div class="pg">07</div>
+  <div class="pnote">Dentist-vs-capitalist story: James M. Stone, who studied under Georges Doriot at Harvard Business School (en.wikipedia.org/wiki/Georges_Doriot). Engine photo: GT Business Lab course materials.</div>
+</section>
+
+  <!-- 08 · Business model -->
+  <section data-label="Business model" class="s-startup s-bm" data-fx="zoom">
+    <h2 class="rise">What is a business model?</h2>
+    <p class="def late">Everyone uses the term. Few can define it.</p>
+    <div class="pg">08</div>
+  </section>
+
+  <!-- 09 · Business models in the news -->
+  <section data-label="Business models in the news" class="s-press">
+    <div class="kicker rise">You have read this term every week this year</div>
+    <h2 class="rise d1">&ldquo;Business model&rdquo; is doing heavy lifting in the news.</h2>
+    <div class="clips">
+      <div class="clip rise d1">
+        <div class="top">
+          <img class="lg" src="images/logos/logo-bloomberg.svg" alt="Bloomberg" />
+          <div class="date">21 January 2026</div>
+        </div>
+        <h3>OpenAI CFO Defends Ads in ChatGPT as &lsquo;Strong <mark>Business Model</mark>&rsquo;</h3>
+      </div>
+      <div class="clip rise d2">
+        <div class="top">
+          <img class="lg ft" src="images/logos/logo-ft-square.svg" alt="Financial Times" />
+          <div class="date">1 February 2026</div>
+        </div>
+        <h3>Will Europe&rsquo;s planned luggage rules kill the budget airline <mark>business model</mark>?</h3>
+      </div>
+      <div class="clip rise d3">
+        <div class="top">
+          <img class="lg espn" src="images/logos/logo-espn.svg" alt="ESPN" />
+          <div class="date">20 May 2026</div>
+        </div>
+        <h3>LIV Golf to pitch new <mark>business model</mark> amid bankruptcy report</h3>
+      </div>
+      <div class="clip rise d3">
+        <div class="top">
+          <img class="lg nyt" src="images/logos/logo-new-york-times.svg" alt="The New York Times" />
+          <div class="date">8 June 2026</div>
+        </div>
+        <h3>This Restaurant Stopped Charging for Food. And Profits Are Up.</h3>
+        <p class="inq">From the article: &ldquo;&hellip;a solution to a broken industry-wide <mark>business model</mark> as well as a critique of that model.&rdquo;</p>
+      </div>
+    </div>
+    <p class="foot late">Whole industries are renegotiating <b style="color:var(--ink);font-weight:700">how supply meets demand</b>.</p>
+    <div class="pnote">Headlines verbatim: Bloomberg, 21 Jan 2026 (bloomberg.com/news/articles/2026-01-21/openai-cfo-defends-ads-in-chatgpt-as-strong-business-model) &middot; Financial Times, Peter Campbell, 1 Feb 2026 (ft.com/content/173ac742-5fdd-420b-a0a9-031a52fee6cf) &middot; ESPN, Mark Schlabach, 20 May 2026 (espn.com/golf/story/_/id/48826532) &middot; The New York Times, Brett Anderson, 8 Jun 2026 (nytimes.com/2026/06/08/dining/post-modern-times-minneapolis-free-food.html); interior sentence quoted verbatim from the article.</div>
+    <div class="pg">09</div>
+  </section>
+
+  <!-- 10 · The definition -->
+  <section data-label="The definition" class="s-def" data-fx="zoom">
+    <div class="wrap">
+      <div class="qcol">
+        <div class="kicker rise">Of many definitions, this is the one we&rsquo;ll use</div>
+        <p class="q late">&ldquo;From an operations point of view, a business model is <em>the logic of the firm</em>: the way it operates and how it creates value for its stakeholders. It is a set of <em>processes, activities, and incentives</em> used to <em>match supply and demand</em>.&rdquo;</p>
+      </div>
+      <figure class="photo rise d1">
+        <img src="images/business-analytics-illustration.svg" alt="A line illustration of a desk with charts, a clipboard, a dial gauge and a pie chart — the everyday machinery of running a firm" />
+      </figure>
+    </div>
+    <div class="pnote">Illustration: Pictographic.ai (free vector illustration).</div>
+    <div class="pg">10</div>
+  </section>
+
+  <!-- 11 · Business model as engine -->
+  <section data-label="Business model as engine" class="s-exhibit s-engine">
+    <div class="kicker rise">An analogy that runs all week</div>
+    <h2 class="rise d1">A business model is an engine.</h2>
+    <p class="sub late">It turns inputs into outputs in pursuit of a goal. It has many interacting parts.</p>
+    <div class="art rise d2"><img class="round" src="images/porsche-v8-engine.jpg" alt="A Porsche V8 racing engine on a display stand" /></div>
+    <p class="ask" data-reveal="1">And how is a business model not like an engine?</p>
+    <p class="answer" data-reveal="2">People are the moving parts.</p>
+    <div class="pg">11</div>
+  </section>
+
+  <!-- 12 · What is a startup -->
+<section data-label="What is a startup" class="s-rocket dark">
+  <div class="bg" data-reveal><img src="images/rocket-launch.jpg" alt="Space Shuttle Columbia lifting off in smoke and flame" /></div>
+  <div class="veil" data-reveal></div>
+  <div class="content">
+    <h2 class="rise">What is a startup?</h2>
+    <p class="def" data-reveal>A <em>temporary organization</em> that exists to <em>search</em> for a business model that is <em>scalable</em>.</p>
+    <p class="coda" data-reveal>A search process, not a smaller version of a big company. Howard Stevenson: &ldquo;the pursuit of opportunity beyond resources controlled.&rdquo;</p>
+  </div>
+  <div class="pg">12</div>
+</section>
+
+  <!-- 13 · Why entrepreneurship -->
+<section data-label="Why entrepreneurship" class="s-ask dark">
+  <div class="bg"><img src="images/stock-machu-picchu.jpg" alt="Machu Picchu ruins among misty mountains" /></div>
+  <div class="veil"></div>
+  <div class="content">
+    <div class="kicker rise">Before any method, a question</div>
+    <h2 class="rise d1">Why are you interested in entrepreneurship?</h2>
+    <p class="sub later">Turn to your neighbor. <b>Two minutes each.</b></p>
+  </div>
+  <div class="pg">13</div>
+</section>
+
+  <!-- 14 · AI rewrites the rules -->
+<section data-label="AI rewrites the rules" class="s-aidata">
+  <div class="kicker rise">June 2026: Doriot&rsquo;s game is changing again</div>
+  <h2 class="rise d1">AI is rewriting the rules in front of you.</h2>
+  <div class="tiles">
+    <div class="tile" data-reveal="1">
+      <img class="lg" src="images/logos/logo-gamma.svg" alt="Gamma" />
+      <div class="co">Gamma</div>
+      <div class="stat">$2.1B</div>
+      <div class="sub">valuation &middot; ~50 people &middot; profitable</div>
+    </div>
+    <div class="tile" data-reveal="2">
+      <img class="lg" src="images/logos/logo-lovable.svg" alt="Lovable" />
+      <div class="co">Lovable</div>
+      <div class="stat">$400M ARR</div>
+      <div class="sub">146 people &middot; $100M added in one month</div>
+    </div>
+    <div class="tile" data-reveal="3">
+      <img class="lg" src="images/logos/logo-cursor-icon.svg" alt="Cursor" />
+      <div class="co">Cursor</div>
+      <div class="stat">$1B+</div>
+      <div class="sub">annualized revenue &middot; ~300 people</div>
+    </div>
+    <div class="tile" data-reveal="4">
+      <img class="lg" src="images/logos/logo-midjourney.svg" alt="Midjourney" />
+      <div class="co">Midjourney</div>
+      <div class="stat">~$500M</div>
+      <div class="sub">est. revenue &middot; ~100 people &middot; no VC ever raised</div>
+    </div>
+    <div class="tile" data-reveal="5">
+      <img class="lg" src="images/logos/logo-safe-superintelligence.png" alt="Safe Superintelligence" />
+      <div class="co">Safe Superintelligence</div>
+      <div class="stat">$32B</div>
+      <div class="sub">valuation &middot; no product released</div>
+    </div>
+  </div>
+  <div class="quote" data-reveal="6">
+    <div class="src">Sam Altman, 2024</div>
+    <p>&ldquo;In my little group chat with my tech CEO friends, there&rsquo;s this betting pool for the first year that there is a <b>one-person billion-dollar company</b>.&rdquo;</p>
+  </div>
+  <div class="pnote">Sources: TechCrunch 10 Nov 2025 (Gamma: $2.1B valuation, $100M+ ARR, ~50 staff, profitable) &middot; TechCrunch 11 Mar 2026 (Lovable: $400M ARR, 146 FTE) &middot; CNBC 13 Nov 2025 (Cursor maker Anysphere: crossed $1B annualized revenue, just over 300 employees, $29.3B valuation) &middot; Sacra &amp; Contrary Research estimates (Midjourney: ~$500M 2025 revenue, ~100 staff, no outside venture funding; company does not disclose) &middot; TechCrunch 12 Apr 2025 (SSI: $32B valuation) &middot; Altman quote: Fortune, 4 Feb 2024.</div>
+  <div class="pg">14</div>
+</section>
+
+  <!-- 15 · Three ways AI is changing entrepreneurship -->
+<section data-label="Three ways AI is changing entrepreneurship" class="s-ai3">
+  <div class="kicker rise">What the evidence says so far</div>
+  <h2 class="rise d1">AI cuts the cost of building,<br />shifts business models, and shrinks teams.</h2>
+  <div class="items">
+    <div class="item" data-reveal="1">
+      <div class="n">01</div>
+      <div class="body">
+        <p><b>Building is cheap.</b> In Y Combinator&rsquo;s Winter 2025 batch, a quarter of startups had codebases about 95% AI generated.</p>
+        <div class="src">Jared Friedman, Y Combinator, March 2025</div>
+      </div>
+      <div class="lgchip"><img class="lg" src="images/logos/logo-y-combinator.svg" alt="Y Combinator" /></div>
+    </div>
+    <div class="item" data-reveal="2">
+      <div class="n">02</div>
+      <div class="body">
+        <p><b>Business models shift.</b> Nadella expects per-seat apps to collapse as logic moves to agents; vendors now sell outcomes.</p>
+        <div class="src">Satya Nadella, Microsoft &middot; BG2 podcast, December 2024</div>
+      </div>
+      <span class="lgchip"><img class="lg" src="images/logos/logo-microsoft.svg" alt="Microsoft" /></span>
+    </div>
+    <div class="item" data-reveal="3">
+      <div class="n">03</div>
+      <div class="body">
+        <p><b>Teams stay small.</b> Gamma reached a $2.1 billion valuation and $100 million ARR with about 50 employees, profitably.</p>
+        <div class="src">Gamma Series B announcement, November 2025</div>
+      </div>
+      <div class="lgchip"><img class="lg" src="images/logos/logo-gamma.svg" alt="Gamma" /></div>
+    </div>
+  </div>
+  <p class="close" data-reveal="4">Building is getting cheap. <em>Choosing what to build is not.</em></p>
+  <div class="pnote">Sources: J. Friedman (YC managing partner) on ~25% of the W25 batch shipping ~95% AI-generated codebases: TechCrunch, 6 Mar 2025 &middot; S. Nadella on per-seat business applications collapsing in the agent era: BG2 Pod w/ B. Gerstner &amp; B. Gurley, Dec 2024 (paraphrased); outcome pricing: Chen &amp; Gupta, &ldquo;AI leads a service-as-software paradigm shift,&rdquo; Foundation Capital, 2024 &middot; Gamma: $68M Series B at $2.1B valuation, $100M+ ARR, ~50 staff, profitable 2+ years: Business Wire &amp; TechCrunch, 10 Nov 2025.</div>
+  <div class="pg">15</div>
+</section>
+
+  <!-- 16 · Divider: Four Myths -->
+  <section data-label="Divider: Four Myths" class="s-myths dark">
+    <div class="part kicker rise" data-morph="part-tag">The four myths</div>
+    <h2 class="rise d1">Four<br />entrepreneurship<br />myths.</h2>
+    <div class="pg">16</div>
+  </section>
+
+  <!-- 17 · Myth 1 -->
+  <section data-label="Myth 1" class="s-myth1">
+    <div class="tag false rise" data-morph="part-tag">Myth № 1 · Process</div>
+    <h2 class="rise d1"><span class="struck">Great ideas strike you<i class="strikeline" data-reveal="1"></i></span><br />
+    <span class="struck">randomly.<i class="strikeline" data-reveal="1"></i></span></h2>
+    <p class="truth" data-reveal="1">Great ideas are generated in volume, then selected.</p>
+    <div class="pg">17</div>
+  </section>
+
+  <!-- 18 · The epiphany story -->
+  <section data-label="The epiphany story" class="s-trio">
+    <div class="kicker rise">The story we tell ourselves</div>
+    <h2 class="rise d1">An apple falls. You code all night.<br />You ring the bell.</h2>
+    <div class="explab rise d1">The expectation</div>
+    <div class="figs">
+      <figure class="rise d1">
+        <div class="ph fit"><img src="images/newton-apple-engraving.png" alt="Engraving of Newton reading under the apple tree" /></div>
+        <figcaption><b>The strike of genius.</b> This engraving was Apple&rsquo;s first logo, 1976. <img class="caplg" src="images/logos/logo-apple.svg" alt="Apple logo" /></figcaption>
+      </figure>
+      <figure class="rise d2">
+        <div class="ph"><img src="images/coder-night-focus.jpg" alt="A founder coding at night, screen glowing" /></div>
+        <figcaption><b>The montage.</b> Forty-eight sleepless hours of furious building.</figcaption>
+      </figure>
+      <figure class="rise d3">
+        <div class="ph"><img src="images/nasdaq-opening-bell.jpg" alt="Executives ringing the stock exchange opening bell" /></div>
+        <figcaption><b>The bell.</b> IPO day, confetti, history.</figcaption>
+      </figure>
+    </div>
+    <div class="reality" data-reveal="1">
+      <p><span class="rlab">The reality</span> Founders generate ideas in volume, select the strongest, and refine them. You cannot schedule a strike of genius. <b>You can schedule volume.</b></p>
+    </div>
+    <div class="pnote">Newton engraving: Apple Computer&rsquo;s first logo, drawn by co-founder Ronald Wayne, 1976 (public domain, Wikimedia Commons).</div>
+    <div class="pg">18</div>
+  </section>
+
+  <!-- 19 · The mountain -->
+  <section data-label="The mountain" class="s-vista s-peak dark">
+    <div class="bg"><img src="images/mountain-lake-glacier-hires.jpg" alt="Mountain peaks above a glacial lake under a clear sky" /></div>
+    <div class="veil"></div>
+    <div class="content">
+      <div class="kicker rise">Most management problems</div>
+      <h2 class="rise d1">You can clearly see the peak.</h2>
+      <p class="sub late">Pick the summit, plan the route, climb.</p>
+    </div>
+    <div class="pnote">Photo: Wild Goose Island, Saint Mary Lake, Glacier National Park. Andrew Parlette, CC BY 2.0, via Wikimedia Commons.</div>
+    <div class="pg">19</div>
+  </section>
+
+  <!-- 20 · The murky lake -->
+  <section data-label="The murky lake" class="s-vista s-lake dark">
+    <div class="bg"><img src="images/mountain-lake-glacier-hires.jpg" alt="Deep water of the same glacial lake, seen up close" /></div>
+    <div class="veil"></div>
+    <div class="content">
+      <div class="kicker rise">Entrepreneurship</div>
+      <h2 class="rise d1">Find the deepest point of a lake you have never seen.</h2>
+      <p class="sub late">All you have: a rowboat, a rope, and a rock. <b>How would you do it?</b></p>
+      <div class="mchips">
+        <div class="mchip" data-reveal="1">Cast wide, sound everywhere</div>
+        <div class="mchip" data-reveal="2">Take many measurements</div>
+        <div class="mchip" data-reveal="3">Iterate toward promise</div>
+        <div class="mchip" data-reveal="4">Assume a continuous bottom</div>
+      </div>
+      <div class="finding">
+        <p class="deepest" data-reveal="5">You don&rsquo;t care about the average sounding. <b>Only the deepest one.</b> Ninety-nine duds and one gem is a great process.</p>
+        <svg class="sound" data-reveal="5" viewBox="0 0 520 250" role="img" aria-label="Cross-section of a lake: a boat sounds the depth with a rope and rock; the unknown bottom's deepest point is marked">
+          <title>Sounding the lake</title>
+          <!-- water surface -->
+          <line x1="14" y1="58" x2="506" y2="58" stroke="rgba(251,251,250,0.9)" stroke-width="3" stroke-linecap="round" />
+          <!-- boat hull on the surface line -->
+          <path d="M124 46 C130 82, 206 82, 212 46 L124 46 Z" fill="none" stroke="rgba(251,251,250,0.95)" stroke-width="3.5" stroke-linejoin="round" />
+          <!-- taut rope -->
+          <line x1="168" y1="74" x2="168" y2="191" stroke="rgba(251,251,250,0.9)" stroke-width="2.5" />
+          <!-- rock on the rope's end -->
+          <path d="M158 193 L177 191 L184 201 L172 211 L157 205 Z" fill="none" stroke="rgba(251,251,250,0.95)" stroke-width="3" stroke-linejoin="round" />
+          <!-- jagged unknown bottom -->
+          <polyline points="14,166 52,188 96,170 138,206 168,214 210,192 252,228 296,206 338,240 368,208 404,228 444,198 506,220" fill="none" stroke="rgba(251,251,250,0.75)" stroke-width="3" stroke-linejoin="round" stroke-dasharray="12 10" />
+          <!-- the deepest point -->
+          <circle cx="338" cy="240" r="7.5" fill="#7ED9A7" />
+        </svg>
+      </div>
+    </div>
+    <div class="pnote">Same photograph as the previous slide, enlarged: Wild Goose Island, Saint Mary Lake, Glacier National Park. Andrew Parlette, CC BY 2.0, via Wikimedia Commons.</div>
+    <div class="pg">20</div>
+  </section>
+
+  <!-- 21 · Dream vs reality: Zocor -->
+  <section data-label="Dream vs reality: Zocor" class="s-duo s-zocor">
+    <div class="kicker rise" data-morph="ex-kick">What search actually looks like</div>
+    <h2 class="rise d1" data-morph="ex-head">The dream is one strike of lightning; the reality is trial and error.</h2>
+    <p class="sub rise d2">Pharma digs the holes for a living. This is the search for Zocor.</p>
+    <div class="panels rise d2">
+      <div class="panel dreamp">
+        <img src="images/lightning-strike-dramatic.jpg" alt="A single lightning bolt striking the ground from a night sky" />
+        <div class="lab dream">The dream</div>
+      </div>
+      <div class="panel realp" data-reveal="1">
+        <div class="lab real">The reality</div>
+        <span class="lgchip"><img class="lg" src="images/logos/logo-merck.svg" alt="Merck" /></span>
+        <div class="fwrap" data-morph="ex-art">
+          <svg class="fsvg" viewBox="0 0 936 472" role="img" aria-label="Pharmaceutical R and D funnel: 5,000 to 10,000 compounds screened, about 250 enter preclinical testing, about 5 enter clinical trials, 1 FDA-approved drug, Zocor, over 10 to 15 years.">
+            <text x="124" y="46" class="cnt">5,000–10,000</text>
+            <text x="360" y="46" class="cnt">~250</text>
+            <text x="590" y="46" class="cnt">~5</text>
+            <text x="790" y="46" class="one">1</text>
+            <text x="124" y="88" class="flab">compounds screened</text>
+            <text x="360" y="88" class="flab">enter preclinical</text>
+            <text x="360" y="118" class="flab">testing</text>
+            <text x="590" y="88" class="flab">enter clinical</text>
+            <text x="590" y="118" class="flab">trials</text>
+            <text x="790" y="98" class="flab">FDA-approved drug</text>
+            <path class="wall" d="M8 150 L700 258" />
+            <path class="wall" d="M8 425 L700 294" />
+            <line class="tick" x1="240" y1="191" x2="240" y2="376" />
+            <line class="tick" x1="480" y1="229" x2="480" y2="331" />
+            <line class="wall" x1="700" y1="276" x2="772" y2="276" />
+            <g class="dots">
+              <circle cx="89" cy="211" r="5"/> <circle cx="154" cy="203" r="5"/> <circle cx="131" cy="259" r="5"/> <circle cx="36" cy="289" r="5"/>
+              <circle cx="38" cy="192" r="5"/> <circle cx="109" cy="354" r="5"/> <circle cx="49" cy="223" r="5"/> <circle cx="149" cy="372" r="5"/>
+              <circle cx="219" cy="207" r="5"/> <circle cx="196" cy="247" r="5"/> <circle cx="86" cy="355" r="5"/> <circle cx="60" cy="305" r="5"/>
+              <circle cx="152" cy="260" r="5"/> <circle cx="134" cy="198" r="5"/> <circle cx="87" cy="305" r="5"/> <circle cx="115" cy="244" r="5"/>
+              <circle cx="183" cy="321" r="5"/> <circle cx="129" cy="361" r="5"/> <circle cx="170" cy="245" r="5"/> <circle cx="54" cy="284" r="5"/>
+              <circle cx="32" cy="327" r="5"/> <circle cx="177" cy="298" r="5"/> <circle cx="140" cy="277" r="5"/> <circle cx="192" cy="364" r="5"/>
+              <circle cx="119" cy="319" r="5"/> <circle cx="58" cy="200" r="5"/> <circle cx="36" cy="350" r="5"/> <circle cx="80" cy="268" r="5"/>
+              <circle cx="142" cy="239" r="5"/> <circle cx="25" cy="268" r="5"/> <circle cx="215" cy="317" r="5"/> <circle cx="204" cy="333" r="5"/>
+              <circle cx="102" cy="265" r="5"/> <circle cx="92" cy="190" r="5"/> <circle cx="24" cy="204" r="5"/> <circle cx="44" cy="255" r="5"/>
+              <circle cx="29" cy="375" r="5"/> <circle cx="117" cy="282" r="5"/> <circle cx="93" cy="236" r="5"/> <circle cx="190" cy="223" r="5"/>
+              <circle cx="29" cy="394" r="5"/> <circle cx="130" cy="382" r="5"/> <circle cx="57" cy="348" r="5"/> <circle cx="131" cy="341" r="5"/>
+              <circle cx="350" cy="289" r="5"/> <circle cx="450" cy="277" r="5"/> <circle cx="293" cy="284" r="5"/> <circle cx="388" cy="314" r="5"/>
+              <circle cx="274" cy="253" r="5"/> <circle cx="273" cy="330" r="5"/> <circle cx="401" cy="232" r="5"/> <circle cx="462" cy="320" r="5"/>
+              <circle cx="287" cy="212" r="5"/> <circle cx="366" cy="229" r="5"/> <circle cx="260" cy="278" r="5"/> <circle cx="347" cy="325" r="5"/>
+              <circle cx="544" cy="289" r="5"/> <circle cx="625" cy="288" r="5"/> <circle cx="530" cy="262" r="5"/> <circle cx="596" cy="266" r="5"/>
+              <circle cx="655" cy="279" r="5"/>
+            </g>
+            <circle class="win" cx="790" cy="276" r="14"/>
+            <text x="790" y="345" class="zlab">Zocor (simvastatin)</text>
+            <text x="790" y="381" class="zlab">1991</text>
+            <line class="tl" x1="8" y1="446" x2="700" y2="446" />
+            <line class="tl" x1="8" y1="438" x2="8" y2="454" />
+            <line class="tl" x1="700" y1="438" x2="700" y2="454" />
+            <text x="354" y="430" class="tlab">10–15 years</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="pnote">Funnel: PhRMA, Drug Discovery and Development: Understanding the R&amp;D Process (2007), the industry-standard pharma R&amp;D funnel (5,000&ndash;10,000 compounds screened, ~250 preclinical, ~5 clinical, 1 approved, 10&ndash;15 years). Zocor (simvastatin, Merck) FDA-approved December 1991 (FDA NDA 019766); story per Terwiesch &amp; Ulrich, Innovation Tournaments (Harvard Business Press, 2009). Photo: &ldquo;Lightning bolt&rdquo; by Ayorinde Ogundele, Wikimedia Commons, CC BY-SA 4.0.</div>
+    <div class="pg">21</div>
+  </section>
+
+  <!-- 22 · Nemo -->
+  <section data-label="Nemo" class="s-exhibit s-nemo">
+    <div class="kicker rise" data-morph="ex-kick">Not just pharma</div>
+    <h2 class="rise d1" data-morph="ex-head">Nemo was found, not struck.</h2>
+    <div class="subrow rise d2">
+      <span class="lgchip"><img class="lg" src="images/logos/logo-pixar.svg" alt="Pixar" /></span>
+      <p class="sub">Pixar weighs about 500 one-sentence pitches a year. Round after round, a handful become films.</p>
+    </div>
+    <div class="art rise d2">
+      <div class="fwrap" data-morph="ex-art">
+        <svg class="fsvg" viewBox="0 0 1500 540" role="img" aria-label="Pixar pitch funnel: about 500 one-sentence pitches a year narrow, round after round, to one feature film, Finding Nemo.">
+          <text x="170" y="64" class="cnt">~500</text>
+          <text x="262" y="108" class="flab">one-sentence pitches a year</text>
+          <text x="1260" y="64" class="one">1</text>
+          <text x="1260" y="108" class="flab">feature film</text>
+          <path class="wall" d="M8 150 L1170 252" />
+          <path class="wall" d="M8 520 L1170 288" />
+          <line class="tick" x1="420" y1="191" x2="420" y2="433" />
+          <line class="tick" x1="800" y1="225" x2="800" y2="357" />
+          <line class="wall" x1="1170" y1="270" x2="1238" y2="270" />
+          <g class="dots">
+            <circle cx="89" cy="389" r="6"/> <circle cx="264" cy="315" r="6"/> <circle cx="108" cy="418" r="6"/> <circle cx="329" cy="320" r="6"/>
+            <circle cx="216" cy="252" r="6"/> <circle cx="29" cy="292" r="6"/> <circle cx="246" cy="209" r="6"/> <circle cx="323" cy="253" r="6"/>
+            <circle cx="115" cy="192" r="6"/> <circle cx="399" cy="365" r="6"/> <circle cx="354" cy="342" r="6"/> <circle cx="213" cy="219" r="6"/>
+            <circle cx="382" cy="285" r="6"/> <circle cx="86" cy="428" r="6"/> <circle cx="74" cy="464" r="6"/> <circle cx="197" cy="339" r="6"/>
+            <circle cx="156" cy="322" r="6"/> <circle cx="350" cy="254" r="6"/> <circle cx="388" cy="401" r="6"/> <circle cx="309" cy="382" r="6"/>
+            <circle cx="244" cy="382" r="6"/> <circle cx="74" cy="324" r="6"/> <circle cx="180" cy="288" r="6"/> <circle cx="38" cy="203" r="6"/>
+            <circle cx="295" cy="441" r="6"/> <circle cx="111" cy="362" r="6"/> <circle cx="235" cy="355" r="6"/> <circle cx="95" cy="230" r="6"/>
+            <circle cx="158" cy="449" r="6"/> <circle cx="157" cy="355" r="6"/> <circle cx="142" cy="212" r="6"/> <circle cx="52" cy="432" r="6"/>
+            <circle cx="317" cy="288" r="6"/> <circle cx="282" cy="364" r="6"/> <circle cx="362" cy="420" r="6"/> <circle cx="179" cy="463" r="6"/>
+            <circle cx="386" cy="334" r="6"/> <circle cx="357" cy="313" r="6"/> <circle cx="168" cy="254" r="6"/> <circle cx="339" cy="211" r="6"/>
+            <circle cx="124" cy="266" r="6"/> <circle cx="184" cy="233" r="6"/> <circle cx="54" cy="281" r="6"/> <circle cx="305" cy="313" r="6"/>
+            <circle cx="122" cy="465" r="6"/> <circle cx="39" cy="241" r="6"/> <circle cx="340" cy="386" r="6"/> <circle cx="314" cy="199" r="6"/>
+            <circle cx="37" cy="364" r="6"/> <circle cx="268" cy="410" r="6"/> <circle cx="245" cy="258" r="6"/> <circle cx="365" cy="232" r="6"/>
+            <circle cx="63" cy="204" r="6"/> <circle cx="37" cy="316" r="6"/> <circle cx="272" cy="225" r="6"/> <circle cx="228" cy="276" r="6"/>
+            <circle cx="169" cy="386" r="6"/> <circle cx="292" cy="412" r="6"/> <circle cx="122" cy="387" r="6"/> <circle cx="263" cy="440" r="6"/>
+            <circle cx="211" cy="383" r="6"/> <circle cx="335" cy="426" r="6"/> <circle cx="396" cy="205" r="6"/> <circle cx="290" cy="246" r="6"/>
+            <circle cx="131" cy="292" r="6"/> <circle cx="98" cy="470" r="6"/>
+            <circle cx="755" cy="345" r="6"/> <circle cx="744" cy="244" r="6"/> <circle cx="643" cy="288" r="6"/> <circle cx="622" cy="244" r="6"/>
+            <circle cx="509" cy="297" r="6"/> <circle cx="452" cy="226" r="6"/> <circle cx="683" cy="287" r="6"/> <circle cx="616" cy="337" r="6"/>
+            <circle cx="565" cy="229" r="6"/> <circle cx="770" cy="277" r="6"/> <circle cx="660" cy="253" r="6"/> <circle cx="457" cy="265" r="6"/>
+            <circle cx="555" cy="282" r="6"/> <circle cx="531" cy="235" r="6"/> <circle cx="707" cy="323" r="6"/> <circle cx="643" cy="365" r="6"/>
+            <circle cx="1000" cy="273" r="6"/> <circle cx="1095" cy="270" r="6"/> <circle cx="957" cy="309" r="6"/> <circle cx="857" cy="283" r="6"/>
+            <circle cx="1145" cy="271" r="6"/>
+          </g>
+          <circle class="win" cx="1260" cy="270" r="16"/>
+          <text x="1260" y="345" class="zlab">Finding Nemo</text>
+        </svg>
+      </div>
+    </div>
+    <div class="pnote">Source: Terwiesch &amp; Ulrich, Innovation Tournaments (Harvard Business Press, 2009): Pixar considers ~500 one-sentence pitches per year; the Cars one-sentence pitch is the book&rsquo;s worked example.</div>
+    <div class="pg">22</div>
+  </section>
+
+  <!-- 23 · Refinement -->
+  <section data-label="Refinement" class="s-ref">
+    <div class="kicker rise">Found a promising sounding? Keep sounding.</div>
+    <h2 class="rise d1">The winners are then refined, relentlessly.</h2>
+    <div class="cards">
+      <div class="card rise d2">
+        <div class="head"><span class="lgchip"><img class="lg" src="images/logos/logo-dyson.svg" alt="Dyson" /></span><div class="co">Supersonic</div></div>
+        <h3>A hair dryer.</h3>
+        <div class="r"><b>103 engineers</b> &middot; 50 months</div>
+        <div class="r"><b>1,010 miles</b> of real human hair tested</div>
+        <div class="r"><b>&pound;40,000</b> of hair tresses, briefly a global hair shortage</div>
+      </div>
+      <div class="card rise d3">
+        <div class="head"><span class="lgchip"><img class="lg" src="images/logos/logo-reframe.png" alt="Reframe" /></span><div class="co">Georgia Tech</div></div>
+        <h3>An app that interrupts a craving.</h3>
+        <div class="r"><b>Two engineering students</b>, a $20k CREATE-X pre-seed</div>
+        <div class="r"><b>3,000+ paid subscribers</b> within months of launch</div>
+        <div class="r"><b>$1.4M seed</b>, refined from a class project, version&nbsp;by&nbsp;version</div>
+      </div>
+    </div>
+    <div class="pnote">Sources: Dyson engineering story (lb.dyson.com: 103 engineers, 50 months, 1,010 miles, &pound;40k of hair) &middot; Georgia Tech College of Engineering news, Apr 2021 (Reframe: Gao &amp; Pradeep, $20k CREATE-X, 3,000+ subscribers, $1.4M seed).</div>
+    <div class="pg">23</div>
+  </section>
+
+  <!-- 24 · Four levers -->
+  <section data-label="Four levers" class="s-levers2">
+    <div class="kicker rise">Girotra, Terwiesch and Ulrich, Management Science 2010</div>
+    <h2 class="rise d1">Four levers run the idea factory.</h2>
+    <div class="row rise d2">
+      <div class="lcol">
+        <div class="card" data-reveal="1" data-lever="1">
+          <div class="top"><span class="n">01</span><h3>Take more draws</h3></div>
+          <p>Generate more opportunities.</p>
+        </div>
+        <div class="card" data-reveal="2" data-lever="2">
+          <div class="top"><span class="n">02</span><h3>Shift the mean</h3></div>
+          <p>Raise the average quality.</p>
+        </div>
+        <div class="card" data-reveal="3" data-lever="3">
+          <div class="top"><span class="n">03</span><h3>Raise the variance</h3></div>
+          <p>Wider spread, weirder ideas.</p>
+        </div>
+        <div class="card" data-reveal="4" data-lever="4">
+          <div class="top"><span class="n">04</span><h3>Evaluate better</h3></div>
+          <p>Select among them more accurately.</p>
+        </div>
+        <p class="tail" data-reveal="4">We care only about the right tail: <b>the quality of the best idea</b>, not the average.</p>
+        <div class="cite">&ldquo;Idea Generation and the Quality of the Best Idea.&rdquo; Pre-read: Innovation Tournaments, ch. 3.</div>
+      </div>
+      <div class="stage">
+        <iframe data-anim src="animation/four-levers-walkthrough.html" title="Four levers walkthrough animation"></iframe>
+        <div class="pfig"><img src="images/four-levers-gt-diagram.png" alt="Opportunity creation process: idea distribution, quality hurdle, exceptional opportunities" /></div>
+      </div>
+    </div>
+    <div class="pnote">Girotra, Terwiesch &amp; Ulrich, &ldquo;Idea Generation and the Quality of the Best Idea,&rdquo; Management Science, 2010. Course pre-read: Innovation Tournaments, ch. 3.</div>
+    <div class="pg">24</div>
+  </section>
+
+  <!-- 25 · The class as a funnel -->
+  <section data-label="The class as a funnel" class="s-anim">
+    <div class="kicker rise">This class, as a funnel</div>
+    <h2 class="rise d1">200 ideas walk in. Ten teams walk out.</h2>
+    <div class="holder rise d2">
+      <iframe data-anim src="animation/torneio-funnel.html" title="Torneio tournament funnel animation"></iframe>
+      <div class="pfig">200 ideas → 40 sixty-second pitches → 10 teams of 4 → final pitches Friday</div>
+    </div>
+    <div class="pg">25</div>
+  </section>
+
+  <!-- 26 · Week at a glance -->
+  <section data-label="Four day plan" class="s-cal">
+    <div class="kicker rise">16–19 June · deliverables</div>
+    <h2 class="rise d1">Four day plan</h2>
+    <div class="grid">
+      <div class="col here rise d1">
+        <div class="you">You are here</div>
+        <div class="d">Tue 16</div>
+        <div class="stage">Generate</div>
+        <div class="chip"><b>Sessions 01–02</b>: myths, the idea factory, tournament launch</div>
+        <div class="chip">Tonight: finish <b>20+ ideas</b>, pick 5, submit as <b>A1</b> · <span class="due">due 23:59</span></div>
+        <div class="chip">Register on Torneio · <b>live in Session 02</b></div>
+      </div>
+      <div class="col rise d2">
+        <div class="d">Wed 17</div>
+        <div class="stage">Select</div>
+        <div class="chip"><b>A2</b> · rate 75+ ideas, 0–10 · <span class="due">due 13:30</span></div>
+        <div class="chip"><b>A3</b> · 60-second pitch + one PDF slide · <span class="due">upload by 16:30</span> for the merged pitch deck · credit until 17:30</div>
+        <div class="chip"><b>A4</b> · multivote, in class · 10 teams of 4 form</div>
+      </div>
+      <div class="col rise d3">
+        <div class="d">Thu 18</div>
+        <div class="stage">Refine</div>
+        <div class="chip"><b>A5</b> · Business Thesis + Value Creation Analysis · <span class="due">due 21:00</span></div>
+        <div class="chip">Customer discovery, live in class</div>
+      </div>
+      <div class="col rise d3">
+        <div class="d">Fri 19</div>
+        <div class="stage">Validate</div>
+        <div class="chip"><b>A6</b> · peer review · <span class="due">due 8:30</span></div>
+        <div class="chip"><b>A7</b> · concept + prototype pitch · <span class="due">due 8:30</span></div>
+        <div class="chip"><b>A8</b> · community survey, in class</div>
+        <div class="chip win">Validated theses</div>
+      </div>
+    </div>
+    <div class="pg">26</div>
+  </section>
+
+  <!-- 27 · AI and ideation -->
+  <section data-label="AI and ideation" class="s-aiwin">
+    <div class="kicker rise">Girotra, Meincke, Terwiesch and Ulrich · Wharton, 2023</div>
+    <div class="chips rise">
+      <span class="lgchip"><img class="lg" src="images/logos/logo-wharton.png" alt="Wharton" /></span>
+      <span class="lgchip"><img class="lg" src="images/logos/logo-openai.svg" alt="OpenAI" /></span>
+    </div>
+    <h2 class="rise d1">GPT-4 out-ideated the MBAs.</h2>
+    <p class="sub rise d2">Wharton&rsquo;s tournament, rerun: 200 student ideas against 200 from GPT-4, physical products for college students under $50. College-age consumers rated all 400 blind on purchase intent.</p>
+    <div class="chart" data-reveal="1">
+      <div class="clab">The best 40 of all 400 ideas, ranked by purchase intent</div>
+      <div class="crow r1">
+        <div class="lab"><b>Humans</b><span>200 ideas in · mean intent 40.4%</span></div>
+        <div class="dots"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="cnt">5</div>
+      </div>
+      <div class="crow r2">
+        <div class="lab"><b>GPT-4, plain prompt</b><span>100 ideas in · mean intent 46.8%</span></div>
+        <div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="cnt">15</div>
+      </div>
+      <div class="crow r3">
+        <div class="lab"><b>GPT-4, seeded</b><span>100 ideas in · prompt seeded with 7 highly rated student ideas · mean intent 49.3%</span></div>
+        <div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="cnt">20</div>
+      </div>
+    </div>
+    <p class="caveat" data-reveal="2">ChatGPT-assisted brainstorms produce <b>narrower idea sets</b>: across five experiments, the diversity drop was significant in 37 of 45 comparisons (Nature Human Behaviour, 2025).</p>
+    <p class="close" data-reveal="3">Volume and average are now free. <b>Variance and judgment are your job.</b></p>
+    <div class="pnote">Sources: Girotra, Meincke, Terwiesch &amp; Ulrich, &ldquo;Ideas Are Dimes a Dozen: Large Language Models for Idea Generation in Innovation,&rdquo; Wharton / Cornell Tech working paper, 2023 (SSRN 4526071): 200 student ideas vs. 100 GPT-4 ideas from a plain prompt and 100 seeded with seven highly rated student ideas; purchase intent rated by US college-age consumers, about 20 ratings per idea; pool means 40.4% / 46.8% / 49.3%; 35 of the pooled top 40 ideas came from GPT-4. Diversity: Meincke, Nave &amp; Terwiesch, &ldquo;ChatGPT decreases idea diversity in brainstorming,&rdquo; Nature Human Behaviour 9, 1107&ndash;1109 (2025).</div>
+    <div class="pg">27</div>
+  </section>
+
+  <!-- 28 · Myth 2 -->
+  <section data-label="Myth 2" class="s-myth1">
+    <div class="tag false rise">Myth № 2 · Generation</div>
+    <h2 class="rise d1"><span class="struck">I need to find a new<i class="strikeline" data-reveal="1"></i></span><br /><span class="struck">technology or a new<i class="strikeline" data-reveal="1"></i></span><br /><span class="struck">market.<i class="strikeline" data-reveal="1"></i></span></h2>
+    <p class="truth" data-reveal="1">Existing products, existing markets, a new way to match them: Business Model Innovation.</p>
+    <div class="pg">28</div>
+  </section>
+
+  <!-- 29 · The famous door -->
+  <section data-label="The famous door" class="s-tiles">
+    <h2 class="rise d1">We picture innovation as new technology or new design.</h2>
+    <div class="grid rise d2">
+      <div class="tile">
+        <div class="ph"><img src="images/coronary-stent.jpg" alt="Two coronary stents beside a centimeter ruler" /></div>
+        <div class="cap">The stent <span class="mlab">NEW TECH</span></div>
+      </div>
+      <div class="tile">
+        <div class="ph"><img src="images/crocs-clogs.jpg" alt="Pairs of Crocs clogs with hang tags" /></div>
+        <div class="cap">Crocs <span class="mlab">NEW DESIGN</span></div>
+      </div>
+      <div class="tile">
+        <div class="ph fit"><img src="images/sriracha-bottle-bmi.jpg" alt="A bottle of sriracha hot sauce" /></div>
+        <div class="cap">Sriracha <span class="mlab">NEW DESIGN</span></div>
+      </div>
+      <div class="tile">
+        <div class="ph"><div class="words"><span class="lgchip"><img class="lg" src="images/logos/logo-openai.svg" alt="OpenAI" /></span><span class="lgchip"><img class="lg" src="images/logos/logo-anthropic.svg" alt="Anthropic" /></span></div></div>
+        <div class="cap">Frontier AI <span class="mlab">NEW TECH</span></div>
+      </div>
+    </div>
+    <div class="pnote">Images: coronary stents, Frank C. Müller, Wikimedia Commons, CC BY-SA 2.5 · Crocs clogs, David (Kcdtsg), Wikimedia Commons, public domain.</div>
+    <div class="pg">29</div>
+  </section>
+
+  <!-- 30 · BMI Venn -->
+  <section data-label="BMI Venn" class="s-venn">
+    <div class="kicker rise">An often overlooked way to innovate</div>
+    <h2 class="rise d1">BMI: existing products + existing needs + a new model to provision them.</h2>
+    <div class="row">
+      <div class="box rise d2">
+        <div class="c c1"></div>
+        <div class="c c2"></div>
+        <div class="c c3"></div>
+        <div class="clab cl1">Products</div>
+        <div class="clab cl2">Needs</div>
+        <div class="clab cl3">New model</div>
+        <div class="bmi late">BMI</div>
+      </div>
+      <div class="txt rise d2">
+        <div class="trio"><b>Products</b>: existing products and technology</div>
+        <div class="trio"><b>Needs</b>: existing market needs</div>
+        <div class="trio"><b>New model</b>: a new business model to provision them</div>
+        <p class="note late">No technology risk, no new-market risk, no R&amp;D bill. And harder for incumbents to imitate.</p>
+        <div class="books later">We love this stuff: Girotra &amp; Netessine, <em>The Risk-Driven Business Model</em> · Osterwalder, <em>Business Model Generation</em></div>
+      </div>
+    </div>
+    <div class="pg">30</div>
+  </section>
+
+  <!-- 31 · BMI hall of fame -->
+  <section data-label="BMI hall of fame" class="s-wall">
+    <div class="kicker rise">Existing products · existing markets · a new match</div>
+    <h2 class="rise d1">The business-model hall of fame.</h2>
+    <div class="grid">
+      <div class="co rise d1"><div class="lgrow"><img class="lg" src="images/logos/logo-zara.svg" alt="Zara" /></div><p>design to rack in two weeks, not two seasons</p></div>
+      <div class="co rise d1"><div class="lgrow"><img class="lg" src="images/logos/logo-amazon.svg" alt="Amazon" /></div><p>retail rebuilt as a logistics and data machine</p></div>
+      <div class="co rise d1"><div class="lgrow"><img class="lg" src="images/logos/logo-taobao.svg" alt="Taobao" /></div><p>a free marketplace, monetized sideways</p></div>
+      <div class="co rise d1"><div class="lgrow"><img class="lg" src="images/logos/logo-toyota.svg" alt="Toyota" /></div><p>production itself as the innovation</p></div>
+      <div class="co rise d2"><div class="lgrow"><img class="lg big" src="images/logos/logo-aravind-eye-care.png" alt="Aravind Eye Care System" /></div><p>assembly-line eye surgery: world class, near free</p></div>
+      <div class="co rise d2"><div class="lgrow"><img class="lg" src="images/logos/logo-shouldice.png" alt="Shouldice Hernia Hospital" /></div><p>one hernia operation, perfected for 80 years</p></div>
+      <div class="co rise d2"><div class="lgrow"><img class="lg" src="images/logos/logo-ecovadis.svg" alt="EcoVadis" /></div><p>sustainability ratings as market infrastructure · INSEAD alumni</p></div>
+      <div class="co rise d2"><div class="lgrow"><img class="lg big" src="images/logos/logo-emma-horizontal.png" alt="Emma Safety Footwear" /></div><p>safety footwear as a service · we&rsquo;ll meet them again</p></div>
+    </div>
+    <p class="foot late">Same shirts, same surgeries, same shoes. <b>Different match between supply and demand.</b></p>
+    <div class="pg">31</div>
+  </section>
+
+  <!-- 32 · Four ways to re-match -->
+  <section data-label="Four ways to re-match" class="s-levers tight">
+    <div class="kicker rise">Girotra and Netessine, your pre-read</div>
+    <h2 class="rise d1">Four ways to re-match supply and demand.</h2>
+    <div class="cards">
+      <div class="card" data-reveal="1">
+        <div class="n">When</div>
+        <h3>Change the timeline</h3>
+        <p>Uber is paid before the driver moves; taxi fleets waited weeks. Cash flow is a design choice.</p>
+        <span class="lgchip"><img class="lg" src="images/logos/logo-uber.svg" alt="Uber" /></span>
+      </div>
+      <div class="card" data-reveal="2">
+        <div class="n">Why</div>
+        <h3>Change the incentives</h3>
+        <p>Rolls-Royce sells thrust by the hour. Clinics get paid for outcomes, not visits.</p>
+        <span class="lgchip"><img class="lg tall" src="images/logos/logo-rolls-royce.svg" alt="Rolls-Royce" /></span>
+      </div>
+      <div class="card" data-reveal="3">
+        <div class="n">What</div>
+        <h3>Change the information</h3>
+        <p>Zara postpones the commitment: styles are cut after demand is revealed, not two seasons ahead.</p>
+        <span class="lgchip"><img class="lg" src="images/logos/logo-zara.svg" alt="Zara" /></span>
+      </div>
+      <div class="card" data-reveal="4">
+        <div class="n">How much</div>
+        <h3>Change the cost &amp; revenue architecture</h3>
+        <p>Dollar Shave Club turned razors into a subscription: same blades, a new way to charge.</p>
+        <span class="lgchip"><img class="lg" src="images/logos/logo-dollar-shave-club.svg" alt="Dollar Shave Club" /></span>
+      </div>
+    </div>
+    <p class="tail" data-reveal="4"><b>Every pattern you&rsquo;ll meet this week is one of these four moves.</b></p>
+    <div class="cite late">&ldquo;Four Paths to Business Model Innovation,&rdquo; Harvard Business Review, 2014.</div>
+    <div class="pg">32</div>
+  </section>
+
+  <!-- 33 · Myth 3 -->
+  <section data-label="Myth 3" class="s-myth1">
+    <div class="tag false rise">Myth № 3 · Selection</div>
+    <h2 class="rise d1"><span class="struck">I&rsquo;m a good judge of my<i class="strikeline" data-reveal="1"></i></span><br /><span class="struck">own ideas.<i class="strikeline" data-reveal="1"></i></span></h2>
+    <p class="first late">The №1 startup killer: <b>a founder in love with their own idea.</b></p>
+    <p class="truth" data-reveal="1">Ideas are best judged by a diverse crowd of the people they serve.</p>
+    <div class="pg">33</div>
+  </section>
+
+  <!-- 34 · Best tech rarely wins -->
+  <section data-label="Best tech rarely wins" class="s-pairs">
+    <div class="kicker rise">A quick test: which one had the better technology?</div>
+    <h2 class="rise d1">The best technology does not always win.</h2>
+    <div class="rows">
+      <div class="row rise d1">
+        <div class="side l">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-sony.svg" alt="Sony logo" /></span>
+          <div class="t"><b>Sony Betamax</b><span>the better picture</span></div>
+        </div>
+        <div class="mid">lost to</div>
+        <div class="side w">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-jvc.svg" alt="JVC logo" /></span>
+          <div class="t"><b>VHS</b><span>longer tapes, open licensing; over 90% of the US market by 1987</span></div>
+        </div>
+      </div>
+      <div class="row rise d2">
+        <div class="side l">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-signal.svg" alt="Signal logo" /></span>
+          <div class="t"><b>Signal</b><span>the security gold standard</span></div>
+        </div>
+        <div class="mid">lost to</div>
+        <div class="side w">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-whatsapp.svg" alt="WhatsApp logo" /></span>
+          <div class="t"><b>WhatsApp</b><span>3 billion+ users vs about 70 million</span></div>
+        </div>
+      </div>
+      <div class="row rise d2">
+        <div class="side l">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-segway.svg" alt="Segway logo" /></span>
+          <div class="t"><b>Segway</b><span>an engineering marvel</span></div>
+        </div>
+        <div class="mid">lost to</div>
+        <div class="side w">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-lime.svg" alt="Lime logo" /></span>
+          <div class="t"><b>E-scooters</b><span>157M shared rides in 2023 vs about 140k Segways ever sold</span></div>
+        </div>
+      </div>
+      <div class="row rise d3">
+        <div class="side l">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-apple.svg" alt="Apple logo" /></span>
+          <div class="t"><b>Apple Newton</b><span>a decade early</span></div>
+        </div>
+        <div class="mid">lost to</div>
+        <div class="side w">
+          <span class="lgchip"><img class="lg" src="images/logos/logo-palm.svg" alt="Palm logo" /></span>
+          <div class="t"><b>Palm, then iPhone</b><span>timing and model beat brilliance</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="note later">Your ranking and the market&rsquo;s ranking will not match. <b>Bet on the model, and let customers&nbsp;judge.</b></p>
+    <div class="pnote">Sources: Wikipedia, videotape format war (VHS &gt;90% US market by 1987) · Business of Apps / Wikipedia (Signal ~70M MAU; WhatsApp 3B+, 2025) · Wikipedia, Segway (~140k units, 2001–2020) · NACTO 2023 (157M shared micromobility trips, US/Canada).</div>
+    <div class="pg">34</div>
+  </section>
+
+  <!-- 35 · Smart money -->
+  <section data-label="Smart money" class="s-waffle">
+    <div class="kicker rise">Even the professionals can&rsquo;t pick</div>
+    <h2 class="rise d1">Smart money loses two times out of three.</h2>
+    <div class="wrap rise d2">
+      <div class="wcol">
+        <div class="waffle" role="img" aria-label="100 squares, one per venture financing: 65 lost money, 31 returned 1 to 10 times, 4 returned 10 times or more">
+          <i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i>
+          <i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i>
+          <i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i>
+          <i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i>
+          <i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i>
+          <i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i>
+          <i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q lose"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i>
+          <i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i>
+          <i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i>
+          <i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q mid"></i><i class="q win"></i><i class="q win"></i><i class="q win"></i><i class="q win"></i>
+        </div>
+        <p class="wcap">One square is one financing: 21,640 US venture financings, 2004&ndash;2013. Correlation Ventures.</p>
+      </div>
+      <div class="side">
+        <div class="leg">
+          <span class="sq lose"></span>
+          <div class="ltxt"><b>65 lost money</b><span>returned less than 1&times; the capital (64.8% of financings)</span></div>
+        </div>
+        <div class="leg">
+          <span class="sq mid"></span>
+          <div class="ltxt"><b>31 made 1&ndash;10&times;</b><span>25.3% returned 1&ndash;5&times;; another 5.9% returned 5&ndash;10&times;</span></div>
+        </div>
+        <div class="leg">
+          <span class="sq win"></span>
+          <div class="ltxt"><b>4 made 10&times; or more</b><span>2.5% at 10&ndash;20&times; · 1.1% at 20&ndash;50&times; · 0.4% above 50&times;</span></div>
+        </div>
+        <p class="land" data-reveal="1">Returns are <b>&ldquo;low, extremely skewed, and unknowable until an investment is made.&rdquo;</b> Kerr, Nanda &amp; Rhodes-Kropf, Journal of Economic Perspectives, 2014.</p>
+      </div>
+    </div>
+    <div class="pnote">Source: Correlation Ventures, n=21,640 US venture financings in companies exiting 2004–2013, via Seth Levine, sethlevine.com, 12 Aug 2014 (64.8% returned &lt;1×; 4% returned 10×+; waffle rounds 64.8/31.2/4.0 to 65/31/4 squares). 2023 update (exits 2013–2022): 48% of financings still lost money; &lt;4% of dollars returned 10×+ (Correlation Ventures, &ldquo;We&rsquo;re Still Not Normal,&rdquo; Jul 2023). Quote: Kerr, Nanda &amp; Rhodes-Kropf, &ldquo;Entrepreneurship as Experimentation,&rdquo; JEP 28(3), 2014.</div>
+    <div class="pg">35</div>
+  </section>
+
+  <!-- 36 · Anti-portfolio -->
+  <section data-label="Anti-portfolio" class="s-anti dark">
+    <div class="kicker rise">bvp.com/anti-portfolio</div>
+    <span class="lgchip bvp rise"><img class="lg" src="images/logos/logo-bessemer-venture-partners.svg" alt="Bessemer Venture Partners logo" /></span>
+    <h2 class="rise d1">The best investors keep public lists of the legends they passed on.</h2>
+    <div class="grid">
+      <div class="card rise d2">
+        <span class="lgchip"><img class="lg" src="images/logos/logo-google.svg" alt="Google logo" /></span>
+        <p class="quote">&ldquo;How can I get out of this house without going anywhere near your garage?&rdquo;</p>
+        <div class="who">David Cowan, ducking an intro to Sergey and Larry, 1999 and 2000</div>
+        <div class="gain">Alphabet &asymp; $4.4 trillion today</div>
+      </div>
+      <div class="card rise d2">
+        <span class="lgchip"><img class="lg" src="images/logos/logo-apple.svg" alt="Apple logo" /></span>
+        <p class="quote">&ldquo;Outrageously expensive.&rdquo;</p>
+        <div class="who">Neill Brownstein, on pre-IPO stock at a $60M valuation</div>
+        <div class="gain">Apple &asymp; $4.3 trillion today</div>
+      </div>
+      <div class="card rise d2">
+        <span class="lgchip"><img class="lg" src="images/logos/logo-ebay.svg" alt="eBay logo" /></span>
+        <p class="quote">&ldquo;Stamps? Coins? Comic books? You&rsquo;ve GOT to be kidding&hellip; No-brainer pass.&rdquo;</p>
+        <div class="who">David Cowan</div>
+        <div class="gain">eBay &asymp; $48 billion today</div>
+      </div>
+      <div class="card rise d3">
+        <span class="lgchip"><img class="lg" src="images/logos/logo-fedex.svg" alt="FedEx logo" /></span>
+        <p class="quote">&ldquo;Incredibly, Bessemer passed on Federal Express seven times.&rdquo;</p>
+        <div class="who">The complete entry; no partner named</div>
+        <div class="gain">FedEx &asymp; $80 billion today</div>
+      </div>
+      <div class="card rise d3">
+        <span class="lgchip"><img class="lg" src="images/logos/logo-airbnb.svg" alt="Airbnb logo" /></span>
+        <p class="quote">&ldquo;In April, Airbnb raised money at 1.5X the &lsquo;crazy&rsquo; price.&rdquo;</p>
+        <div class="who">Jeremy Levine called the $40M ask &ldquo;crazy,&rdquo; January 2010</div>
+        <div class="gain">Airbnb &asymp; $77 billion today</div>
+      </div>
+      <div class="card rise d3">
+        <span class="lgchip"><img class="lg" src="images/logos/logo-tesla-mark.svg" alt="Tesla logo" /></span>
+        <p class="quote">&ldquo;It&rsquo;s a win-win. I get a great car and some other VC pays for it!&rdquo;</p>
+        <div class="who">Byron Deeter, after test-driving the Roadster, 2006</div>
+        <div class="gain">Tesla &asymp; $1.5 trillion today</div>
+      </div>
+    </div>
+    <div class="pnote">Source: bvp.com/anti-portfolio, fetched 12 June 2026; quotes verbatim from the page, trimmed with ellipses only. Apple pass: pre-IPO secondary at a $60M valuation (Apple IPO: Dec 1980). Market caps as of 12 June 2026, stockanalysis.com: Alphabet $4.40T · Apple $4.27T · Tesla $1.46T · FedEx $79.95B · Airbnb $77.41B · eBay $47.89B. Refresh figures the morning of class.</div>
+    <div class="pg">36</div>
+  </section>
+
+  <!-- 37 · The customer judges -->
+  <section data-label="The customer judges" class="s-cust">
+    <div class="bg" data-reveal="1"><img src="images/stock-crowd-voting.jpg" alt="A large excited crowd with raised arms" /></div>
+    <div class="veil" data-reveal="1"></div>
+    <div class="content">
+      <h2 class="rise">So who can tell you whether an idea is good?</h2>
+      <div class="ans" data-reveal="1">The customer.</div>
+      <p class="note" data-reveal="2">Paying, or at least using, is evidence. Everything else is hypothesis. <b>Tonight your ideas go in. Tomorrow, forty classmates rate them.</b></p>
+    </div>
+    <div class="pnote">Photo: Nicholas Green, Unsplash (Unsplash License).</div>
+    <div class="pg">37</div>
+  </section>
+
+  <!-- 38 · MYTH №4 — the business plan -->
+  <section data-label="Myth 4" class="s-myth1">
+    <div class="tag false rise">Myth № 4 · The business plan</div>
+    <h2 class="rise d1"><span class="struck">A great business plan<i class="strikeline" data-reveal="1"></i></span><br /><span class="struck">gets you funded.<i class="strikeline" data-reveal="1"></i></span></h2>
+    <p class="truth" data-reveal="1">Evidence of product-market fit gets you funded. You gather it like a scientist: hypothesize, experiment, refine.</p>
+    <div class="pg">38</div>
+  </section>
+
+  <!-- 39 · THE FALLACY OF THE PLAN — Segway -->
+  <section data-label="The fallacy" class="s-segway">
+    <div class="kicker rise">The fallacy of the plan, 2001</div>
+    <h2 class="rise d1">Segway was the most hyped invention since the Macintosh.</h2>
+    <div class="cols">
+      <figure class="side rise d2">
+        <div class="ph">
+          <img src="images/stock-segway-tour.jpg" alt="Group riding Segways down a sunny city street" />
+          <span class="lgchip"><img class="lg" src="images/logos/logo-segway.svg" alt="Segway" /></span>
+        </div>
+        <figcaption>Segway PT. Consumer launch price $4,950.</figcaption>
+      </figure>
+      <div class="quotes rise d2">
+        <div class="slab hypelab">The hype</div>
+        <blockquote>As significant as the personal computer.<cite>Steve Jobs, per the leaked book proposal, 2001</cite></blockquote>
+        <blockquote>Maybe bigger than the Internet.<cite>John Doerr, as reported by Time, December 2001</cite></blockquote>
+      </div>
+      <figure class="side real" data-reveal="1">
+        <div class="slab reallab">The customer</div>
+        <div class="poster"><img src="images/paul-blart-mall-cop-poster.jpg" alt="Paul Blart: Mall Cop theatrical poster, Kevin James on a Segway" /></div>
+      </figure>
+    </div>
+    <p class="rline" data-reveal="1">Nineteen years on sale, about 140,000 units: roughly what the plan projected for the first year.</p>
+    <p class="rcite" data-reveal="1">Time&rsquo;s 50 Worst Inventions, 2010: &ldquo;the vehicle of choice for mall cops and lazy tourists.&rdquo;</p>
+    <p class="lesson" data-reveal="2">You want <b>fast failure</b> or <b>long-term success</b>. Medium-term failure is the trap: it eats savings, careers, and relationships.</p>
+    <div class="pnote">Sources: headline framing per Fast Company, 23 Jun 2020 (&ldquo;Segway, the most hyped invention since the Macintosh, to end production&rdquo;; ~140,000 units 2002&ndash;2020) · Jobs wording verbatim from the leaked Kemper book proposal (Slate, 1 Aug 2021); Doerr per Time, &ldquo;Reinventing the Wheel,&rdquo; 2 Dec 2001 (indirect speech) · first-year projection 50,000&ndash;100,000 units in 13 months: Wikipedia, Segway Inc. · price $4,950: Amazon press release, 18 Nov 2002 · Time, &ldquo;The 50 Worst Inventions,&rdquo; 27 May 2010 · Poster &copy; Columbia Pictures (2009), low-resolution fair-use classroom exhibit · Photo: Alain Rouiller, Unsplash License.</div>
+    <div class="pg">39</div>
+  </section>
+
+  <!-- 40 · EVIDENCE LOOP -->
+  <section data-label="Evidence loop" class="s-loop">
+    <h2 class="rise d1">Evidence-Based Entrepreneurship: the scientific method pointed at a business model design.</h2>
+    <p class="def rise d1">Treat every business model as a stack of guesses. Test the <b>riskiest guess</b> with the <b>cheapest experiment</b>, and let evidence steer.</p>
+    <div class="chain rise d2">
+      <div class="chip">Business model</div><div class="arr">→</div>
+      <div class="chip">Hypothesis</div><div class="arr">→</div>
+      <div class="chip">Prototype</div><div class="arr">→</div>
+      <div class="chip">Experiment</div><div class="arr">→</div>
+      <div class="chip ev">Evidence</div><div class="arr">→</div>
+      <div class="chip">Refine</div>
+    </div>
+    <div class="back rise d3"></div>
+    <div class="backlab rise d3">Repeat until the evidence convinces you</div>
+    <p class="lean late">In startup vocabulary: <span style="white-space:nowrap"><b>hypothesis</b> = assumption</span> · <span style="white-space:nowrap"><b>experiment</b> = customer conversation or prototype</span> · <span style="white-space:nowrap"><b>evidence</b> = validated learning</span> · <span style="white-space:nowrap"><b>iterate</b> = pivot or persevere</span>.</p>
+    <div class="pnote">Vocabulary: Eric Ries, The Lean Startup (2011): validated learning; pivot or persevere.</div>
+    <div class="pg">40</div>
+  </section>
+
+  <!-- 41 · SCIENTIFIC METHOD — animated -->
+  <section data-label="Scientific method, animated" class="s-anim side">
+    <div class="kicker rise">The oldest algorithm we have</div>
+    <h2 class="rise d1">Think like a scientist.</h2>
+    <div class="holder">
+      <div class="txt rise d2">
+        <p class="sub">Ask, research, hypothesize, experiment, analyze, share. Including the branch most founders skip: <b>is the test itself valid?</b> A broken experiment says nothing about the idea.</p>
+        <p class="sub" style="margin-top:36px">Every result, validated or not, feeds the next question.</p>
+      </div>
+      <iframe data-anim class="rise d2" src="animation/scientific-method.html" title="Scientific method loop animation"></iframe>
+      <div class="pfig">Ask, research, hypothesize, experiment, analyze, share, and around again.</div>
+    </div>
+    <div class="pg">41</div>
+  </section>
+
+  <!-- 42 · TALK TO CUSTOMERS -->
+  <section data-label="Talk to customers" class="s-startup s-talk" data-fx="zoom">
+    <h2 class="rise" style="font-size:136px">Talk to potential customers.</h2>
+    <p class="def late">Hypotheses are tested on people. The full-term version of this course requires <em>100+ customer conversations</em>. A semester version: <em>200</em>.</p>
+    <div class="book later">
+      <img class="cover" src="images/mom-test-cover.jpg" alt="The Mom Test by Rob Fitzpatrick, book cover" />
+      <p><b>The Mom Test</b>, Rob Fitzpatrick: how to ask questions that get honest answers. More on Thursday.</p>
+    </div>
+    <div class="pnote">Book: Rob Fitzpatrick, The Mom Test (2013). Cover shown for classroom identification.</div>
+    <div class="pg">42</div>
+  </section>
+
+
+
+
+
+
+
+
+  <!-- 43 · RECAP — four myths, four answers -->
+  <section data-label="Four answers" class="s-recap">
+    <div class="kicker rise">The whole course on one slide</div>
+    <h2 class="rise d1">Four myths, four answers.</h2>
+    <div class="rows">
+      <div class="row rise d1">
+        <div class="myth"><small>Myth 1 · Process</small><span class="claim">Great ideas strike you randomly.</span></div>
+        <div class="mid">→</div>
+        <div class="ans">A wide funnel: idea tournaments.</div>
+      </div>
+      <div class="row rise d2">
+        <div class="myth"><small>Myth 2 · Generation</small><span class="claim">I need a new technology or a new market.</span></div>
+        <div class="mid">→</div>
+        <div class="ans">Business Model Innovation.</div>
+      </div>
+      <div class="row rise d2">
+        <div class="myth"><small>Myth 3 · Selection</small><span class="claim">I&rsquo;m a good judge of my own ideas.</span></div>
+        <div class="mid">→</div>
+        <div class="ans">Wisdom of the crowd: communal feedback.</div>
+      </div>
+      <div class="row rise d3">
+        <div class="myth"><small>Myth 4 · The Business Plan</small><span class="claim">A great business plan gets you funded.</span></div>
+        <div class="mid">→</div>
+        <div class="ans">Evidence of product-market fit, gathered scientifically.</div>
+      </div>
+    </div>
+    <div class="pg">43</div>
+  </section>
+
+
+  <!-- 44 · BRIDGE TO BREAK — dark divider, not an end slide -->
+  <section data-label="Bridge to break" class="s-bridge s-myths dark" data-fx="zoom">
+    <div class="part kicker rise">Break · 15 minutes</div>
+    <h2 class="rise d1">After the break: disciplined ideation.</h2>
+    <p class="sub late">You&rsquo;ll generate your first ideas <b>in the room</b>. Grab coffee. <b>You&rsquo;ll register on Torneio mid-session</b>; your five theses go in tonight.</p>
+    <div class="pg">44</div>
+  </section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+<script src="deck-morph.js"></script>
+
+<div id="blackout"></div>
+<script>
+// Press B to fade the screen to black (and back) — for discussion moments.
+(function () {
+  const bo = document.getElementById('blackout');
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'b' || e.key === 'B') bo.toggleAttribute('data-on');
+    else if (e.key === 'Escape') bo.removeAttribute('data-on');
+  });
+  bo.addEventListener('click', () => bo.removeAttribute('data-on'));
+})();
+</script>
+
+<script>
+// Animation iframes: pause when their slide is inactive, resume when shown
+// (the animation files listen for deck:pause / deck:play). Also pull keyboard
+// focus back to the deck if a click lands inside an iframe, so arrow keys
+// keep driving the slides.
+(function () {
+  const stage = document.querySelector('deck-stage');
+  if (!stage) return;
+  const sync = () => {
+    document.querySelectorAll('deck-stage section iframe[data-anim]').forEach((f) => {
+      const active = f.closest('section').hasAttribute('data-deck-active');
+      try { f.contentWindow.postMessage(active ? 'deck:play' : 'deck:pause', '*'); } catch (e) {}
+    });
+  };
+  stage.addEventListener('slidechange', sync);
+  window.addEventListener('load', () => setTimeout(sync, 500));
+  window.addEventListener('blur', () => {
+    requestAnimationFrame(() => {
+      const ae = document.activeElement;
+      if (ae && ae.matches && ae.matches('iframe[data-anim]')) {
+        ae.blur();
+        window.focus();
+      }
+    });
+  });
+})();
+</script>
+
+<script>
+/* Four-levers bridge: drives animation/four-levers-walkthrough.html (K6).
+   Posts lever:N where N = highest currently shown lever card, else 0. */
+(function () {
+  function init() {
+    var slide = document.querySelector('section.s-levers2');
+    if (!slide) return;
+    var frame = slide.querySelector('iframe[data-anim]');
+    if (!frame) return;
+    var cards = Array.prototype.slice.call(slide.querySelectorAll('.card[data-lever]'));
+    function post() {
+      var n = 0;
+      cards.forEach(function (c) {
+        if (c.hasAttribute('data-reveal-shown')) {
+          n = Math.max(n, parseInt(c.getAttribute('data-lever'), 10) || 0);
+        }
+      });
+      try { frame.contentWindow.postMessage('lever:' + n, '*'); } catch (e) {}
+    }
+    var mo = new MutationObserver(post);
+    cards.forEach(function (c) {
+      mo.observe(c, { attributes: true, attributeFilter: ['data-reveal-shown'] });
+    });
+    frame.addEventListener('load', post);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+</script>
+
+<!-- Tweaks (palette / pace experiments) — only visible when Tweaks is toggled on -->
+<div id="tweaks-root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "paper": "#FBFBFA",
+  "accents": [
+    "#C8361F",
+    "#1E7A4F"
+  ],
+  "pace": "default",
+  "pageNumbers": true
+}/*EDITMODE-END*/;
+
+function DeckTweaks() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  React.useEffect(() => {
+    const r = document.documentElement.style;
+    r.setProperty('--paper', t.paper);
+    r.setProperty('--false', t.accents[0]);
+    r.setProperty('--true', t.accents[1]);
+    r.setProperty('--pace', String({ brisk: 0.7, default: 1, slow: 1.45 }[t.pace] || 1));
+    document.body.toggleAttribute('data-no-pg', !t.pageNumbers);
+  }, [t]);
+  return (
+    <TweaksPanel>
+      <TweakSection label="Color" />
+      <TweakColor label="Paper" value={t.paper}
+                  options={['#FBFBFA', '#F7F3EA', '#FFFFFF']}
+                  onChange={(v) => setTweak('paper', v)} />
+      <TweakColor label="Accents (myth · evidence)" value={t.accents}
+                  options={[['#C8361F', '#1E7A4F'], ['#D14E24', '#0E7490'], ['#B42318', '#3756C0']]}
+                  onChange={(v) => setTweak('accents', v)} />
+      <TweakSection label="Motion" />
+      <TweakRadio label="Reveal pace" value={t.pace}
+                  options={['brisk', 'default', 'slow']}
+                  onChange={(v) => setTweak('pace', v)} />
+      <TweakSection label="Chrome" />
+      <TweakToggle label="Page numbers" value={t.pageNumbers}
+                   onChange={(v) => setTweak('pageNumbers', v)} />
+    </TweaksPanel>
+  );
+}
+ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<DeckTweaks />);
+</script>
+</body>
+</html>

@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>INBM · Session 05: Venture Risk Management</title><style>
+:root{
+  --paper:#FBFBFA; --ink:#131312; --muted:#71716A; --hair:#E4E4DE;
+  --false:#C8361F; --true:#1E7A4F; --sans:"Helvetica Neue",Helvetica,"Arial Nova",Arial,sans-serif;
+}
+html,body{margin:0;padding:0;background:#000;}
+body{font-family:var(--sans);}
+deck-stage:not(:defined){visibility:hidden;}
+/* base styles keyed on bare `section` so they survive cloning into the thumbnail-rail shadow roots */
+section{box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans);}
+section *,section *::before,section *::after{box-sizing:border-box;}
+.dark{background:var(--ink);color:var(--paper);} .dark .kicker,.dark .muted{color:#8B8B84}.dark .pg{color:#8B8B84}
+.pg{position:absolute;right:64px;bottom:52px;font-size:24px;color:var(--muted);opacity:.55;font-variant-numeric:tabular-nums;z-index:5;}
+.kicker{font-size:29px;font-weight:500;letter-spacing:.01em;color:var(--muted);}
+.tag{align-self:flex-start;font-size:26px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:14px 28px;border-radius:4px;border:2.5px solid var(--ink);color:var(--ink);background:transparent;}
+.tag.green{border-color:var(--true);color:var(--true);} .tag.false{border-color:var(--false);color:var(--false);} .tag.fill{background:var(--ink);color:var(--paper);}
+mark{background:transparent;color:var(--true);font-weight:700;}
+strong,b{font-weight:700;color:inherit;}
+.red{color:var(--false);} .grn{color:var(--true);}
+img{display:block;}
+.pnote{display:none;}
+@media print{.pnote{display:block;position:absolute;left:140px;right:140px;bottom:14px;font-size:20px;line-height:1.3;color:var(--muted);background:rgba(251,251,250,.94);padding:6px 12px;border-radius:6px;z-index:6}.dark .pnote{background:rgba(19,19,18,.9);color:#8B8B84}}
+
+/* Reveal system */
+[data-reveal]{opacity:0;pointer-events:none;transition:opacity .45s ease,transform .45s ease;}
+[data-reveal][data-reveal-shown]{opacity:1;pointer-events:auto;}
+@media (prefers-reduced-motion:no-preference){[data-deck-active] .rise{animation:rise calc(1.05s * var(--pace,1)) cubic-bezier(.2,.7,.2,1) both}[data-deck-active] .rise.d1{animation-delay:calc(.25s * var(--pace,1))}[data-deck-active] .rise.d2{animation-delay:calc(.5s * var(--pace,1))}[data-deck-active] .rise.d3{animation-delay:calc(.75s * var(--pace,1))}[data-deck-active] .late{animation:appear calc(1.1s * var(--pace,1)) ease-out calc(2.2s * var(--pace,1)) both}[data-deck-active] .later{animation:appear calc(1.1s * var(--pace,1)) ease-out calc(3.4s * var(--pace,1)) both}
+  deck-stage section{transition:opacity .7s ease,visibility .7s;}
+  deck-stage section[data-fx="zoom"]{transition:opacity .7s ease,visibility .7s,transform .9s cubic-bezier(.25,.1,.2,1);transform:scale(1);}
+  deck-stage section[data-fx="zoom"]:not([data-deck-active]){transform:scale(1.045);}}
+@keyframes rise{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}@keyframes appear{from{opacity:0}to{opacity:1}}
+
+/* Title / statements / dividers */
+.s-title{padding:0 140px;justify-content:center}.s-title .kicker{margin-bottom:56px}.s-title h1{margin:0;font-size:164px;line-height:1.0;letter-spacing:-.035em;font-weight:700;max-width:1660px}.s-title .who{margin-top:72px;font-size:34px;color:var(--muted);line-height:1.5}.s-title .who b{color:var(--ink);font-weight:500}
+.s-startup{align-items:center;justify-content:center;text-align:center;padding:0 120px}.s-startup h2{margin:0;font-size:150px;letter-spacing:-.035em;font-weight:700;line-height:1.02;max-width:1660px}.s-startup .def{margin-top:70px;font-size:54px;line-height:1.42;color:var(--muted);max-width:1480px}.s-startup .def em{font-style:normal;color:var(--ink);font-weight:700}.s-startup .small{margin-top:48px;font-size:34px;line-height:1.4;color:var(--muted)}.s-startup.dark .def{color:#B9B9B2}.s-startup.dark .def em{color:var(--paper)}
+.s-divider{padding:120px 140px}.s-divider .part{align-self:flex-start}.s-divider h2{margin:auto 0 0;font-size:190px;line-height:.96;letter-spacing:-.04em;font-weight:700;max-width:1640px}.s-divider .below{margin-top:48px;font-size:38px;line-height:1.45;color:#8B8B84;max-width:1480px}.s-divider .below b{color:var(--paper)}
+
+/* Shared story/exhibit */
+.s-story{padding:0;flex-direction:row;align-items:stretch}.s-story .ph{width:58%;flex:none;position:relative;background:var(--hair);overflow:hidden}.s-story .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.s-story .rail{flex:1;min-width:0;padding:96px 110px 96px 90px;display:flex;flex-direction:column;justify-content:center}.s-story.flip{flex-direction:row-reverse}.s-story.flip .rail{padding:96px 90px 96px 110px}.logo-chip{display:inline-flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--hair);border-radius:12px;padding:16px 28px;min-height:96px;max-width:430px}.logo-chip img{max-height:64px;max-width:360px;object-fit:contain}.logo-chip.sm{min-height:72px;padding:10px 18px}.logo-chip.sm img{max-height:46px;max-width:220px}.logo-chip.lg{min-height:128px}.logo-chip.lg img{max-height:88px;max-width:420px}.s-story h2{margin:34px 0 0;font-size:70px;line-height:1.06;letter-spacing:-.03em;font-weight:700;max-width:780px}.s-story .take{margin:30px 0 0;font-size:36px;line-height:1.42;color:var(--muted);max-width:780px}.s-story .take b{color:var(--ink)}.valchip{align-self:flex-start;margin-top:30px;font-size:28px;font-weight:700;letter-spacing:.01em;color:var(--ink);border:2.5px solid var(--ink);border-radius:999px;padding:12px 28px}.who-line{margin-top:34px;border-left:5px solid var(--true);padding-left:24px}.who-line b{display:block;font-size:34px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.12}.who-line span{display:block;margin-top:6px;font-size:27px;color:var(--muted);line-height:1.25}
+.quote{margin-top:32px;border-left:5px solid var(--ink);padding-left:26px;font-size:30px;line-height:1.36;color:var(--ink);font-style:italic;max-width:780px}.quote cite{display:block;margin-top:12px;font-style:normal;font-size:25px;color:var(--muted);font-weight:700}
+.mini-list{margin:26px 0 0;padding:0;list-style:none;max-width:780px}.mini-list li{font-size:30px;line-height:1.3;color:var(--muted);padding:13px 0 13px 36px;position:relative;border-top:2px solid var(--hair)}.mini-list li::before{content:"";position:absolute;left:6px;top:23px;width:11px;height:11px;border-radius:50%;background:var(--true)}.mini-list li b{color:var(--ink)}
+.s-exhibit{padding:92px 140px 80px}.s-exhibit h2{margin:24px 0 0;font-size:92px;line-height:1.06;letter-spacing:-.03em;font-weight:700;max-width:1600px}.s-exhibit .sub{margin:22px 0 0;font-size:38px;line-height:1.42;color:var(--muted);max-width:1500px}.s-exhibit .art{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;margin-top:28px}.s-exhibit .art img{max-width:1400px;max-height:100%;object-fit:contain;border-radius:12px}
+.s-exhibit.duo .art{gap:72px;align-items:center}.s-exhibit.duo figure{margin:0;display:flex;flex-direction:column;align-items:center;max-width:47%;min-height:0}.s-exhibit.duo figure img{max-width:100%;max-height:470px;object-fit:contain;border-radius:12px}.s-exhibit.duo figcaption{margin-top:20px;font-size:27px;color:var(--muted);text-align:center;line-height:1.3}
+
+/* VCA timeline — horizontal evenly-spaced nodes */
+.s-vca-road{padding:84px 120px 90px}.s-vca-road h2{margin:18px 0 0;font-size:82px;line-height:1.08;letter-spacing:-.03em}
+.s-vca-road .road-wrap{flex:1;display:flex;align-items:center;margin-top:40px}
+.s-vca-road .timeline{position:relative;width:100%;display:flex;justify-content:space-between;align-items:flex-start}
+.s-vca-road .timeline::before{content:"";position:absolute;left:8%;right:8%;top:43px;height:6px;background:#C5CAD2;border-radius:3px;z-index:0}
+.s-vca-road .tstep{position:relative;z-index:1;width:16%;display:flex;flex-direction:column;align-items:center;text-align:center}
+.s-vca-road .tnode{width:92px;height:92px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:700;border:7px solid var(--paper);font-variant-numeric:tabular-nums}
+.s-vca-road .tstep b{display:block;margin-top:24px;font-size:31px;line-height:1.14;letter-spacing:-.01em;color:var(--ink)}
+.s-vca-road .tstep p{margin:12px 0 0;font-size:25px;line-height:1.32;color:var(--muted)}
+
+/* Business Model Canvas */
+.bmc{position:relative;display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:1fr 1fr .82fr;width:100%;height:100%;border:4px solid var(--ink);background:#fff}.bmc .cell{position:relative;border-right:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);padding:18px 20px;overflow:hidden}.bmc .kp{grid-column:1 / 3;grid-row:1 / 3}.bmc .ka{grid-column:3 / 5;grid-row:1}.bmc .kr{grid-column:3 / 5;grid-row:2}.bmc .vp{grid-column:5 / 7;grid-row:1 / 3}.bmc .cr{grid-column:7 / 9;grid-row:1}.bmc .ch{grid-column:7 / 9;grid-row:2}.bmc .cs{grid-column:9 / 11;grid-row:1 / 3;border-right:none}.bmc .cst{grid-column:1 / 6;grid-row:3;border-bottom:none}.bmc .rev{grid-column:6 / 11;grid-row:3;border-bottom:none;border-right:none}.bmc .lab{font-size:19px;font-weight:700;letter-spacing:.04em;line-height:1.12;text-transform:uppercase;color:var(--muted);padding-right:34px}.bmc .abbr{position:absolute;right:15px;top:15px;font-size:21px;line-height:1;font-weight:700;color:var(--muted);opacity:.34;letter-spacing:.02em}.bmc .mini{margin-top:18px;font-size:24px;line-height:1.25;color:var(--ink)}.bmc .mini p{margin:0 0 9px}.bmc .mini b{color:var(--ink)}
+.bmc.full .cell{background:rgba(30,122,79,.035)}.bmc.full .vp,.bmc.full .cs,.bmc.full .cst,.bmc.full .rev{background:rgba(30,122,79,.08)}
+.s-bmc-intro{padding:84px 140px 84px}.s-bmc-intro h2{margin:22px 0 0;font-size:82px;line-height:1.08;letter-spacing:-.03em}.s-bmc-intro .row{display:grid;grid-template-columns:1.05fr 560px;gap:64px;flex:1;min-height:0;margin-top:42px}.s-bmc-intro .canvas{height:100%;position:relative}.s-bmc-intro .side{display:flex;flex-direction:column;justify-content:center}.s-bmc-intro .side .r{padding:22px 0;border-top:2px solid var(--hair);font-size:34px;line-height:1.35;color:var(--muted)}.s-bmc-intro .side .r b{color:var(--ink)}
+.s-bmc-intro .stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:6}.s-bmc-intro .stamp span{font-size:165px;font-weight:800;color:var(--false);transform:rotate(-22deg);letter-spacing:-.01em;line-height:1;text-shadow:0 0 40px rgba(251,251,250,.92),0 6px 28px rgba(251,251,250,.7)}
+
+/* Step lock spine (shared with the risk-reduction step slides) */
+.step-lock{position:absolute;left:140px;top:78px;right:140px;z-index:4}.sl-head{display:flex;align-items:center;gap:26px}.sl-kick{font-size:27px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--true)}.sl-track{display:inline-flex;gap:9px}.sl-track i{width:44px;height:9px;border-radius:5px;background:var(--hair);display:block}.sl-track i.on{background:var(--true)}.sl-count{font-size:31px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}.sl-count b{font-size:38px;font-weight:700;color:var(--ink);margin-right:2px}.sl-name{margin-top:18px;font-size:60px;font-weight:700;line-height:1.02;letter-spacing:-.03em;color:var(--ink);max-width:1500px}.has-steplock{padding-top:222px}
+section.has-steplock{padding-top:222px}section.has-steplock>h2{margin-top:0}
+
+/* Video facade */
+.s-video{padding:0;background:var(--ink);align-items:center;justify-content:center;position:relative}
+.s-video a.frame{position:relative;display:block;width:1500px;height:846px;border-radius:14px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.5);text-decoration:none;background:#0061FF}
+.s-video a.frame .thumb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0061FF,#0046b8)}
+.s-video a.frame .thumb img{max-width:560px;max-height:200px;object-fit:contain;filter:brightness(0) invert(1)}
+.s-video .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,0) 40%)}
+.s-video .play{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:154px;height:106px;border-radius:26px;background:#FF0000;display:flex;align-items:center;justify-content:center;transition:transform .2s ease}
+.s-video a.frame:hover .play{transform:translate(-50%,-50%) scale(1.06)}
+.s-video .play::after{content:"";border-left:50px solid #fff;border-top:31px solid transparent;border-bottom:31px solid transparent;margin-left:12px}
+.s-video .vtitle{position:absolute;left:54px;right:54px;bottom:48px;color:#fff;font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1.14}
+.s-video .vtitle .watch{display:block;margin-top:14px;font-size:26px;font-weight:500;color:rgba(255,255,255,.82)}
+.s-video .vkick{position:absolute;left:140px;top:78px;font-size:27px;font-weight:500;letter-spacing:.01em;color:#8B8B84;z-index:2}
+
+/* Step slides (generic) */
+.s-step{padding:90px 140px 80px}.s-step h2{margin:14px 0 0;font-size:72px;line-height:1.06;letter-spacing:-.03em;max-width:1600px}.s-step.has-steplock h2{margin-top:0}.s-step .body{display:grid;grid-template-columns:1fr 540px;gap:64px;flex:1;min-height:0;margin-top:38px}.s-step .body.wide{grid-template-columns:1fr}.s-step .aside{border-left:5px solid var(--true);padding-left:36px;align-self:center}.s-step .aside .k{font-size:26px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--true)}.s-step .aside p{margin:16px 0 0;font-size:32px;line-height:1.38;color:var(--muted)}.s-step .aside p b{color:var(--ink)}.s-step .cards{display:grid;grid-template-columns:1fr 1fr;gap:32px}.s-step .cards.three{grid-template-columns:repeat(3,1fr)}.s-step .qcard{border-top:5px solid var(--ink);padding-top:24px}.s-step .qcard.green{border-top-color:var(--true)}.s-step .qcard.red{border-top-color:var(--false)}.s-step .qcard h3{margin:0;font-size:40px;line-height:1.12;letter-spacing:-.02em}.s-step .qcard p{margin:14px 0 0;font-size:30px;line-height:1.35;color:var(--muted)}.s-step .qcard p b{color:var(--ink)}
+
+/* Demand / two-column panels */
+.s-demand{padding:222px 140px 80px}.s-demand.nolock{padding-top:90px}.s-demand h2{margin:14px 0 0;font-size:72px;letter-spacing:-.03em;line-height:1.06;max-width:1640px}.s-demand .cols{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin-top:46px}.s-demand .panel{border-top:6px solid var(--ink);padding-top:26px}.s-demand .panel.risk{border-top-color:var(--false)}.s-demand .panel h3{margin:0;font-size:40px;letter-spacing:-.02em}.s-demand .panel.risk h3{color:var(--false)}.s-demand .panel .item{padding:16px 0;border-bottom:2px solid var(--hair);font-size:33px;line-height:1.25}.s-demand .panel .item span{color:var(--muted)}.s-demand .panel.risk .item b{color:var(--false)}.s-demand .foot{margin-top:32px;font-size:32px;color:var(--muted)}.s-demand .foot b{color:var(--ink)}
+
+/* Q&A reveal slide */
+.s-qa{padding:84px 130px 80px}.s-qa h2{margin:14px 0 0;font-size:64px;letter-spacing:-.03em;line-height:1.08;max-width:1600px}.s-qa .qa-list{flex:1;display:flex;flex-direction:column;justify-content:center;gap:42px;margin-top:34px}.s-qa .q{font-size:44px;font-weight:700;letter-spacing:-.01em;color:var(--ink);border-left:5px solid var(--ink);padding-left:26px;line-height:1.1}.s-qa .a{font-size:33px;line-height:1.38;color:var(--muted);padding-left:31px;margin-top:18px;max-width:1540px}.s-qa .a b{color:var(--ink)}
+
+/* Activity (peer review A6) */
+.s-act{padding:64px 110px}.s-act .frame{flex:1;border:4px solid var(--ink);border-radius:20px;padding:44px 76px 36px;display:flex;flex-direction:column;position:relative}.s-act .tag{position:absolute;top:-30px;left:76px;background:var(--paper)}.s-act h2{margin:16px 0 0;font-size:66px;letter-spacing:-.025em}.s-act .cols{display:grid;grid-template-columns:1.3fr 1fr;gap:80px;margin-top:32px;flex:1;min-height:0;align-items:center}.s-act ol{list-style:none;counter-reset:s;margin:0;padding:0}.s-act li{counter-increment:s;display:grid;grid-template-columns:64px 1fr;gap:26px;padding:15px 0;border-bottom:2px solid var(--hair);font-size:31px;line-height:1.32}.s-act li:last-child{border-bottom:none}.s-act li::before{content:counter(s);width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:700}.s-act li b{color:var(--ink)}.s-act li span{color:var(--muted)}.s-act .goal{border-left:5px solid var(--true);padding-left:42px;align-self:center}.s-act .goal .k{font-size:26px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--true)}.s-act .goal h3{margin:14px 0 0;font-size:46px;line-height:1.08;letter-spacing:-.02em}.s-act .goal p{margin:18px 0 0;font-size:30px;line-height:1.4;color:var(--muted)}.s-act .goal p b{color:var(--ink)}
+
+/* Homework + end */
+.s-hw{padding:96px 140px 80px}.s-hw h2{margin:32px 0 0;font-size:88px;letter-spacing:-.03em}.s-hw .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:52px;flex:1;align-content:start}.s-hw .card{border-top:6px solid var(--ink);padding-top:30px}.s-hw .card .n{font-size:28px;font-weight:700;color:var(--muted)}.s-hw .card h3{margin:14px 0 0;font-size:42px;line-height:1.15;letter-spacing:-.015em}.s-hw .card p{margin:18px 0 0;font-size:29px;line-height:1.45;color:var(--muted)}.s-hw .card p b{color:var(--ink)}
+.s-end{padding:120px 140px}.s-end h2{margin:auto 0 0;font-size:190px;letter-spacing:-.035em;line-height:1}.s-end .contact{margin-top:64px;font-size:38px;color:#8B8B84}.s-end .contact b{color:var(--paper);font-weight:500}
+
+/* ════════ NEW archetypes for Session 05 ════════ */
+
+/* Four-day plan (from S1 .s-cal) */
+.s-cal{padding:84px 110px 100px}.s-cal .kicker{margin-bottom:16px}.s-cal h2{margin:0;font-size:72px;font-weight:700;letter-spacing:-.025em}.s-cal .grid{display:grid;grid-template-columns:1fr 1fr 1.25fr 1fr;gap:26px;margin-top:36px;flex:1;min-height:0}.s-cal .col{border:3px solid var(--hair);border-radius:14px;padding:30px 28px 22px;position:relative;display:flex;flex-direction:column}.s-cal .col.here{border:4px solid var(--ink)}.s-cal .you{position:absolute;top:-24px;left:24px;background:var(--ink);color:var(--paper);font-size:24px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:9px 18px;border-radius:4px}.s-cal .d{font-size:26px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}.s-cal .stage{margin-top:8px;font-size:42px;font-weight:700;letter-spacing:-.015em}.s-cal .chip{border-top:2px solid var(--hair);margin-top:18px;padding-top:16px;font-size:26px;line-height:1.35;color:var(--muted)}.s-cal .chip b{color:var(--ink);font-weight:700}.s-cal .chip .due{color:var(--ink);font-weight:700;white-space:nowrap}.s-cal .chip.win{color:var(--true);font-weight:700;font-size:30px}
+.s-cal .chip.moved{color:var(--false)}.s-cal .chip.moved b{color:var(--false)}.s-cal .chip.moved .strike{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--false)}.s-cal .chip.moved .arrow{display:block;text-decoration:none;font-weight:700;font-size:24px;margin-top:6px;letter-spacing:.005em}
+.s-cal .inclass{display:inline-block;background:var(--ink);color:var(--paper);font-size:24px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 12px;border-radius:4px;line-height:1.25;white-space:nowrap;vertical-align:baseline}
+
+/* Team of four headshots */
+.s-team4{padding:84px 130px 78px}.s-team4 h2{margin:14px 0 0;font-size:72px;letter-spacing:-.03em;line-height:1.06;max-width:1640px}.s-team4 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:34px;margin-top:40px}.s-team4 figure{margin:0;display:flex;flex-direction:column}.s-team4 .ph{height:340px;border-radius:14px;overflow:hidden;background:var(--hair)}.s-team4 .ph img{width:100%;height:100%;object-fit:cover;object-position:center 20%}.s-team4 figcaption{margin-top:18px}.s-team4 .nm{font-size:34px;font-weight:700;letter-spacing:-.01em;line-height:1.05}.s-team4 .role{margin-top:7px;font-size:26px;color:var(--muted);line-height:1.3}.s-team4 .punch{margin-top:auto;padding-top:34px;font-size:46px;font-weight:700;letter-spacing:-.02em;line-height:1.12;color:var(--muted)}.s-team4 .punch b{color:var(--ink)}
+
+/* Segway year timeline */
+.s-timeline{padding:84px 120px 84px}.s-timeline h2{margin:14px 0 0;font-size:74px;letter-spacing:-.03em;line-height:1.06;max-width:1640px}.s-timeline .tl{margin-top:46px}.s-timeline .axis{position:relative;display:flex;justify-content:space-between}.s-timeline .axis::before{content:"";position:absolute;left:9%;right:9%;top:62px;height:5px;background:#C5CAD2;border-radius:3px;z-index:0}.s-timeline .yr{position:relative;z-index:1;width:18%;text-align:center;display:flex;flex-direction:column;align-items:center}.s-timeline .yr .y{font-size:40px;font-weight:700;letter-spacing:.01em}.s-timeline .yr .dot{width:26px;height:26px;border-radius:50%;background:var(--ink);margin:18px 0 0;border:6px solid var(--paper)}.s-timeline .yr.last .dot{background:var(--false)}.s-timeline .yr .ev{margin-top:24px;font-size:26px;color:var(--muted);line-height:1.32}.s-timeline .kill{margin-top:58px;font-size:42px;line-height:1.3;color:var(--muted);max-width:1560px}.s-timeline .kill b{color:var(--ink)}.s-timeline .kill .red{color:var(--false)}
+
+/* 5-step risk-reduction ladder */
+.s-method5{padding:84px 130px 76px}.s-method5 h2{margin:14px 0 0;font-size:62px;letter-spacing:-.03em;line-height:1.06;max-width:1560px}.s-method5 .steps{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;margin-top:32px}.s-method5 .st{display:grid;grid-template-columns:90px 1fr;gap:32px;align-items:start;padding:20px 30px;border-radius:14px;border:3px solid var(--hair)}.s-method5 .st .n{width:72px;height:72px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700}.s-method5 .st .t{font-size:36px;font-weight:700;letter-spacing:-.01em;line-height:1.1}.s-method5 .st .d{margin-top:8px;font-size:28px;color:var(--muted);line-height:1.32}.s-method5 .st .d b{color:var(--ink)}
+
+/* Segway risk table (Step 3 reference) */
+.s-risktable{padding:84px 110px 78px}.s-risktable h2{margin:14px 0 0;font-size:62px;letter-spacing:-.03em;line-height:1.06}.s-risktable table{width:100%;border-collapse:collapse;margin-top:28px;font-size:25px;line-height:1.24}.s-risktable th{font-size:24px;letter-spacing:.08em;text-transform:uppercase;text-align:left;color:var(--muted);border-bottom:4px solid var(--ink);padding:12px 16px;font-weight:700}.s-risktable th.c,.s-risktable td.c{text-align:center}.s-risktable td{border-bottom:2px solid var(--hair);padding:13px 16px;vertical-align:top}.s-risktable td.k{font-weight:700;color:var(--ink);width:42px}.s-risktable td.risk{color:var(--ink)}.s-risktable td.cost{font-weight:700;text-align:right;white-space:nowrap}.s-risktable .dots{color:var(--false);font-size:26px;letter-spacing:3px;font-weight:700}.s-risktable tr.hi td{background:rgba(200,54,31,.05)}
+
+/* Step 4 — feasible task sequence graph (SVG) */
+.s-seqgraph{padding:90px 140px 80px}.s-seqgraph h2{margin:0;font-size:72px;letter-spacing:-.03em;line-height:1.06}.s-seqgraph.has-steplock h2{margin-top:0}.s-seqgraph .wrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;margin-top:20px}.s-seqgraph svg{width:100%;height:100%;max-height:660px}.s-seqgraph .nd{fill:#fff;stroke:var(--ink);stroke-width:3}.s-seqgraph .nd.start{fill:var(--ink)}.s-seqgraph .nl{font-size:34px;font-weight:700;fill:var(--ink);text-anchor:middle}.s-seqgraph .nl.w{fill:#fff}.s-seqgraph .cap{font-size:23px;fill:var(--muted);text-anchor:middle}.s-seqgraph .cap b{font-weight:700}.s-seqgraph .edge{fill:none;stroke:var(--ink);stroke-width:3.5}.s-seqgraph .ah{fill:var(--ink)}.s-seqgraph .dots{font-size:22px;fill:var(--false);text-anchor:middle;letter-spacing:2px;font-weight:700}
+
+/* Step 5 — risk vs cost step chart (SVG) */
+.s-riskcost{padding:90px 140px 78px}.s-riskcost h2{margin:0;font-size:68px;letter-spacing:-.03em;line-height:1.06}.s-riskcost.has-steplock h2{margin-top:0}.s-riskcost .wrap{flex:1;display:flex;min-height:0;margin-top:14px}.s-riskcost svg{width:100%;height:100%;max-height:600px}.s-riskcost .axis{stroke:var(--ink);stroke-width:3}.s-riskcost .alab{font-size:26px;fill:var(--muted);font-weight:700}.s-riskcost .orig{fill:none;stroke:var(--ink);stroke-width:4}.s-riskcost .alt{fill:none;stroke:var(--true);stroke-width:5}.s-riskcost .plab{font-size:25px;font-weight:700}.s-riskcost .tick{font-size:24px;fill:var(--muted)}.s-riskcost .note{font-size:24px;fill:var(--muted)}.s-riskcost .foot{margin-top:10px;font-size:34px;font-weight:700;letter-spacing:-.01em;text-align:center}.s-riskcost .foot .grn{color:var(--true)}
+.s-riskcost .step{font-size:24px;font-weight:600}.s-riskcost .frame{font-size:27px;font-weight:800}.s-riskcost .lo{fill:#131312}.s-riskcost .la{fill:#1E7A4F}.s-riskcost .mu{fill:#71716A;font-style:italic;font-weight:500}
+
+/* How to build an MVP — CSS vehicle rows */
+.s-mvpbuild{padding:80px 120px 76px}.s-mvpbuild h2{margin:0;font-size:64px;letter-spacing:-.03em;line-height:1.06}.s-mvpbuild .band{margin-top:30px}.s-mvpbuild .bl{display:flex;align-items:center;gap:22px;font-size:28px;color:var(--muted);font-weight:700;letter-spacing:.02em}.s-mvpbuild .bl .ln{flex:1;height:2px;background:var(--hair)}.s-mvpbuild .bl.bad{color:var(--false)}.s-mvpbuild .bl.good{color:var(--true)}.s-mvpbuild .row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;gap:10px}.s-mvpbuild .cell{flex:1;display:flex;flex-direction:column;align-items:center;gap:14px}.s-mvpbuild .face{width:46px;height:46px}.s-mvpbuild .veh{height:104px;display:flex;align-items:flex-end;justify-content:center}.s-mvpbuild .veh svg{height:100%;width:auto}.s-mvpbuild .vstroke{fill:none;stroke:var(--ink);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}.s-mvpbuild .band.b2{margin-top:40px}.s-mvpbuild .num{font-size:22px;color:var(--muted);font-weight:700}
+
+/* Interview transcripts */
+.s-transcript{padding:70px 120px 66px}.s-transcript h2{margin:0;font-size:60px;letter-spacing:-.03em;line-height:1.06}.s-transcript .convo{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;margin-top:26px;max-width:1700px}.s-transcript .turn{display:grid;grid-template-columns:152px 1fr;gap:26px;align-items:start;font-size:26px;line-height:1.32}.s-transcript .who{font-weight:700;font-size:25px;color:var(--muted);text-align:right}.s-transcript .turn.q .who{color:var(--ink)}.s-transcript.dark .turn.q .who{color:var(--paper)}.s-transcript .ln{color:var(--ink)}.s-transcript.dark .ln{color:#E9E9E4}.s-transcript.dark .who{color:#9b9b94}.s-transcript.dark .pg{color:#8B8B84}
+/* === Bad/Good interview: bigger type + two distinct speaker colors === */
+.s-transcript{--qcol:#2E6FB0;--acol:#B26A1E}/* interviewer=blue, interviewee=amber */
+.s-transcript .turn{font-size:30px;line-height:1.3}
+.s-transcript .who{font-size:27px}
+.s-transcript .convo{gap:16px}
+/* light slide */
+.s-transcript .turn.q .who{color:var(--qcol)}
+.s-transcript .turn.q .ln{color:var(--qcol)}
+.s-transcript .turn.a .who{color:var(--acol)}
+.s-transcript .turn.a .ln{color:var(--acol);font-weight:500}
+/* dark slide: brighter speaker hues that read on ink */
+.s-transcript.dark{--qcol:#6FB0E8;--acol:#E6A95A}
+.s-transcript.dark .turn.q .who{color:var(--qcol)}
+.s-transcript.dark .turn.q .ln{color:var(--qcol)}
+.s-transcript.dark .turn.a .who{color:var(--acol)}
+.s-transcript.dark .turn.a .ln{color:var(--acol);font-weight:500}
+
+/* Mom Test tactics (dark) */
+.s-momtest{padding:88px 130px 80px;background:var(--ink);color:var(--paper)}.s-momtest .kicker{color:#8B8B84}.s-momtest h2{margin:14px 0 0;font-size:74px;letter-spacing:-.03em;line-height:1.05;color:var(--paper);max-width:1600px}.s-momtest .grid{display:grid;grid-template-columns:1fr 1fr;gap:34px 60px;margin-top:46px;flex:1;align-content:center}.s-momtest .t{border-top:5px solid var(--true);padding-top:22px}.s-momtest .t h3{margin:0;font-size:36px;letter-spacing:-.02em;color:var(--paper)}.s-momtest .t .say{margin:16px 0 0;font-size:28px;line-height:1.36;color:#cfcfca;font-style:italic}.s-momtest .foot{margin-top:36px;font-size:30px;font-weight:700;color:#B9B9B2}.s-momtest .foot b{color:var(--paper)}
+
+@media print{
+  html,body{background:#fff;overflow:visible;width:auto;height:auto} deck-stage{display:block;width:auto;height:auto;overflow:visible;background:#fff} section{position:relative;left:auto;top:auto;width:1920px;height:1080px;transform:none!important;opacity:1!important;visibility:visible!important} [data-reveal]{opacity:1!important;pointer-events:auto!important} #blackout{display:none}.pg{opacity:.55}
+}
+/* Scientific-method animated slide (ported from Session 01) */
+.s-anim { padding: 70px 140px 60px; }
+.s-anim h2 { margin: 18px 0 0; font-size: 72px; font-weight: 700; letter-spacing: -0.025em; }
+.s-anim .holder { flex: 1; min-height: 0; margin-top: 28px; display: flex; align-items: center; justify-content: center; }
+.s-anim iframe { width: 1640px; height: 100%; border: 3px solid var(--hair); border-radius: 14px; background: #fff; }
+.s-anim.side .holder { gap: 56px; }
+.s-anim.side .txt { flex: 1; align-self: center; }
+.s-anim.side .txt .sub { font-size: 38px; line-height: 1.5; color: var(--muted); }
+.s-anim.side .txt .sub b { color: var(--ink); font-weight: 700; }
+.s-anim.side iframe { width: 960px; height: 100%; flex: none; }
+.s-anim .pfig { display: none; }
+@media print {
+  .s-anim iframe { display: none; }
+  .s-anim .pfig { display: flex; flex: 1; align-items: center; justify-content: center; text-align: center;
+                  font-size: 54px; font-weight: 700; line-height: 1.4; color: var(--ink); }
+  .s-anim .pfig img { max-width: 1100px; max-height: 640px; object-fit: contain; }
+}
+
+.s-step .oq-contrast{display:grid;grid-template-columns:1fr 132px 1fr;align-items:center;gap:0;margin-top:20px}
+.s-step .oq-contrast .qcard{padding-top:30px}
+.s-step .oq-contrast .qcard h3{font-size:44px}
+.s-step .oq-contrast .oq-q{margin:20px 0 0;font-size:40px;line-height:1.18;letter-spacing:-.01em;color:var(--ink)}
+.s-step .oq-contrast .oq-why{margin:18px 0 0;font-size:30px;line-height:1.32;color:var(--muted)}
+.s-step .oq-arrow{display:flex;align-items:center;justify-content:center;height:100%}
+.s-step .oq-arrow .oq-line{display:block;width:74px;height:6px;background:var(--ink)}
+.s-step .oq-arrow .oq-head{display:block;width:0;height:0;border-top:19px solid transparent;border-bottom:19px solid transparent;border-left:30px solid var(--ink);margin-left:-2px}
+.s-step .oq-openers{display:flex;align-items:baseline;flex-wrap:wrap;gap:14px 30px;margin-top:64px;border-top:3px solid var(--hair);padding-top:30px}
+.s-step .oq-openers .oq-k{font-size:26px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--true)}
+.s-step .oq-openers .oq-words{font-size:34px;line-height:1.3;color:var(--muted)}
+.s-step .oq-openers .oq-words b{color:var(--ink);font-weight:700}
+.s-step .oq-openers .oq-rule{font-size:30px;line-height:1.3;color:var(--ink);font-weight:500;margin-left:auto}
+
+/* ===== round-4 additions ===== */
+/* method3 */
+.s-story.concierge .ph .suitcase{position:absolute;right:34px;bottom:34px;margin:0;width:288px;background:#fff;border-radius:14px;padding:18px 18px 16px;box-shadow:0 20px 54px rgba(0,0,0,.34);transform:rotate(-2.5deg);transform-origin:bottom right}
+.s-story.concierge .ph .suitcase img{position:static;width:100%;height:auto;object-fit:contain;display:block}
+.s-story.concierge .ph .suitcase figcaption{margin-top:12px;font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.18;color:var(--ink);text-align:center}
+/* method4 */
+.s-crowd{flex-direction:column;justify-content:center;padding:96px 140px}
+.s-crowd .kicker{align-self:flex-start}
+.s-crowd h2{margin:18px 0 0;font-size:96px;line-height:1;letter-spacing:-.035em;font-weight:700}
+.s-crowd .take{margin:26px 0 0;font-size:40px;line-height:1.38;color:var(--muted);max-width:1500px}
+.s-crowd .take b{color:var(--ink)}
+.s-crowd .strip{margin:50px 0 0;width:100%;max-width:1640px;border:3px solid var(--hair);border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.12)}
+.s-crowd .strip img{display:block;width:100%;height:auto}
+.s-crowd .who-line{margin-top:48px;border-left:5px solid var(--true);padding-left:24px}
+.s-crowd .who-line b{display:block;font-size:36px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.12}
+.s-crowd .who-line span{display:block;margin-top:8px;font-size:30px;color:var(--muted);line-height:1.28}
+.s-crowd .cred-row{display:flex;align-items:center;gap:30px;margin-top:38px}.s-crowd .cred-row .founder-photo{width:140px;height:176px;object-fit:cover;border-radius:12px;flex:none}.s-crowd .cred-row .who-line{margin-top:0;border-left:none;padding-left:0}
+/* method5 */
+.s-story.twoph .ph{display:flex;gap:0;background:var(--ink)}
+.s-story.twoph .ph figure{position:relative;margin:0;flex:1;min-width:0;overflow:hidden}
+.s-story.twoph .ph figure img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:26px}
+.s-story.twoph .ph figure:first-child{border-right:4px solid var(--paper)}
+/* peoplepods */
+.s-vid2{padding:0;flex-direction:row;align-items:stretch}
+.s-vid2 .rail{flex:1;min-width:0;padding:96px 70px 96px 110px;display:flex;flex-direction:column;justify-content:center}
+.s-vid2 .kicker{margin-bottom:10px}
+.s-vid2 h2{margin:14px 0 0;font-size:84px;line-height:1.02;letter-spacing:-.03em;font-weight:700;max-width:760px}
+.s-vid2 .what{margin:32px 0 0;font-size:38px;line-height:1.34;color:var(--ink);max-width:760px}
+.s-vid2 .eg{margin:26px 0 0;font-size:33px;line-height:1.4;color:var(--muted);max-width:760px}
+.s-vid2 .eg b{color:var(--ink)}
+.s-vid2 .media{width:50%;flex:none;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:60px}
+.s-vid2 .facade{position:relative;display:block;width:720px;height:405px;border-radius:14px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.45);text-decoration:none;background:#0061FF}
+.s-vid2 .facade .thumb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#fff}
+.s-vid2 .facade .thumb img{max-width:420px;max-height:150px;object-fit:contain}
+.s-vid2 .facade .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.32),rgba(0,0,0,0) 46%)}
+.s-vid2 .facade .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:128px;height:88px;border-radius:22px;background:#FF0000;display:flex;align-items:center;justify-content:center;transition:transform .2s ease}
+.s-vid2 .facade:hover .play{transform:translate(-50%,-50%) scale(1.06)}
+.s-vid2 .facade .play::after{content:"";border-left:42px solid #fff;border-top:26px solid transparent;border-bottom:26px solid transparent;margin-left:10px}
+.s-vid2 .vcap{font-size:26px;font-weight:500;color:#8B8B84;text-align:center;max-width:720px}
+.s-vid2 .player{font-size:24px;width:760px;max-width:100%;max-height:560px;border-radius:14px;background:#000;box-shadow:0 24px 70px rgba(0,0,0,.45);display:block}
+.s-vid2 .founder{display:flex;align-items:center;gap:22px;margin-top:34px;border-left:5px solid var(--true);padding-left:24px}
+.s-vid2 .founder img{width:118px;height:118px;border-radius:12px;object-fit:cover;flex:none}
+.s-vid2 .founder .cred{font-size:30px;font-weight:700;color:var(--ink);line-height:1.15}
+.s-vid2 .who-line{margin-top:32px;border-left:5px solid var(--true);padding-left:24px}
+.s-vid2 .who-line b{display:block;font-size:32px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.12}
+.s-vid2 .who-line span{display:block;margin-top:6px;font-size:27px;color:var(--muted);line-height:1.25}
+/* research */
+.s-step .rscol{max-width:1500px;align-self:center}.s-step .rscol p{margin:0 0 30px;font-size:44px;line-height:1.32;color:var(--ink);text-wrap:pretty}.s-step .rscol p:last-child{margin-bottom:0}.s-step .rscol .rsnote{font-size:36px;color:var(--muted);border-left:5px solid var(--true);padding-left:32px;margin-top:8px}.s-step .rscol .rsnote b{color:var(--ink)}.s-step .cite{margin-top:18px;font-size:26px;line-height:1.4;color:var(--muted)}.s-step .cite em{font-style:italic}
+/* stories */
+.s-startup .def2{margin-top:42px;font-size:48px;line-height:1.4;color:var(--ink);font-weight:500;max-width:1480px}.s-startup .def2 em{font-style:normal;color:var(--ink);font-weight:700}
+/* ainotes */
+.s-step .ai-cap{max-width:1640px}.s-step .ai-cap>p{margin:0;font-size:40px;line-height:1.34;color:var(--ink)}.s-step .ai-tools{display:flex;align-items:center;gap:56px;margin:40px 0 0;flex-wrap:wrap}.s-step .ai-tools .tool{display:flex;align-items:center;justify-content:center;height:74px}.s-step .ai-tools .tool img{height:60px;width:auto;object-fit:contain}.s-step .ai-tools .tool.sq{flex-direction:column;gap:10px;height:auto}.s-step .ai-tools .tool.sq img{height:74px}.s-step .ai-tools .tool.sq span{font-size:24px;color:var(--muted);font-weight:700}.s-step .ai-brain{display:grid;grid-template-columns:1fr 540px;gap:64px;margin-top:48px;align-items:center}.s-step .ai-brain>p{margin:0;font-size:38px;line-height:1.34;color:var(--ink)}.s-step .ai-brain>p b{color:var(--true)}.s-step .ai-brain .ai-but{border-left:5px solid var(--true);padding-left:36px}.s-step .ai-brain .ai-but .k{font-size:26px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--true)}.s-step .ai-brain .ai-but p{margin:14px 0 0;font-size:32px;line-height:1.34;color:var(--muted)}
+/* aicost */
+.s-step .ai-logos{display:flex;align-items:center;justify-content:center;gap:84px;margin-top:44px;padding-top:38px;border-top:2px solid var(--hair)}
+.s-step .ai-logos img{height:100px;width:auto;opacity:.9}
+.s-step .ai-logos img.l-openai{height:56px}
+/* raterisk mini-bmc */
+.s-step .left-col{display:flex;flex-direction:column;min-height:0}
+.s-step .mini-bmc{margin-top:28px;display:flex;flex-direction:column;flex:1;min-height:0}
+.s-step .mini-bmc .bmc{flex:1;min-height:0}
+.s-step .mini-bmc .bmc .cell{display:flex;align-items:center;justify-content:center;padding:6px}
+.s-step .mini-bmc .bmc .ab{font-size:28px;font-weight:700;letter-spacing:.02em;color:var(--muted)}
+.s-step .mini-bmc .bmc .cell.hot{background:rgba(200,54,31,.12)}
+.s-step .mini-bmc .bmc .cell.hot .ab{color:var(--false)}
+.s-step .mini-bmc .mini-cap{margin-top:14px;font-size:26px;color:var(--muted)}
+/* transcripts: two speaker colors, fit */
+.s-transcript{--qcol:#2E6FB0;--acol:#B26A1E}
+.s-transcript .turn{font-size:28px;line-height:1.28}
+.s-transcript .who{font-size:26px}
+.s-transcript .convo{gap:12px;margin-bottom:22px}
+.s-transcript .turn.q .who,.s-transcript .turn.q .ln{color:var(--qcol)}
+.s-transcript .turn.a .who,.s-transcript .turn.a .ln{color:var(--acol);font-weight:500}
+.s-transcript.dark{--qcol:#6FB0E8;--acol:#E6A95A}
+.s-transcript.dark .turn.q .who,.s-transcript.dark .turn.q .ln{color:var(--qcol)}
+.s-transcript.dark .turn.a .who,.s-transcript.dark .turn.a .ln{color:var(--acol);font-weight:500}
+.s-step .mini-list li{padding-top:17px;padding-bottom:17px}
+</style></head><body>
+<deck-stage width="1920" height="1080">
+
+<!-- 01 · TITLE -->
+<section data-label="Title" class="s-title" data-fx="zoom">
+  <div class="kicker rise">INSEAD MBA · Identifying New Business Models · Session 05</div>
+  <h1 class="rise d1">Venture Risk Management</h1>
+  <div class="who rise d2"><b>Andre Calmon</b> · Technology and Operations Management</div>
+</section>
+
+<!-- 02 · RECAP — four-day plan -->
+<section data-label="Recap · week" class="s-cal">
+  <div class="kicker rise">16-19 June · where we are</div>
+  <h2 class="rise d1">You are here: refine, then validate.</h2>
+  <div class="grid">
+    <div class="col rise d1">
+      <div class="d">Tue 16</div><div class="stage">Generate</div>
+      <div class="chip"><b>S1-2</b>: myths, the idea factory, tournament</div>
+      <div class="chip">200 ideas → 60-second pitches</div>
+    </div>
+    <div class="col rise d2">
+      <div class="d">Wed 17</div><div class="stage">Select</div>
+      <div class="chip"><b>S3-4</b>: pitches, teams, thesis, the canvas</div>
+      <div class="chip">10 teams of 4 form · Value Creation Analysis</div>
+    </div>
+    <div class="col here rise d3">
+      <div class="you">You are here</div>
+      <div class="d">Thu 18</div><div class="stage">Refine</div>
+      <div class="chip"><b>Today</b>: evidence, customer discovery, AI MVPs</div>
+      <div class="chip">Tonight teams meet: build your VCA + <b>concept + prototype</b></div>
+      <div class="chip moved"><span class="strike"><b>A6</b> peer review · due Fri 8:30</span><span class="arrow">&rarr; now in class Friday morning</span></div>
+    </div>
+    <div class="col rise d3">
+      <div class="d">Fri 19</div><div class="stage">Validate</div>
+      <div class="chip"><b>A5 + A7</b> &middot; VCA + concept + prototype pitch (a little shorter) · <span class="due">due 8:30</span></div>
+      <div class="chip"><b>A6</b> peer review <span class="inclass">in class</span> &middot; early morning</div>
+      <div class="chip win">Validated theses</div>
+    </div>
+  </div>
+  <div class="pg">02</div>
+</section>
+
+<!-- 03 · RECAP — VCA in six steps -->
+<section data-label="Recap · VCA" class="s-vca-road">
+  <div class="kicker rise">Yesterday's tool</div><h2 class="rise d1">The Value Creation Analysis runs in six steps.</h2>
+  <div class="road-wrap rise d2"><div class="timeline">
+    <div class="tstep"><div class="tnode">1</div><b>State the thesis</b><p>Carry over your X&middot;Y&middot;Z from Session&nbsp;2.</p></div>
+    <div class="tstep"><div class="tnode">2</div><b>Map the model</b><p>Make it explicit on the Business Model Canvas.</p></div>
+    <div class="tstep"><div class="tnode">3</div><b>Pick comparisons</b><p>The next-best option and adjacent industries.</p></div>
+    <div class="tstep"><div class="tnode">4</div><b>Map differences</b><p>How your model differs, box by box.</p></div>
+    <div class="tstep"><div class="tnode">5</div><b>Demand side</b><p>Why buy this? What risks do customers face?</p></div>
+    <div class="tstep"><div class="tnode">6</div><b>Profit + risk</b><p>Deliver profitably? Which risks to manage?</p></div>
+  </div></div>
+  <div class="pg">03</div>
+</section>
+
+<!-- TONIGHT'S TEAM WORK (A5 + discovery prep) -->
+<section data-label="Today · team work" class="s-act">
+  <div class="frame">
+    <span class="tag">Today · with your team</span>
+    <h2>Today's job: make your model testable.</h2>
+    <div class="cols">
+      <ol>
+        <li><div><b>Run the VCA.</b> Treat every box as a hypothesis, not a fact. Fill both canvases: your model, then the differences against your point of comparison.</div></li>
+        <li><div><b>Rank the risk.</b> Score each hypothesis (doubt &times; importance) and flag the few that could break the model. We work through this today.</div></li>
+        <li><div><b>Line up 10+ interviews.</b> Name at least ten people you can talk to about the hypotheses and risks you flagged. Mom Test rules apply; we cover those today.</div></li>
+        <li><div><b>Design an experiment or two.</b> Pick one or two concrete tests or prototypes that challenge your riskiest assumptions.</div></li>
+      </ol>
+      <div class="goal">
+        <div class="k">Due Friday 8:30 · LMS</div>
+        <h3>Thesis, VCA, riskiest assumptions, experiments + prototype, and your presentation.</h3>
+        <p><b>A5 + A7</b> · one per team. Friday morning we run peer review in class, then give you time to update before you present.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · PEER REVIEW GUIDE (A6) -->
+<section data-label="Peer review · A6" class="s-act">
+  <div class="frame">
+    <span class="tag">Peer review · A6 · in class · 40 min</span>
+    <h2>What you build today, you defend in class tomorrow.</h2>
+    <div class="cols">
+      <ol>
+        <li><div><b>10 min.</b> Team A presents its canvas and VCA.</div></li>
+        <li><div><b>10 min.</b> Team B gives feedback and names the <b>3 most questionable assumptions</b>.</div></li>
+        <li><div><b>10 min.</b> Team B presents its canvas and VCA.</div></li>
+        <li><div><b>10 min.</b> Team A gives feedback and names the <b>3 most questionable assumptions</b>.</div></li>
+      </ol>
+      <div class="goal">
+        <div class="k">In class · Friday morning</div>
+        <h3>Pair with your assigned team and stress-test each other.</h3>
+        <p>Then update your canvas and sharpen your pitch in the time we give you. <b>No photo to submit.</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · THE SEGWAY BUSINESS -->
+<section data-label="Segway business" class="s-story">
+  <div class="ph" style="background:#EAEDF0"><img src="images/segway-product.jpg" alt="The Segway Human Transporter" style="object-fit:contain" /></div>
+  <div class="rail">
+    <div class="kicker">A cautionary tale · 2001</div>
+    <h2>A $500M valuation before it sold a single unit.</h2>
+    <p class="take"><b>$80M</b> from Kleiner Perkins &amp; CSFB · 12.5 mph · 80 lbs · 11-mile range · <b>$9,000</b> (consumer $4,950) · <b>40,000 units a month</b> projected by end of 2002.</p>
+    <div class="quote">"Ten years from now, this will be the way many people in many places get around."<cite>Dean Kamen, inventor</cite></div>
+  </div>
+  <div class="pg">06</div>
+</section>
+
+<!-- 06 · THE DREAM TEAM -->
+<section data-label="Segway · the people" class="s-team4">
+  <div class="kicker rise">The people behind it</div>
+  <h2 class="rise d1">The best team money could assemble.</h2>
+  <div class="grid">
+    <figure class="rise d1"><div class="ph"><img src="images/steve-jobs-portrait.jpeg" alt="Steve Jobs" /></div><figcaption><div class="nm">Steve Jobs</div><div class="role">Designed the interface: one control, like the iPhone.</div></figcaption></figure>
+    <figure class="rise d2"><div class="ph"><img src="images/segway-bezos.jpg" alt="Jeff Bezos" /></div><figcaption><div class="nm">Jeff Bezos</div><div class="role">Online logistics: it would sell on Amazon.</div></figcaption></figure>
+    <figure class="rise d2"><div class="ph" style="background:#0d0d0d"><img src="images/segway-kamen.jpg" alt="Dean Kamen with the Segway" style="object-fit:contain" /></div><figcaption><div class="nm">Dean Kamen</div><div class="role">Legendary inventor: insulin pump and the iBot.</div></figcaption></figure>
+    <figure class="rise d3"><div class="ph"><img src="images/segway-doerr.jpg" alt="John Doerr" /></div><figcaption><div class="nm">John Doerr</div><div class="role">Kleiner Perkins: the original blue-blood VC.</div></figcaption></figure>
+  </div>
+  <div class="punch rise d3">The prettiest decks, the best Excels, the most innovative tech. <b>No shortage of money.</b></div>
+  <div class="pg">07</div>
+</section>
+
+<!-- 07 · SEGWAY TIMELINE -->
+<section data-label="Segway timeline" class="s-timeline">
+  <div class="kicker rise">What actually happened</div>
+  <h2 class="rise d1">Five years of hype, then the numbers came in.</h2>
+  <div class="tl rise d2">
+    <div class="axis">
+      <div class="yr"><div class="y">1999</div><div class="dot"></div><div class="ev">iBot wheelchair &amp; "Ginger" prototypes</div></div>
+      <div class="yr"><div class="y">2000</div><div class="dot"></div><div class="ev">$80M venture financing</div></div>
+      <div class="yr"><div class="y">2001</div><div class="dot"></div><div class="ev">"IT" leak; launched on Good Morning America</div></div>
+      <div class="yr"><div class="y">2002</div><div class="dot"></div><div class="ev">~100 trial units; advance orders on Amazon</div></div>
+      <div class="yr last"><div class="y">2003</div><div class="dot"></div><div class="ev">~5,000 units sold in two years</div></div>
+    </div>
+  </div>
+  <div class="kill late">The plan said <b>1,000,000 a year.</b> Reality: <b class="red">~5,000 in two years</b>, wrong by a factor of 200.</div>
+  <div class="pg">08</div>
+</section>
+
+<!-- 08 · MALL-COP PUNCHLINE -->
+<section data-label="Mall cop" class="s-exhibit duo">
+  <div class="kicker rise">How the culture remembered it</div>
+  <h2 class="rise d1">The future of transport became a punchline.</h2>
+  <div class="art rise d2">
+    <figure><img src="images/bush_falls_segway.jpg" alt="President George W. Bush falling off a Segway, 2003" /><figcaption>2003: the President falls off, on camera.</figcaption></figure>
+    <figure><img src="images/paul-blart-mall-cop-poster.jpg" alt="Paul Blart: Mall Cop film poster, the character riding a Segway" /><figcaption>2009: Hollywood turns it into the mall-cop joke.</figcaption></figure>
+  </div>
+  <p class="sub late">Great team, great funding, great press. They still tested the wrong risk.</p>
+  <div class="pg">09</div>
+</section>
+
+<!-- 09 · TASK SCHEDULING -->
+<section data-label="Task scheduling" class="s-demand nolock">
+  <div class="kicker rise">The Segway business plan</div>
+  <h2 class="rise d1">They spent $50M nailing the things they already knew.</h2>
+  <div class="cols">
+    <div class="panel rise d1"><h3>What they did · $50M+ · 2000-01</h3>
+      <div class="item"><b>Technical performance</b></div>
+      <div class="item"><b>Production capacity</b></div>
+      <div class="item"><b>Reliability &amp; robustness</b></div>
+      <div class="item"><b>Legality &amp; patents</b></div>
+      <div class="item"><b>Staffing a large organization</b></div>
+    </div>
+    <div class="panel risk rise d2"><h3>What they postponed · $?? · 2002</h3>
+      <div class="item"><b>Where will people ride it?</b></div>
+      <div class="item"><b>Which markets?</b></div>
+      <div class="item"><b>What price point?</b></div>
+      <div class="item"><b>Demand forecast</b></div>
+      <div class="item"><b>What is the real benefit?</b></div>
+    </div>
+  </div>
+  <div class="foot rise d3">Every hard question, the <b>demand side</b>, got pushed to last. That is exactly where the business died.</div>
+  <div class="pg">10</div>
+</section>
+
+<!-- 10 · THREE VENTURE-RISK QUESTIONS -->
+<section data-label="Venture risk questions" class="s-qa">
+  <div class="kicker rise">Three questions every venture must answer</div>
+  <h2 class="rise d1">New-venture planning is risk reduction and learning, not growth.</h2>
+  <div class="qa-list">
+    <div class="qa">
+      <div class="q rise d1">What is the objective of new-venture planning?</div>
+      <div class="a" data-reveal="1"><b>Learning and risk reduction</b>: nail the model, find the biggest unknowns. Not execution, fundraising, or growth. Failing early is fine; the goal is to avoid <b>late</b> failure, after years and millions.</div>
+    </div>
+    <div class="qa">
+      <div class="q rise d2">Which risks should you prioritize?</div>
+      <div class="a" data-reveal="2">The ones that are <b>highly uncertain</b> and could <b>break the business</b>. Demand side (Segway) or supply side (cheap green energy, Hyperloop).</div>
+    </div>
+    <div class="qa">
+      <div class="q rise d3">How do you mitigate them?</div>
+      <div class="a" data-reveal="3">Stretch the dollars. <b>Learn the most for the least cash</b>: cheap experiments with a real purpose, not a big bet before you have tested demand.</div>
+    </div>
+  </div>
+  <div class="pg">11</div>
+</section>
+
+<!-- THINK LIKE A SCIENTIST (ported from Session 01, slide 41) -->
+<!-- NEW: learning rate KPI -->
+<section data-label="Learning rate is the KPI" class="s-startup" data-fx="zoom">
+  <h2 class="rise">Before product-market fit, learning rate is the most important KPI.</h2>
+  <p class="def late">Not revenue, not headcount, not the size of the round. The one number that matters is <em>learning rate per week.</em></p>
+  <div class="pg">12</div>
+</section>
+
+<section data-label="Scientific method, animated" class="s-anim side">
+  <div class="kicker rise">The oldest algorithm we have</div>
+  <h2 class="rise d1">Think like a scientist.</h2>
+  <div class="holder">
+    <div class="txt rise d2">
+      <p class="sub">Ask, research, hypothesize, experiment, analyze, share. Including the branch most founders skip: <b>is the test itself valid?</b> A broken experiment says nothing about the idea.</p>
+      <p class="sub" style="margin-top:36px">Every result, validated or not, feeds the next question.</p>
+    </div>
+    <iframe data-anim class="rise d2" src="animation/scientific-method.html" title="Scientific method loop animation"></iframe>
+    <div class="pfig">Ask, research, hypothesize, experiment, analyze, share, and around again.</div>
+  </div>
+  <div class="pg">13</div>
+</section>
+
+<!-- NEW: INSEAD evidence (Camuffo/Spina) -->
+<section data-label="Scientific founders · evidence" class="s-step">
+  <div class="kicker rise">INSEAD research on evidence-based entrepreneurship</div>
+  <h2 class="rise d1">Founders trained to think like scientists kill weak ideas sooner.</h2>
+  <div class="body wide">
+    <div class="rscol rise d1">
+      <p>It started as a randomized control trial of 116 Italian startups. Treated founders learned to state a theory, write falsifiable hypotheses, and test them. The follow-up replicated the result across 759 firms in four trials.</p>
+      <p>Trained founders terminate weak ideas earlier and pivot in a focused way, once or twice, rather than never or endlessly. They are no more likely to quit.</p>
+      <p class="rsnote rise d2">This is INSEAD research. Co-author <b>Chiara Spina</b> is a professor here.</p>
+    </div>
+  </div>
+  <div class="cite rise d3">Camuffo, Cordova, Gambardella &amp; Spina (2020), <em>Management Science</em> 66(2). Camuffo, Gambardella, Messinese, Novelli, Paolucci &amp; Spina (2024), <em>Strategic Management Journal</em> 45(6).</div>
+  <div class="pnote">Sources: Camuffo, A., Cordova, A., Gambardella, A. &amp; Spina, C. (2020). A Scientific Approach to Entrepreneurial Decision Making: Evidence from a Randomized Control Trial. Management Science, 66(2), 564-586. Camuffo, A., Gambardella, A., Messinese, D., Novelli, E., Paolucci, E. &amp; Spina, C. (2024). A scientific approach to entrepreneurial decision-making: Large-scale replication and extension. Strategic Management Journal, 45(6), 1209-1237.</div>
+  <div class="pg">14</div>
+</section>
+
+<!-- DIVIDER: evidence-based entrepreneurship -->
+<section data-label="Divider · Evidence-based" class="s-divider dark">
+  <div class="part kicker rise">Managing venture risk</div>
+  <h2 class="rise d1">Evidence-based<br/>entrepreneurship.</h2>
+  <div class="below late">A disciplined way to get from point A to point B, cutting the biggest uncertainties before you spend the big money. <b>Step by step.</b></div>
+  <div class="pg">15</div>
+</section>
+
+<!-- 12 · DRAW THE OWL -->
+<section data-label="Draw the owl" class="s-exhibit">
+  <div class="kicker rise">Why "step by step" matters</div>
+  <h2 class="rise d1">Most frameworks skip the hard part.</h2>
+  <div class="art rise d2"><img src="images/draw-the-owl.jpg" alt="How to draw an owl: step 1, draw two circles; step 2, draw the rest of the owl" /></div>
+  <p class="sub late">So here is a real step-by-step, one that doesn't jump from "two circles" to "the rest of the owl."</p>
+  <div class="pg">16</div>
+</section>
+
+<!-- 13 · THE 5-STEP METHOD -->
+<section data-label="5-step method" class="s-method5">
+  <div class="kicker rise">A step-by-step approach to risk reduction</div>
+  <h2 class="rise d1">Four steps from a fragile idea to what to do next.</h2>
+  <div class="steps">
+    <div class="st rise d1"><div class="n">1</div><div><div class="t">Make assumptions explicit</div><div class="d">Map it on the Business Model Canvas and run the VCA. Every box is your <b>most probable hypothesis</b>.</div></div></div>
+    <div class="st rise d1"><div class="n">2</div><div><div class="t">Rate the risk</div><div class="d">Score each hypothesis by <b>doubt</b> (1-3) × <b>centrality</b> (1-3). The product is its risk factor.</div></div></div>
+    <div class="st rise d2"><div class="n">3</div><div><div class="t">Design learning and risk-mitigating tasks</div><div class="d">For the biggest risks, find the <b>cheapest way to get primary data</b>, and estimate its cost.</div></div></div>
+    <div class="st rise d3"><div class="n">4</div><div><div class="t">Pick the path</div><div class="d">Choose the sequence with the <b>most risk reduction per dollar</b>. That is what you do next.</div></div></div>
+  </div>
+  <div class="pg">17</div>
+</section>
+
+<!-- 14 · STEP 1 · the canvas -->
+<section data-label="Step 1 · canvas" class="s-bmc-intro has-steplock">
+  <div class="step-lock"><div class="sl-head"><span class="sl-kick">Risk step</span><span class="sl-track"><i class="on"></i><i></i><i></i><i></i></span><span class="sl-count"><b>1</b>/4</span></div><div class="sl-name">Make assumptions explicit</div></div>
+  <h2 class="rise">Make every assumption explicit through your canvas and VCA.</h2>
+  <div class="row"><div class="canvas rise d1">
+<div class="bmc">
+  <div class="cell kp"><div class="lab">Key Partners</div><div class="abbr">KP</div></div>
+  <div class="cell ka"><div class="lab">Key Activities</div><div class="abbr">KA</div></div>
+  <div class="cell kr"><div class="lab">Key Resources</div><div class="abbr">KR</div></div>
+  <div class="cell vp"><div class="lab">Value Propositions</div><div class="abbr">VP</div></div>
+  <div class="cell cr"><div class="lab">Customer Relationships</div><div class="abbr">CR</div></div>
+  <div class="cell ch"><div class="lab">Channels</div><div class="abbr">CH</div></div>
+  <div class="cell cs"><div class="lab">Customer Segments</div><div class="abbr">CS</div></div>
+  <div class="cell cst"><div class="lab">Cost Structure</div><div class="abbr">C$</div></div>
+  <div class="cell rev"><div class="lab">Revenue Streams</div><div class="abbr">R$</div></div>
+</div><div class="stamp" aria-hidden="true"><span>Hypotheses</span></div></div><div class="side rise d2"><div class="r"><b>Upper right:</b> the customer, who you serve and the value you promise.</div><div class="r"><b>Upper left:</b> how you deliver that value, and who helps.</div><div class="r"><b>Bottom:</b> the economics: costs and revenue.</div><div class="r"><b>Every box</b> is a hypothesis, an untested belief.</div></div></div>
+  <div class="pg">18</div>
+</section>
+
+<!-- 15 · STEP 2 · rate the risk -->
+<section data-label="Step 2 · rate risk" class="s-step has-steplock">
+  <div class="step-lock"><div class="sl-head"><span class="sl-kick">Risk step</span><span class="sl-track"><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="sl-count"><b>2</b>/4</span></div><div class="sl-name">Rate the risk</div></div>
+  <h2 class="rise">Score every box: risk factor = doubt &times; centrality.</h2>
+  <div class="body">
+    <div class="left-col">
+      <div class="cards">
+        <div class="qcard rise d1"><h3>Doubt &middot; 1&ndash;3</h3><p>How unsure are you that this box is true?</p></div>
+        <div class="qcard rise d2"><h3>Centrality &middot; 1&ndash;3</h3><p>If it is false, how badly does the whole business break?</p></div>
+      </div>
+      <div class="mini-bmc rise d2">
+        <div class="bmc mini9">
+          <div class="cell kp"><span class="ab">KP</span></div>
+          <div class="cell ka"><span class="ab">KA</span></div>
+          <div class="cell kr"><span class="ab">KR</span></div>
+          <div class="cell vp hot"><span class="ab">VP</span></div>
+          <div class="cell cr"><span class="ab">CR</span></div>
+          <div class="cell ch"><span class="ab">CH</span></div>
+          <div class="cell cs hot"><span class="ab">CS</span></div>
+          <div class="cell cst"><span class="ab">C$</span></div>
+          <div class="cell rev"><span class="ab">R$</span></div>
+        </div>
+        <div class="mini-cap">Every box gets a score. The high ones are where you test.</div>
+      </div>
+    </div>
+    <div class="aside rise d2"><div class="k">Then test</div><p>Multiply the two for every box, then test the ones that are <b>both uncertain and central</b>. Where you and your team <b>agree</b> a box is highly uncertain and central, <b>pivot or design an experiment</b>. Where you <b>disagree</b> on the doubt or centrality, that gap is itself worth testing.</p></div>
+  </div>
+  <div class="pg">19</div>
+</section>
+
+<!-- 16 · STEP 2 · the common tall tales -->
+<section data-label="Step 2 · tall tales" class="s-demand has-steplock">
+  <div class="step-lock"><div class="sl-head"><span class="sl-kick">Risk step</span><span class="sl-track"><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="sl-count"><b>2</b>/4</span></div><div class="sl-name">The common tall tales</div></div>
+  <h2 class="rise">The most common BS founders tell themselves.</h2>
+  <div class="cols">
+    <div class="panel rise d1"><h3>Market &amp; consumers</h3>
+      <div class="item">Will they get real value? Does it solve a problem?</div>
+      <div class="item">Will they pay? For add-ons too?</div>
+      <div class="item">Will they stick around?</div>
+      <div class="item">How will you even find them?</div>
+    </div>
+    <div class="panel rise d2"><h3>Delivery &amp; production</h3>
+      <div class="item">Is it technically feasible?</div>
+      <div class="item">What will it cost to make and deliver?</div>
+      <div class="item">Is it scalable? Is it legal?</div>
+      <div class="item">Will the partners show up?</div>
+    </div>
+  </div>
+  <div class="pg">20</div>
+</section>
+
+<!-- 17 · STEP 3 · risk table -->
+<section data-label="Step 3 · risk table" class="s-risktable">
+  <div class="kicker rise">Risk step 3 of 4 · learning and risk-mitigating tasks</div>
+  <h2 class="rise d1">For Segway, the cheapest tests were also the most critical.</h2>
+  <table class="rise d1">
+    <thead><tr><th></th><th>Key risk</th><th class="c">Risk</th><th>Mitigating task</th><th class="c">Cost</th></tr></thead>
+    <tbody>
+      <tr><td class="k">A</td><td>Will technical performance be acceptable?</td><td class="c"><span class="dots">•••</span></td><td>Build &amp; test an alpha prototype</td><td class="cost">$1M</td></tr>
+      <tr><td class="k">B</td><td>Can we establish production capacity?</td><td class="c"><span class="dots">•</span></td><td>Design supply chain, set up production</td><td class="cost">$3M</td></tr>
+      <tr><td class="k">C</td><td>How reliable &amp; robust can we make it?</td><td class="c"><span class="dots">•</span></td><td>Production-intent design, life testing</td><td class="cost">$5M</td></tr>
+      <tr><td class="k">D</td><td>In how many states will it be legal?</td><td class="c"><span class="dots">•••</span></td><td>Lobby state &amp; local governments</td><td class="cost">$7M</td></tr>
+      <tr><td class="k">E</td><td>How strong is the IP barrier?</td><td class="c"><span class="dots">••</span></td><td>File patents</td><td class="cost">$0.1M</td></tr>
+      <tr><td class="k">F</td><td>Can we staff a large enterprise?</td><td class="c"><span class="dots">•</span></td><td>Recruit the management team</td><td class="cost">$1M</td></tr>
+      <tr class="hi"><td class="k">G</td><td>Which market segments &amp; benefits resonate?</td><td class="c"><span class="dots">•••</span></td><td>Customer interviews &amp; demonstrations</td><td class="cost">$0.1M</td></tr>
+      <tr class="hi"><td class="k">H</td><td>What is the right price point?</td><td class="c"><span class="dots">•••</span></td><td>Competitive analysis, customer surveys</td><td class="cost">$0.05M</td></tr>
+      <tr class="hi"><td class="k">I</td><td>What is the sales trajectory?</td><td class="c"><span class="dots">•••</span></td><td>Diffusion modeling, purchase-intent survey</td><td class="cost">$0.1M</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Rows <b>G-I</b>, the demand questions, were the highest risk and the <b>cheapest to answer</b>. Segway tested them last.</p>
+  <div class="pg">21</div>
+</section>
+
+<!-- STEP 4 · choosing between sequences (risk vs cost) -->
+<section data-label="Step 4 · risk vs cost" class="s-riskcost has-steplock">
+  <div class="step-lock"><div class="sl-head"><span class="sl-kick">Risk step</span><span class="sl-track"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="sl-count"><b>4</b>/4</span></div><div class="sl-name">Choose the sequence</div></div>
+  <h2 class="rise">Same tasks, two orders. One cuts risk far cheaper.</h2>
+  <div class="wrap rise d1">
+    <svg viewBox="0 0 1600 580" preserveAspectRatio="xMidYMid meet">
+      <line class="axis" x1="150" y1="60" x2="150" y2="470"/>
+      <line class="axis" x1="150" y1="470" x2="1520" y2="470"/>
+      <polygon class="ah" points="150,52 142,72 158,72" style="fill:#131312"/>
+      <polygon class="ah" points="1528,470 1508,462 1508,478" style="fill:#131312"/>
+      <text class="alab" x="74" y="265" transform="rotate(-90 74 265)" text-anchor="middle">Uncertainty</text>
+      <text class="alab" x="835" y="556" text-anchor="middle">Cumulative investment ($M)</text>
+      <text class="tick" x="830" y="500" text-anchor="middle">10</text>
+      <text class="tick" x="1470" y="500" text-anchor="middle">20</text>
+      <line class="axis" x1="830" y1="466" x2="830" y2="474" style="stroke-width:2"/>
+      <line class="axis" x1="1470" y1="466" x2="1470" y2="474" style="stroke-width:2"/>
+      <polyline class="orig" points="190,90 254,90 254,144 446,144 446,162 766,162 766,180 1214,180 1214,234 1220,234 1220,270 1284,270 1284,288 1291,288 1291,342 1294,342 1294,396 1300,396 1300,450"/>
+      <polyline class="alt" points="190,90 254,90 254,144 260,144 260,198 263,198 263,252 270,252 270,306 276,306 276,342 468,342 468,360 788,360 788,378 1236,378 1236,432 1300,432 1300,450"/>
+      <text class="step lo" x="232" y="80">A proto</text>
+      <text class="step lo" x="360" y="136">B design</text>
+      <text class="step lo" x="600" y="154">C supply chain</text>
+      <text class="step lo" x="1010" y="172">D lobby</text>
+      <text class="step lo" x="1316" y="326">E&#183;F&#183;G&#183;H&#183;I</text>
+      <text class="step mu" x="1316" y="354">the cheap tests, last</text>
+      <text class="frame lo" x="1316" y="150">Risk seeking</text>
+      <text class="step mu" x="1316" y="182">bet on success,</text>
+      <text class="step mu" x="1316" y="208">validate late</text>
+      <text class="step la" x="298" y="214">G&#183;H&#183;I&#183;E first</text>
+      <text class="step mu" x="298" y="242">the cheap demand tests</text>
+      <text class="step la" x="560" y="402">B&#183;C&#183;D&#183;F later</text>
+      <text class="frame la" x="360" y="430">Risk averse</text>
+      <text class="step mu" x="360" y="458">cut the biggest risks cheaply</text>
+    </svg>
+  </div>
+  <div class="foot">Choose the sequence with the <span class="grn">most risk reduction per dollar.</span></div>
+  <div class="pg">22</div>
+</section>
+
+<!-- 20 · AFTER SEGWAY: scooters -->
+<section data-label="After Segway · scooters" class="s-story flip">
+  <div class="ph"><img src="images/scooter-rider.jpg" alt="A rider on a shared electric kick-scooter in a city" /></div>
+  <div class="rail">
+    <div class="kicker">After Segway</div>
+    <h2>Same idea, lighter, and a completely different model.</h2>
+    <p class="take">As fast as a Segway. Lighter. Far cheaper. But the unlock was the model behind <b>Lime, Bird, and Jump</b>, not the vehicle.</p>
+    <ul class="mini-list">
+      <li>You find it by phone, no need to own one.</li>
+      <li>The company charges it, places it, maintains it.</li>
+      <li>Lost or stolen? Not yours, no big deal.</li>
+    </ul>
+  </div>
+  <div class="pg">23</div>
+</section>
+
+<!-- 21 · DIVIDER: customer discovery -->
+<!-- NEW: two strategies -->
+<section data-label="Two strategies" class="s-demand nolock">
+  <div class="kicker rise">How to learn fast and cut risk</div>
+  <h2 class="rise d1">There are two ways to learn and shrink your biggest risks.</h2>
+  <div class="cols">
+    <div class="panel rise d1"><h3>Strategy 1 · Talk to customers</h3>
+      <div class="item"><b>Talk to customers</b><span>: the people who would buy and use it.</span></div>
+      <div class="item"><b>And anyone tied to your highest risks</b><span>: suppliers, partners, regulators, channel, technical experts.</span></div>
+      <div class="item"><b>Go where the uncertainty is</b><span>: not only the demand side.</span></div>
+    </div>
+    <div class="panel rise d2"><h3>Strategy 2 · Run experiments</h3>
+      <div class="item"><b>Build prototypes and MVPs</b><span>: the cheapest thing that tests a real assumption.</span></div>
+      <div class="item"><b>Design small, purposeful tests</b><span>: each one answers one question.</span></div>
+      <div class="item"><b>Let evidence, not opinion, decide</b><span>: keep, kill, or pivot.</span></div>
+    </div>
+  </div>
+  <div class="foot rise d3">Both do the same job: <b>learn the most for the least cash</b>, before you spend the big money.</div>
+  <div class="pg">24</div>
+</section>
+
+<section data-label="Divider · discovery" class="s-divider dark">
+  <div class="part kicker rise">Strategy 1 of 2</div>
+  <h2 class="rise d1">Talk to<br/>customers.</h2>
+  <div class="below late">And anyone tied to your riskiest assumptions, not just customers. The fastest, cheapest way to kill a bad assumption is <b>primary data</b>.</div>
+  <div class="pg">25</div>
+</section>
+
+<!-- 22 · CONDUCT INTERVIEWS -->
+<section data-label="Conduct interviews" class="s-step">
+  <div class="kicker rise">Collecting primary data · customer interviews</div>
+  <h2 class="rise d1">Dig for their pains, gains, and requirements.</h2>
+  <div class="body">
+    <div>
+      <div class="qcard rise d1"><h3>Pains</h3><p>What problem are they solving? How bad is it, and how do they handle it now, at what cost in time and money?</p></div>
+      <div class="qcard rise d2" style="margin-top:30px"><h3>Gains</h3><p>What outcome are they actually trying to reach?</p></div>
+      <div class="qcard rise d3" style="margin-top:30px"><h3>Requirements</h3><p>What would any solution have to do to win them over?</p></div>
+      <p class="rise d3" style="margin:34px 0 0;font-size:29px;line-height:1.4;color:var(--muted)">Keep one list: <b style="color:var(--ink)">name, title, company</b>. It tells you who to interview, and surfaces patterns across everyone you have talked to.</p>
+    </div>
+    <div class="rise d2" style="align-self:stretch;display:flex;flex-direction:column;justify-content:center">
+      <div style="flex:1;min-height:0;border-radius:14px;overflow:hidden;background:var(--hair)"><img src="images/customers-discovery.jpg" alt="Founders talking with customers during discovery interviews" style="width:100%;height:100%;object-fit:cover"/></div>
+      <div style="margin-top:18px;font-size:27px;color:var(--muted)">Go where your customers already are.</div>
+    </div>
+  </div>
+  <div class="pg">26</div>
+</section>
+
+<!-- 23 · OPEN-ENDED QUESTIONS -->
+<section data-label="Open-ended questions" class="s-step">
+  <div class="kicker rise">Ask open-ended questions</div>
+  <h2 class="rise d1">Resist yes/no. Ask for stories.</h2>
+  <div class="body wide">
+    <div class="oq-contrast rise d1">
+      <div class="qcard red"><h3>Do not ask</h3><p class="oq-q">"Is a lower cost important to you?"</p><p class="oq-why">Leading: it invites a polite yes.</p></div>
+      <div class="oq-arrow" aria-hidden="true"><span class="oq-line"></span><span class="oq-head"></span></div>
+      <div class="qcard green"><h3>Ask instead</h3><p class="oq-q">"What role does cost play in your decision-making?"</p><p class="oq-why">Open: it invites the real story.</p></div>
+    </div>
+    <div class="oq-openers rise d2">
+      <span class="oq-k">Openers</span>
+      <span class="oq-words"><b>Where</b> do you... <b>How</b> do you... <b>When</b> do you... <b>Who</b> do you...</span>
+      <span class="oq-rule">Past behavior beats hypotheticals every time.</span>
+    </div>
+  </div>
+  <div class="pg">27</div>
+</section>
+
+<!-- 24 · FINISH EVERY INTERVIEW -->
+<section data-label="Finish every interview" class="s-startup" data-fx="zoom">
+  <h2 class="rise">End every interview with two questions.</h2>
+  <p class="def late">"<em>What else should I have asked?</em>" and "<em>Who else should I talk to?</em>" Then thank them, and keep the door open.</p>
+  <div class="pg">28</div>
+</section>
+
+<!-- 25 · THE MOM TEST -->
+<section data-label="The Mom Test" class="s-story flip">
+  <div class="ph" style="background:#EAE4DA"><img src="images/mom-test-cover.jpg" alt="The Mom Test by Rob Fitzpatrick" style="object-fit:contain;padding:70px" /></div>
+  <div class="rail">
+    <div class="kicker">Rob Fitzpatrick</div>
+    <h2>The Mom Test: ask so that even your mom can't mislead you.</h2>
+    <p class="take">Friends, family, and polite strangers tell you what you want to hear. Better questions get past that.</p>
+    <div class="who-line"><b>The core principle</b><span>Talk about their life, their problems, their past. Never your idea.</span></div>
+  </div>
+  <div class="pg">29</div>
+</section>
+
+<!-- 26 · MOM TEST IN PRACTICE -->
+<section data-label="Mom Test · practice" class="s-momtest">
+  <div class="kicker rise">The Mom Test in practice</div>
+  <h2 class="rise d1">Four moves that get you the truth.</h2>
+  <div class="grid">
+    <div class="t rise d1"><h3>Ask about their life, not your idea</h3><div class="say">"How do you deal with [problem] today? Tell me about the last time it happened."</div></div>
+    <div class="t rise d1"><h3>Get specific, in the past</h3><div class="say">"When was the last time? Walk me through exactly what you did."</div></div>
+    <div class="t rise d2"><h3>Listen more than you talk</h3><div class="say">Give them room. Resist the urge to pitch or explain your solution.</div></div>
+    <div class="t rise d2"><h3>Deflect compliments, dig beneath features</h3><div class="say">"Kind of you to say. But what makes you say that? Why would that feature help?"</div></div>
+  </div>
+  <div class="foot rise d3">Then: keep it casual · seek real commitment: time, reputation, money · find your <b>who-where</b>.</div>
+  <div class="pg">30</div>
+</section>
+
+<!-- 27 · BAD INTERVIEW -->
+<section data-label="Bad interview" class="s-transcript">
+  <h2 class="rise" data-morph="goodint">Is this a good customer interview?</h2>
+  <div class="convo rise d1">
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"Hi, thanks for meeting with me. I'm working on a new productivity app, and I'd love to get your feedback. Do you think it's a good idea?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"Sure, it sounds interesting."</div></div>
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"Great! So, our app has features like AI-powered task prioritization, gamified to-do lists, and integration with all your favorite calendar apps. Would you use an app like that?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"Yeah, probably."</div></div>
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"Awesome! Most people say they would pay at least $10/month for an app like this. What do you think?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"That seems reasonable."</div></div>
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"Perfect! So, on a scale of 1-10, how likely are you to recommend our app to your friends?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"Maybe an 8?"</div></div>
+  </div>
+  <div class="pg">31</div>
+</section>
+
+<!-- 28 · GOOD INTERVIEW -->
+<section data-label="Good interview" class="s-transcript dark">
+  <h2 class="rise" data-morph="goodint">Is this a good customer interview?</h2>
+  <div class="convo rise d1">
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"Hi, thanks for taking the time to chat. I'm exploring some of the challenges people face with managing their time and tasks. Can you tell me a bit about your current approach to staying organized?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"Sure, I use a combination of a to-do list app and my calendar. I also have a notebook where I jot down ideas."</div></div>
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"What's working well for you with that system? What are some of the pain points?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"Well, the to-do list app is okay for simple tasks, but it gets overwhelming when I have a lot of complex projects going on. I often feel like I'm not sure what to prioritize."</div></div>
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"Tell me about the last time you felt overwhelmed by your to-do list. What happened?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"Last week, actually. I had a major deadline coming up, and I kept getting sidetracked by smaller, less important tasks. I ended up working late every night to catch up."</div></div>
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"What did you do to try to get back on track?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"I tried to break down the big project into smaller steps, but it was still hard to know where to start. I also tried using the prioritization feature in my to-do list app, but it didn't really help."</div></div>
+    <div class="turn q"><div class="who">Interviewer</div><div class="ln">"If you could change one thing about your current system, what would it be?"</div></div>
+    <div class="turn a"><div class="who">Interviewee</div><div class="ln">"I wish there was a way to see how all my tasks and projects fit together, so I could get a better sense of the big picture and prioritize more effectively."</div></div>
+  </div>
+  <div class="pg">32</div>
+</section>
+
+<!-- 29 · HOW INSEAD FOUNDERS DID IT -->
+<section data-label="INSEAD founders" class="s-step">
+  <div class="kicker rise">How INSEAD founders actually did it</div>
+  <h2 class="rise d1">They went out and logged the conversations.</h2>
+  <div class="body">
+    <div class="rise d1"><ul class="mini-list" style="max-width:none">
+      <li><b>Ful Foods</b>: 150+ interviews over one summer.</li>
+      <li><b>StanPlus / RED.Health</b>: outside hospitals, talking to ambulance crews and patients.</li>
+      <li><b>People Pods</b>: knocking on doors, talking to construction workers.</li>
+      <li><b>Knix</b>: dozens of classmates; sourced fabric on an INSEAD trip to South Korea.</li>
+      <li><b>Pipo Saúde</b>: Thiago Torres (19D) interviewed dozens of med students; won the IVC.</li>
+    </ul></div>
+    <div class="rise d2" style="align-self:stretch;display:flex;flex-direction:column;justify-content:center">
+      <div style="height:560px;border-radius:14px;overflow:hidden;background:var(--hair)"><img src="images/thiago-torres.jpg" alt="Thiago Torres, Pipo Saúde" style="width:100%;height:100%;object-fit:cover"/></div>
+      <div style="margin-top:18px;font-size:27px;color:var(--muted)"><b style="color:var(--ink)">Thiago Torres</b> · Pipo Saúde</div>
+    </div>
+  </div>
+  <div class="pg">33</div>
+</section>
+
+<!-- 30 · STORIES & EVIDENCE -->
+<section data-label="Stories not TAM" class="s-startup">
+  <h2 class="rise">Stories and evidence beat TAM, SAM, SOM.</h2>
+  <p class="def late">A hypothesis that fails still taught you something <em>few other people know</em>.</p>
+  <p class="def2 later">You are an INSEADer. People love talking to you. <em>Use it.</em></p>
+  <div class="pg">34</div>
+</section>
+
+<!-- 31 · AI IN INTERVIEWS -->
+<section data-label="AI in interviews" class="s-step">
+  <div class="kicker rise">AI and customer interviews</div>
+  <h2 class="rise d1">Let AI hold the notes. You hold the conversation.</h2>
+  <div class="body wide">
+    <div class="ai-cap rise d1">
+      <p>Record on your phone and let a tool transcribe and summarize. You stay fully in the human conversation while it captures every word.</p>
+      <div class="ai-tools">
+        <div class="tool"><img src="images/logo-superwhisper.png" alt="superwhisper" /></div>
+        <div class="tool"><img src="images/logo-otter.png" alt="Otter" /></div>
+        <div class="tool"><img src="images/logo-fathom.png" alt="Fathom" /></div>
+        <div class="tool sq"><img src="images/logo-voicememos.png" alt="Voice Memos" /><span>Voice Memos</span></div>
+      </div>
+    </div>
+    <div class="ai-brain rise d2">
+      <p>Then keep every transcript in one place and build a searchable <b>brain</b> of all your conversations. Mine it later for patterns: the same problem said three ways, the price nobody will pay, the workaround everyone uses.</p>
+      <div class="ai-but"><div class="k">But</div><p>The interview stays human. An LLM is polite. It is not your customer.</p></div>
+    </div>
+  </div>
+  <div class="pg">35</div>
+</section>
+
+<section data-label="Line up 10 on LinkedIn" class="s-act">
+  <div class="frame">
+    <span class="tag">For your final presentation &middot; do this first</span>
+    <h2>Find 10 people who can speak to your riskiest hypotheses.</h2>
+    <div class="cols">
+      <ol>
+        <li><div><b>Name your riskiest hypotheses.</b> Pick the assumptions that, if wrong, break the model.</div></li>
+        <li><div><b>Open LinkedIn.</b> Search for people who live near those hypotheses: buyers, users, operators, people who have built the thing.</div></li>
+        <li><div><b>List 10 names.</b> You do not have to interview them. For now, just get the names. Current students count.</div></li>
+        <li><div><b>Note why each one.</b> One line per person on what they could tell you that nobody else can.</div></li>
+      </ol>
+      <div class="goal">
+        <div class="k">Output &middot; 10 names</div>
+        <h3>A short list of 10 real people, each tied to your riskiest hypotheses.</h3>
+        <p>This is your interview pipeline. The conversations come next. <b>You are an INSEADer. People will take the call.</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 32 · DIVIDER: experiments & MVPs -->
+<section data-label="Divider · MVPs" class="s-divider dark">
+  <div class="part kicker rise">Strategy 2 of 2</div>
+  <h2 class="rise d1">Experiments, prototypes<br/>and MVPs.</h2>
+  <div class="below late">Once you know your riskiest assumption, build the <b>cheapest thing</b> that tests it.</div>
+  <div class="pg">37</div>
+</section>
+
+<!-- 33 · HOW TO BUILD AN MVP (CSS vehicles) -->
+<section data-label="How to build an MVP" class="s-exhibit">
+  <div class="kicker rise">How to build an MVP</div>
+  <h2 class="rise d1">Build something usable at every stage.</h2>
+  <div class="art rise d2"><img src="images/mvp-skateboard-car.png" alt="Henrik Kniberg's MVP diagram: the top row builds a car wheel by wheel and is unusable until the end; the bottom row goes skateboard, scooter, bicycle, motorcycle, car and is usable at every step" style="object-fit:contain" /></div>
+  <p class="sub late">Each version in the bottom row works on its own, so each one teaches you something. The top row only moves once, at the very end.</p>
+  <div class="pnote">Image: Henrik Kniberg</div>
+  <div class="pg">38</div>
+</section>
+
+<!-- 34 · AI DROPS THE COST OF BUILDING -->
+<section data-label="AI drops build cost" class="s-step">
+  <div class="kicker rise">What changed in 2026</div>
+  <h2 class="rise d1">AI is dropping the cost of building to near zero.</h2>
+  <div class="body wide">
+    <div class="cards three">
+      <div class="qcard rise d1"><h3>A weekend prototype</h3><p>The killer combination right now: <b>Claude Code</b> (especially ultracode), a design tool, and <b>GitHub Pages</b> to stand up a working prototype over a weekend. Pick the combo that fits you.</p></div>
+      <div class="qcard rise d2"><h3>Prototype, not business</h3><p>AI helps with <b>prototype execution</b>. It does not yet run the business for you. That part is still on you.</p></div>
+      <div class="qcard rise d3"><h3>Read your CAC</h3><p>An AI prototype plus a landing page gives you a real read on your <b>customer-acquisition cost</b>.</p></div>
+    </div>
+    <div class="ai-logos rise d3">
+      <img class="l-openai" src="images/logo-openai.svg" alt="OpenAI Codex" />
+      <img src="images/logo-claude.svg" alt="Claude Code" />
+      <img src="images/logo-gemini.svg" alt="Gemini CLI" />
+      <img src="images/logo-github.svg" alt="GitHub" />
+    </div>
+  </div>
+  <div class="pg">39</div>
+</section>
+
+<!-- 35 · SIX MVP METHODS -->
+<section data-label="Six MVP methods" class="s-step">
+  <div class="kicker rise">Six ways to test cheaply</div>
+  <h2 class="rise d1">Six MVP methods. Each one tests demand without building the whole thing.</h2>
+  <div class="body wide">
+    <div class="cards three" style="gap:30px 40px">
+      <div class="qcard rise d1"><h3>1 &middot; Wizard of Oz</h3><p>It looks automated. People do the work behind the curtain.</p></div>
+      <div class="qcard rise d1"><h3>2 &middot; Landing page &amp; video</h3><p>A page or demo video. Measure sign-ups and real interest.</p></div>
+      <div class="qcard rise d2"><h3>3 &middot; Concierge</h3><p>Deliver the service by hand, customer by customer.</p></div>
+      <div class="qcard rise d2"><h3>4 &middot; Crowdfunding</h3><p>Pre-orders prove demand with real money up front.</p></div>
+      <div class="qcard rise d3"><h3>5 &middot; Non-functional prototype</h3><p>A front end that looks real and does nothing yet.</p></div>
+      <div class="qcard rise d3"><h3>6 &middot; Audience building</h3><p>Give value free, grow a community, monetize later.</p></div>
+    </div>
+  </div>
+  <p style="margin-top:30px;font-size:31px;color:var(--muted);text-align:center">The next six slides take them one at a time, each with a real INSEAD example.</p>
+  <div class="pg">40</div>
+</section>
+
+<!-- 36 · METHOD 1 · Wizard of Oz / StanPlus -->
+<section data-label="Method 1 · Wizard of Oz" class="s-story">
+  <div class="ph"><img src="images/stanplus-team.jpg" alt="StanPlus / RED.Health founders" /></div>
+  <div class="rail">
+    <div class="kicker">Method 1 of 6</div>
+    <h2>Wizard of Oz</h2>
+    <p class="take">Create a product that looks like it works automatically, while the work is actually done by hand behind the scenes.</p>
+    <div class="who-line"><b>StanPlus (now RED.Health)</b><span>Prabhdeep, Antoine and José León ran ambulance dispatch by hand behind an app-like front end, proving the service worked before building the software.</span></div>
+  </div>
+  <div class="pg">41</div>
+</section>
+
+<!-- 37 · METHOD 2 · Landing page / Dropbox -->
+<section data-label="Method 2 · Dropbox" class="s-vid2">
+  <div class="rail">
+    <div class="kicker">Method 2 of 6</div>
+    <h2>Landing page &amp; video</h2>
+    <p class="what">Put up a simple page or a short demo video for a product you have not built, then measure sign-ups and interest.</p>
+    <p class="eg"><b>Dropbox</b> had no working sync to show, so Drew Houston filmed a three-minute demo of the product as if it already worked. The video stood in for the product and took the beta waitlist from <b>5,000 to 75,000 overnight</b>.</p>
+  </div>
+  <div class="media">
+    <a class="facade" href="https://www.youtube.com/watch?v=7QmCUDHpNzE" target="_blank" rel="noopener">
+      <div class="thumb"><img src="images/dropbox-logo.jpg" alt="Dropbox" /></div>
+      <div class="scrim"></div>
+      <div class="play" aria-hidden="true"></div>
+    </a>
+    <div class="vcap">The Dropbox demo video. Click to watch on YouTube.</div>
+  </div>
+  <div class="pg">42</div>
+</section>
+
+<!-- 38 · METHOD 2 · Landing page / People Pods -->
+<section data-label="Method 2 · People Pods" class="s-vid2 ppods">
+  <div class="rail">
+    <div class="kicker">Method 2 of 6 · INSEAD example</div>
+    <h2>Test demand before you build anything.</h2>
+    <p class="what"><b>People Pods</b> is affordable, dignified housing for migrant construction workers. The team tested demand with a landing page and this short video before building anything.</p>
+    <div class="founder">
+      <img src="images/peoplepods-ivc-founders.jpg" alt="People Pods founders" />
+      <div class="cred">Daniel Layung (17D)</div>
+    </div>
+  </div>
+  <div class="media">
+    <video class="player" controls preload="metadata" src="media/peoplepods.mp4" poster="images/peoplepods-landing.jpg">Your browser does not support embedded video.</video>
+    <div class="vcap">The People Pods demo video. Press play.</div>
+  </div>
+  <div class="pg">43</div>
+</section>
+
+<!-- 39 · METHOD 3 · Concierge / Soko -->
+<section data-label="Method 3 · Concierge" class="s-story concierge">
+  <div class="ph">
+    <img src="images/founder-ella-peinovich.jpg" alt="Ella Peinovich, Soko founder" />
+    <figure class="suitcase" data-reveal="1">
+      <img src="images/concierge-suitcase.png" alt="The suitcase the concierge carried the product in" />
+      <figcaption>She carried the product in a suitcase.</figcaption>
+    </figure>
+  </div>
+  <div class="rail">
+    <div class="kicker">Method 3 of 6</div>
+    <h2>Concierge</h2>
+    <p class="take">Provide a customized manual service that delivers the offering by hand, working directly with customers.</p>
+    <div class="who-line"><b>Soko</b><span>Ella Peinovich was the concierge. She coordinated Kenyan artisans and buyers as a hands-on manual service, learning the model before scaling the technology.</span></div>
+  </div>
+  <div class="pg">44</div>
+</section>
+
+<!-- 40 · METHOD 4 · Crowdfunding / Knix -->
+<section data-label="Method 4 · Crowdfunding" class="s-crowd">
+  <div class="kicker">Method 4 of 6</div>
+  <h2>Crowdfunding</h2>
+  <p class="take">Use a platform like Kickstarter to turn interest into pre-orders: real money up front, before you build at scale.</p>
+  <figure class="strip">
+    <img src="images/knix-kickstarter.png" alt="Knix 8-in-1 EVOLUTION BRA Kickstarter campaign: $1,105,177 pledged, 13,642 backers" />
+  </figure>
+  <div class="cred-row"><img class="founder-photo" src="images/joanna-griffiths-vrm.jpg" alt="Joanna Griffiths, Knix founder" /><div class="who-line"><b>Knix &middot; Joanna Griffiths (12J)</b><span>She ran her 8-in-1 Evolution Bra on Kickstarter and raised $1,105,177 from 13,642 backers.</span></div></div>
+  <div class="pg">45</div>
+</section>
+
+<!-- 41 · METHOD 5 · Non-functional / WheelChariot -->
+<section data-label="Method 5 · Non-functional" class="s-story twoph">
+  <div class="ph">
+    <figure><img src="images/wheelchariot-i2p.jpg" alt="WheelChariot at the i2p / InVenture showcase" /></figure>
+    <figure><img src="images/wheelchariot-check.jpg" alt="WheelChariot winning a $25,000 check" /></figure>
+  </div>
+  <div class="rail">
+    <div class="kicker">Method 5 of 6</div>
+    <h2>Non-functional prototype</h2>
+    <p class="take">Build a front end with interface elements that simulate the product, with nothing actually working yet.</p>
+    <div class="who-line"><b>WheelChariot</b><span>Gabriel Jones and Tori Stopford showed a working-looking prototype at the i2p showcase and won a $25,000 check, before the product itself worked.</span></div>
+  </div>
+  <div class="pg">46</div>
+</section>
+
+<!-- 42 · METHOD 6 · Audience building / Ful Foods -->
+<section data-label="Method 6 · Audience building" class="s-story flip">
+  <div class="ph"><img src="images/ful-founders-ivc.png" alt="Ful Foods founders" /></div>
+  <div class="rail">
+    <div class="kicker">Method 6 of 6</div>
+    <h2>Audience building</h2>
+    <p class="take">Build a community of potential customers by giving valuable things away free, then monetize later.</p>
+    <div class="who-line"><b>Ful Foods</b><span>Cristina Prat, Sara Guaglio and Julia Streuli (19D) grew a community around their spirulina-based products with free value first, then sold to it.</span></div>
+  </div>
+  <div class="pg">47</div>
+</section>
+
+<section data-label="Six methods · recap" class="s-step">
+  <div class="kicker rise">Six methods, one job</div>
+  <h2 class="rise d1">Six ways to learn before you build.</h2>
+  <div class="body wide">
+    <div class="cards three" style="gap:30px 40px">
+      <div class="qcard rise d1"><h3>1 &middot; Wizard of Oz</h3><p>Automated front, human back.</p></div>
+      <div class="qcard rise d1"><h3>2 &middot; Landing page &amp; video</h3><p>Sell the promise, count the clicks.</p></div>
+      <div class="qcard rise d2"><h3>3 &middot; Concierge</h3><p>Deliver it by hand first.</p></div>
+      <div class="qcard rise d2"><h3>4 &middot; Crowdfunding</h3><p>Demand paid in advance.</p></div>
+      <div class="qcard rise d3"><h3>5 &middot; Non-functional prototype</h3><p>Looks real, does nothing yet.</p></div>
+      <div class="qcard rise d3"><h3>6 &middot; Audience building</h3><p>Free value now, money later.</p></div>
+    </div>
+  </div>
+  <p style="margin-top:30px;font-size:31px;color:var(--muted);text-align:center">The right method is the one that kills your <b style="color:var(--ink)">riskiest assumption</b> the cheapest.</p>
+  <div class="pg">48</div>
+</section>
+
+<!-- 43 · WHAT MAKES A GOOD MVP -->
+<section data-label="Good MVP" class="s-startup">
+  <h2 class="rise">A great MVP learns the most for the least.</h2>
+  <p class="def late">Aim for the <em>fastest learning</em>, not the smallest product. Which assumption are you least sure of? What is the cheapest test of it?</p>
+  <div class="pg">49</div>
+</section>
+
+<!-- 44 · ERIC RIES -->
+<section data-label="Eric Ries" class="s-startup dark" data-fx="zoom">
+  <h2 class="rise" style="font-size:92px">"We must learn what customers really want, not what they say they want, or what we think they should want."</h2>
+  <p class="def late">Eric Ries · <em>The Lean Startup</em></p>
+  <div class="pg">50</div>
+</section>
+
+<!-- 45 · NEXT STEPS -->
+<section data-label="Next steps" class="s-hw">
+  <div class="tag rise">Due tomorrow · Friday 8:30 on LMS</div>
+  <h2 class="rise d1">Tonight: turn assumptions into evidence.</h2>
+  <div class="grid">
+    <div class="card rise d1"><div class="n">01</div><h3>Finish the VCA</h3><p>Both canvases plus your <b>3 riskiest assumptions</b>. This is A5.</p></div>
+    <div class="card rise d2"><div class="n">02</div><h3>Line up your interviews</h3><p>Find <b>at least 10 people</b> you can talk to, and design <b>1 to 2 experiments</b> or a prototype to test the riskiest assumptions. This is A7.</p></div>
+    <div class="card rise d3"><div class="n">03</div><h3>Friday morning, in class</h3><p>A <b>40-minute peer review</b> (A6) with a matched team, then time to update before your <b>short final pitch</b>.</p></div>
+  </div>
+  <div class="pg">51</div>
+</section>
+
+<!-- 46 · END -->
+<!-- FINAL PRESENTATION FORMAT -->
+<section data-label="Final presentation · format" class="s-act">
+  <div class="frame">
+    <span class="tag">Final presentation &middot; Friday</span>
+    <h2>Your final pitch is four slides in eight minutes.</h2>
+    <div class="cols">
+      <ol>
+        <li><div><b>The thesis and the pitch.</b> State X will buy Y because of Z, and sell it.</div></li>
+        <li><div><b>VCA outcomes and risks.</b> High level, no canvas: your main hypotheses, your point of comparison, why customers choose you, and your biggest risks.</div></li>
+        <li><div><b>Customer interview plan.</b> Who you will talk to, and what each conversation teaches you.</div></li>
+        <li><div><b>Experiments and prototypes.</b> The one or two tests that attack your riskiest assumptions.</div></li>
+      </ol>
+      <div class="goal">
+        <div class="k">Timing</div>
+        <h3>4 minutes to present, 4 minutes for questions.</h3>
+        <p>One slide each, eight minutes total. Keep the VCA high level; <b>do not show the full Business Model Canvas.</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="End" class="s-end dark" data-fx="zoom">
+  <h2 class="rise">Go design experiments.</h2>
+  <div class="contact rise d1">Tomorrow we want a rough plan, not polish &middot; <b>andre.calmon@insead.edu</b></div>
+</section>
+
+</deck-stage>
+<div id="blackout"></div>
+<script src="deck-stage.js"></script>
+<script src="deck-morph.js"></script>
+<script>
+/* deck-stage.js is the shared shell (scaling, nav, thumbnail rail, counter, print).
+   Glue: click-to-advance on desktop (deck-stage handles tap only on touch); links/buttons opt out. */
+(function(){
+  var fine=!window.matchMedia||window.matchMedia('(pointer:fine)').matches;
+  if(fine){
+    document.addEventListener('click',function(e){
+      var path=e.composedPath?e.composedPath():[e.target],onSlide=false;
+      for(var i=0;i<path.length;i++){
+        var n=path[i];if(!n||!n.tagName)continue;var t=n.tagName;
+        if(t==='A'||t==='BUTTON'||t==='INPUT'||t==='SELECT'||t==='TEXTAREA'||t==='LABEL'||t==='SUMMARY')return;
+        if(n.id==='blackout')return;
+        if(n.getAttribute&&n.getAttribute('role')==='button')return;
+        if(t==='SECTION'&&n.parentElement&&n.parentElement.tagName==='DECK-STAGE')onSlide=true;
+      }
+      if(!onSlide)return;
+      var stage=document.querySelector('deck-stage');
+      if(stage&&typeof stage.next==='function')stage.next();
+    });
+  }
+})();
+</script>
+<script>(function(){const bo=document.getElementById('blackout');document.addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey)return;if(e.key==='b'||e.key==='B')bo.toggleAttribute('data-on');else if(e.key==='Escape')bo.removeAttribute('data-on');});bo.addEventListener('click',()=>bo.removeAttribute('data-on'));})();</script>
+</body></html>

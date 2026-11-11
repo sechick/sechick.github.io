@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Scientific Method — How Entrepreneurs Test Ideas</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:#ffffff;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    overflow:hidden;
+  }
+  .diagram{height:100%;padding:8px 0}
+  svg{display:block;height:100%;max-width:100%;margin:0 auto}
+  /* control bar hides behind hover: no sub-floor chrome text while presenting */
+  .controls{
+    position:fixed;left:14px;bottom:10px;display:flex;gap:8px;
+    opacity:0;pointer-events:none;transition:opacity .2s;
+  }
+  body:hover .controls{opacity:1;pointer-events:auto}
+  button{
+    font:600 20px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:#64748b;background:#fff;border:1px solid #dde5ea;
+    border-radius:999px;padding:10px 16px;cursor:pointer;
+    transition:color .15s,border-color .15s;
+  }
+  button:hover{color:#1f2937;border-color:#b9c6cf}
+  button:focus-visible{outline:2px solid #f08c1e;outline-offset:2px}
+
+  .step .t{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight:700;font-size:30px;fill:#23303f;text-anchor:middle;
+  }
+  .side .t{font-size:28px;font-weight:600}
+  .title{font-weight:700;font-size:34px;fill:#1f2937}
+  .legend{font-weight:700;font-size:28px;fill:#23303f;text-anchor:middle}
+  .box{stroke:rgba(0,0,0,.14);stroke-width:1;transition:filter .25s}
+  .lit .box{filter:brightness(1.07) drop-shadow(0 0 6px rgba(240,140,30,.55));
+            stroke:#f08c1e;stroke-width:1.6}
+
+  .conn{fill:none;stroke:#94a3b0;stroke-width:2.5;
+        stroke-linecap:round;stroke-linejoin:round}
+  .loop{fill:none;stroke:#a3aeb9;stroke-width:2.5;
+        stroke-linecap:round;stroke-linejoin:round;
+        stroke-dasharray:.001 .016}
+  .cyc{fill:none;stroke:#f08c1e;stroke-width:2.6;
+       stroke-linecap:round;stroke-linejoin:round}
+
+  .step,.conn,.loop,.legendg{opacity:0}
+  .play .step{animation:rise .55s ease-out forwards;animation-delay:var(--d,0s)}
+  .play .legendg{animation:rise .55s ease-out forwards;animation-delay:.1s}
+  .play .conn{stroke-dasharray:1;stroke-dashoffset:1;
+    animation:drawin .45s ease-out forwards;animation-delay:var(--d,0s)}
+  .play .loop{animation:fadein .8s ease-out forwards,march 30s linear infinite;
+    animation-delay:var(--d,0s),var(--d,0s)}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes drawin{from{opacity:1;stroke-dashoffset:1}to{opacity:1;stroke-dashoffset:0}}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  @keyframes march{from{stroke-dashoffset:0}to{stroke-dashoffset:-1}}
+
+  @media (prefers-reduced-motion: reduce){
+    .step,.conn,.loop,.legendg{opacity:1 !important;animation:none !important;
+      stroke-dashoffset:0 !important;transform:none !important}
+    .play .conn{stroke-dasharray:none}
+  }
+</style>
+</head>
+<body>
+<div class="diagram play" id="diagram">
+<svg id="svg" viewBox="0 0 1000 870" xmlns="http://www.w3.org/2000/svg"
+     role="img" aria-label="The scientific method as an entrepreneurial learning loop, in four phases. Think: ask a question, do background research, form a hypothesis. Test: run an experiment and check the procedure is working, troubleshooting it first if not. Learn: analyze data; results either align with the hypothesis or only partially or not at all. Share: communicate results. Every experiment becomes background research for the next idea.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b0"/>
+    </marker>
+    <marker id="arrowd" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#a3aeb9"/>
+    </marker>
+    <marker id="arrowg" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#f08c1e"/>
+    </marker>
+  </defs>
+
+  <text class="title" x="24" y="46">The Scientific Method</text>
+
+  <!-- phase legend, top right -->
+  <g class="legendg">
+    <rect x="530" y="12" width="104" height="40" rx="20" fill="#F5C45E"/>
+    <text class="legend" x="582" y="42">Think</text>
+    <rect x="644" y="12" width="92" height="40" rx="20" fill="#53C6B6"/>
+    <text class="legend" x="690" y="42">Test</text>
+    <rect x="746" y="12" width="110" height="40" rx="20" fill="#93A4EC"/>
+    <text class="legend" x="801" y="42">Learn</text>
+    <rect x="866" y="12" width="110" height="40" rx="20" fill="#F2877A"/>
+    <text class="legend" x="921" y="42">Share</text>
+  </g>
+
+  <!-- THINK -->
+  <g class="step" id="b-ask" style="--d:.05s">
+    <rect class="box" x="310" y="78" width="340" height="54" rx="14" fill="#F5C45E"/>
+    <text class="t" x="480" y="116">Ask a Question</text>
+  </g>
+  <path class="conn" pathLength="1" style="--d:.35s" d="M480,132 L480,152" marker-end="url(#arrow)"/>
+
+  <g class="step" id="b-res" style="--d:.45s">
+    <rect class="box" x="310" y="158" width="340" height="54" rx="14" fill="#F5C45E"/>
+    <text class="t" x="480" y="196">Background Research</text>
+  </g>
+  <path class="conn" pathLength="1" style="--d:.75s" d="M480,212 L480,232" marker-end="url(#arrow)"/>
+
+  <g class="step" id="b-hyp" style="--d:.85s">
+    <rect class="box" x="310" y="238" width="340" height="54" rx="14" fill="#F5C45E"/>
+    <text class="t" x="480" y="276">Form a Hypothesis</text>
+  </g>
+  <path class="conn" pathLength="1" style="--d:1.15s" d="M480,292 L480,312" marker-end="url(#arrow)"/>
+
+  <!-- TEST -->
+  <g class="step" id="b-exp" style="--d:1.25s">
+    <rect class="box" x="310" y="318" width="340" height="54" rx="14" fill="#53C6B6"/>
+    <text class="t" x="480" y="356">Run an Experiment</text>
+  </g>
+  <path class="conn" pathLength="1" style="--d:1.55s" d="M480,372 L480,392" marker-end="url(#arrow)"/>
+
+  <g class="step" id="b-proc" style="--d:1.65s">
+    <rect class="box" x="310" y="398" width="340" height="54" rx="14" fill="#53C6B6"/>
+    <text class="t" x="480" y="436">Procedure Working?</text>
+  </g>
+  <path class="conn" pathLength="1" style="--d:1.95s" d="M480,452 L480,468 L437,468 L437,478" marker-end="url(#arrow)"/>
+  <path class="conn" pathLength="1" style="--d:1.95s" d="M480,452 L480,468 L523,468 L523,478" marker-end="url(#arrow)"/>
+
+  <g class="step" id="b-no" style="--d:2.1s">
+    <rect class="box" x="399" y="484" width="76" height="46" rx="12" fill="#53C6B6"/>
+    <text class="t" x="437" y="518">No</text>
+  </g>
+  <g class="step" id="b-yes" style="--d:2.1s">
+    <rect class="box" x="485" y="484" width="76" height="46" rx="12" fill="#53C6B6"/>
+    <text class="t" x="523" y="518">Yes</text>
+  </g>
+
+  <path class="conn" pathLength="1" style="--d:2.35s" d="M399,507 L262,507" marker-end="url(#arrow)"/>
+  <g class="step side" id="b-trb" style="--d:2.5s">
+    <rect class="box" x="16" y="380" width="240" height="200" rx="14" fill="#FBF3D9" stroke="#E3D5A3"/>
+    <text class="t" x="136" y="420">Troubleshoot the</text>
+    <text class="t" x="136" y="454">procedure first.</text>
+    <text class="t" x="136" y="500">A broken test</text>
+    <text class="t" x="136" y="534">says nothing</text>
+    <text class="t" x="136" y="568">about the idea.</text>
+  </g>
+  <path class="loop" pathLength="1" style="--d:2.85s"
+        d="M136,380 L136,345 L304,345" marker-end="url(#arrowd)"/>
+
+  <path class="conn" pathLength="1" style="--d:2.45s" d="M523,530 L523,548 L480,548 L480,558" marker-end="url(#arrow)"/>
+
+  <!-- LEARN -->
+  <g class="step" id="b-ana" style="--d:2.6s">
+    <rect class="box" x="310" y="564" width="340" height="84" rx="14" fill="#8B9CE9"/>
+    <text class="t" x="480" y="599">Analyze Data and</text>
+    <text class="t" x="480" y="633">Draw Conclusions</text>
+  </g>
+  <path class="conn" pathLength="1" style="--d:2.9s" d="M480,648 L480,664 L260,664 L260,674" marker-end="url(#arrow)"/>
+  <path class="conn" pathLength="1" style="--d:2.9s" d="M480,648 L480,664 L670,664 L670,674" marker-end="url(#arrow)"/>
+
+  <g class="step" id="b-resL" style="--d:3.05s">
+    <rect class="box" x="120" y="680" width="280" height="84" rx="14" fill="#93A4EC"/>
+    <text class="t" x="260" y="715" style="font-size:28px">Results Align</text>
+    <text class="t" x="260" y="747" style="font-size:28px">with Hypothesis</text>
+  </g>
+  <g class="step" id="b-resR" style="--d:3.05s">
+    <rect class="box" x="470" y="680" width="400" height="84" rx="14" fill="#93A4EC"/>
+    <text class="t" x="670" y="715" style="font-size:28px">Results Align Partially</text>
+    <text class="t" x="670" y="747" style="font-size:28px">or Not at All</text>
+  </g>
+  <path class="conn" pathLength="1" style="--d:3.35s" d="M260,764 L260,780 L474,780"/>
+  <path class="conn" pathLength="1" style="--d:3.35s" d="M670,764 L670,780 L486,780"/>
+  <path class="conn" pathLength="1" style="--d:3.5s" d="M480,780 L480,792" marker-end="url(#arrow)"/>
+
+  <!-- SHARE -->
+  <g class="step" id="b-com" style="--d:3.6s">
+    <rect class="box" x="310" y="798" width="340" height="54" rx="14" fill="#F2877A"/>
+    <text class="t" x="480" y="836">Communicate Results</text>
+  </g>
+
+  <!-- iteration note -->
+  <g class="step side" id="b-note" style="--d:3.9s">
+    <rect class="box" x="690" y="300" width="294" height="330" rx="14" fill="#FBF3D9" stroke="#E3D5A3"/>
+    <text class="t" x="837" y="340">Every experiment</text>
+    <text class="t" x="837" y="374">becomes background</text>
+    <text class="t" x="837" y="408">research for the</text>
+    <text class="t" x="837" y="442">next idea.</text>
+    <!-- Build / Measure / Learn cycle -->
+    <g id="bml">
+      <text class="t" x="837" y="495" style="font-weight:700;font-size:28px">Build</text>
+      <text class="t" x="901" y="596" style="font-weight:700;font-size:28px">Measure</text>
+      <text class="t" x="765" y="596" style="font-weight:700;font-size:28px">Learn</text>
+      <path class="cyc" d="M885,498 Q928,524 918,566" marker-end="url(#arrowg)"/>
+      <path class="cyc" d="M866,608 Q834,624 800,608" marker-end="url(#arrowg)"/>
+      <path class="cyc" d="M752,566 Q742,524 785,498" marker-end="url(#arrowg)"/>
+    </g>
+  </g>
+  <path class="loop" pathLength="1" style="--d:4.2s" d="M870,722 L900,722 L900,634"/>
+  <path class="loop" pathLength="1" style="--d:4.2s" d="M900,296 L900,265 L656,265" marker-end="url(#arrowd)"/>
+
+  <!-- golden idea pulse (driven by JS) -->
+  <g id="pulse" opacity="0">
+    <circle id="pulseTrail" r="12" fill="#f08c1e" opacity=".18"/>
+    <circle id="pulseDot" r="8" fill="#f08c1e"/>
+  </g>
+  <circle id="ring" r="0" fill="none" stroke="#f08c1e" stroke-width="3" opacity="0"/>
+</svg>
+</div>
+<div class="controls">
+  <button id="playBtn" type="button">Pause</button>
+  <button id="replayBtn" type="button">Replay</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var diagram = document.getElementById("diagram");
+  var svg = document.getElementById("svg");
+  var pulse = document.getElementById("pulse");
+  var dot = document.getElementById("pulseDot");
+  var trail = document.getElementById("pulseTrail");
+  var ring = document.getElementById("ring");
+  var playBtn = document.getElementById("playBtn");
+  var replayBtn = document.getElementById("replayBtn");
+  var reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // The story the golden idea acts out, in SVG coordinates.
+  // Attempt 1: experiment runs, results only partially align -> pivot loop.
+  // Attempt 2: test breaks -> troubleshoot -> retest -> validated -> share.
+  var PATH = [
+    {x:480,y:50,jump:true},
+    {x:480,y:105,dwell:.5,lit:"b-ask"},
+    {x:480,y:185,dwell:.5,lit:"b-res"},
+    {x:480,y:265,dwell:.5,lit:"b-hyp"},
+    {x:480,y:345,dwell:.6,lit:"b-exp"},
+    {x:480,y:425,dwell:.5,lit:"b-proc"},
+    {x:480,y:468},{x:523,y:468},
+    {x:523,y:507,dwell:.4,lit:"b-yes"},
+    {x:523,y:548},{x:480,y:548},
+    {x:480,y:606,dwell:.6,lit:"b-ana"},
+    {x:480,y:664},{x:670,y:664},
+    {x:670,y:722,dwell:.8,lit:"b-resR"},
+    {x:870,y:722},{x:900,y:722},
+    {x:900,y:465,dwell:.9,lit:"b-note"},
+    {x:900,y:265},{x:656,y:265},
+    {x:480,y:265,dwell:.6,lit:"b-hyp"},
+    {x:480,y:345,dwell:.5,lit:"b-exp"},
+    {x:480,y:425,dwell:.5,lit:"b-proc"},
+    {x:480,y:468},{x:437,y:468},
+    {x:437,y:507,dwell:.4,lit:"b-no"},
+    {x:399,y:507},{x:262,y:507},
+    {x:136,y:507,dwell:.9,lit:"b-trb"},
+    {x:136,y:345},{x:304,y:345},
+    {x:480,y:345,dwell:.6,lit:"b-exp"},
+    {x:480,y:425,dwell:.5,lit:"b-proc"},
+    {x:480,y:468},{x:523,y:468},
+    {x:523,y:507,dwell:.4,lit:"b-yes"},
+    {x:523,y:548},{x:480,y:548},
+    {x:480,y:606,dwell:.6,lit:"b-ana"},
+    {x:480,y:664},{x:260,y:664},
+    {x:260,y:722,dwell:.9,lit:"b-resL"},
+    {x:260,y:780},{x:480,y:780},
+    {x:480,y:825,dwell:1.6,lit:"b-com",event:"celebrate"}
+  ];
+  var SPEED = 165;          // SVG units per second
+  var START_DELAY = reduceMotion ? 0 : 4.6;
+
+  var seg = 0, segT = 0, dwellLeft = START_DELAY, running = true;
+  var litBox = null, litTimer = 0, ringT = -1;
+  var last = null;
+
+  function setLit(id){
+    if (litBox) litBox.classList.remove("lit");
+    litBox = id ? document.getElementById(id) : null;
+    if (litBox) litBox.classList.add("lit");
+    litTimer = 0.9;
+  }
+
+  function place(x, y){
+    dot.setAttribute("cx", x); dot.setAttribute("cy", y);
+    trail.setAttribute("cx", x); trail.setAttribute("cy", y);
+  }
+
+  function celebrate(x, y){
+    ring.setAttribute("cx", x); ring.setAttribute("cy", y);
+    ringT = 0;
+  }
+
+  function resetPulse(){
+    seg = 0; segT = 0; dwellLeft = START_DELAY;
+    pulse.setAttribute("opacity", 0);
+    setLit(null);
+  }
+
+  function step(dt){
+    if (litTimer > 0){
+      litTimer -= dt;
+      if (litTimer <= 0) setLit(null);
+    }
+    if (ringT >= 0){
+      ringT += dt*1.6;
+      if (ringT >= 1){ ringT = -1; ring.setAttribute("opacity",0); }
+      else {
+        ring.setAttribute("r", 10 + ringT*34);
+        ring.setAttribute("opacity", (1-ringT)*.8);
+      }
+    }
+    if (dwellLeft > 0){ dwellLeft -= dt; return; }
+    if (seg >= PATH.length-1){
+      // story finished: fade and restart from the top
+      var op = parseFloat(pulse.getAttribute("opacity")) - dt*1.5;
+      if (op <= 0){ resetPulse(); dwellLeft = 1.2; }
+      else pulse.setAttribute("opacity", op);
+      return;
+    }
+    pulse.setAttribute("opacity", 1);
+    var a = PATH[seg], b = PATH[seg+1];
+    if (b.jump){ seg++; segT = 0; return; }
+    var dx = b.x-a.x, dy = b.y-a.y;
+    var len = Math.sqrt(dx*dx+dy*dy);
+    segT += dt*SPEED/Math.max(1,len);
+    if (segT >= 1){
+      seg++; segT = 0;
+      place(b.x, b.y);
+      if (b.lit) setLit(b.lit);
+      if (b.event === "celebrate") celebrate(b.x, b.y);
+      if (b.dwell) dwellLeft = b.dwell;
+    } else {
+      place(a.x+dx*segT, a.y+dy*segT);
+    }
+  }
+
+  function frame(ts){
+    if (!running) return;
+    if (last === null) last = ts;
+    var dt = Math.min(0.05, (ts-last)/1000);
+    last = ts;
+    step(dt);
+    requestAnimationFrame(frame);
+  }
+
+  playBtn.addEventListener("click", function(){
+    running = !running;
+    playBtn.textContent = running ? "Pause" : "Play";
+    if (running){ last = null; requestAnimationFrame(frame); }
+  });
+  replayBtn.addEventListener("click", function(){
+    diagram.classList.remove("play");
+    void diagram.offsetWidth;
+    diagram.classList.add("play");
+    resetPulse();
+    if (!running){ running = true; playBtn.textContent = "Pause"; last = null;
+                   requestAnimationFrame(frame); }
+  });
+
+  // parent deck can pause/resume this iframe; reuse the Pause/Play button path
+  window.addEventListener("message", function(e){
+    if (e.data === "deck:pause"){ if (running) playBtn.click(); }
+    else if (e.data === "deck:play"){ if (!running) playBtn.click(); }
+  });
+
+  place(PATH[0].x, PATH[0].y);
+  if (reduceMotion){
+    running = false;
+    playBtn.textContent = "Play";
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+</body>
+</html>

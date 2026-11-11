@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Quality Hurdle — Sampling Ideas</title>
+<style>
+  :root{
+    --bg:#eef3f6;
+    --card:#fdfefe;
+    --ink:#1f2937;
+    --muted:#64748b;
+    --line:#dde5ea;
+    --accent:#f08c1e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    font-family:-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  }
+  .wrap{width:100%;max-width:1160px}
+  .stage{
+    position:relative;
+    width:100%;
+    aspect-ratio:1264/740;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(31,41,55,.07);
+  }
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .controls{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    padding:0 4px;
+  }
+  button{
+    font:600 13px/1 -apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--muted);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;
+    cursor:pointer;
+    transition:color .15s,border-color .15s,transform .05s;
+  }
+  button:hover{color:var(--ink);border-color:#b9c6cf}
+  button:active{transform:translateY(1px)}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .stats{
+    margin-left:auto;
+    font:500 12.5px/1 ui-monospace,Menlo,monospace;
+    color:var(--muted);
+    letter-spacing:.02em;
+    transition:color .2s;
+    white-space:nowrap;
+  }
+  .stats.flash{color:var(--accent)}
+  @media (max-width:560px){
+    body{padding:10px}
+    .controls{flex-wrap:wrap}
+    .stats{width:100%;margin-left:0;margin-top:4px}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="stage"><canvas id="c" aria-label="Animated diagram: ideas are sampled from a quality distribution and fly horizontally at the quality level they were drawn at. Most hit a wall and pile up; only ideas sampled from the top tail of the distribution clear the hurdle."></canvas></div>
+  <div class="controls">
+    <button id="playBtn" type="button">Pause</button>
+    <button id="speedBtn" type="button">Speed 1&times;</button>
+    <button id="resetBtn" type="button">Reset</button>
+    <div class="stats" id="stats">0 sampled &middot; 0 cleared</div>
+  </div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var canvas = document.getElementById("c");
+  var ctx = canvas.getContext("2d");
+  var statsEl = document.getElementById("stats");
+  var playBtn = document.getElementById("playBtn");
+  var speedBtn = document.getElementById("speedBtn");
+  var resetBtn = document.getElementById("resetBtn");
+
+  var COLORS = {
+    curve:    "#2e8b43",
+    curveSoft:"rgba(46,139,67,0.12)",
+    ink:      "#1f2937",
+    label:    "#2b3645",
+    wall:     "#6e7681",
+    wallEdge: "#5b636c",
+    idea:     "#303b49",
+    ideaFill: "#ffffff",
+    pileEdge: "#3c4654",
+    orange:   "#f08c1e",
+    orangeHi: "#ffb75e",
+    ground:   "#15191f",
+    puff:     "#8a97a5",
+    dash:     "#c3ced6"
+  };
+
+  // ---------- state ----------
+  var W = 0, H = 0, dpr = 1;
+  var G = {};
+  var particles = [];
+  var pile = [];
+  var puffs = [];
+  var sparks = [];
+  var slots = [];
+  var launched = 0, cleared = 0;
+  var spawnTimer = 0.4;
+  var time = 0;
+  var labelPulse = 0;
+  var speedSteps = [1, 2, 0.5];
+  var speedIdx = 0;
+  var running = true;
+  var reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- helpers ----------
+  function randn(){ // Box-Muller
+    var u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+  function clamp(x, a, b){ return Math.max(a, Math.min(b, x)); }
+
+  // ---------- geometry ----------
+  // Higher on screen = higher quality. The wall top sits ~1.55 sigma above
+  // the mean of the distribution, so roughly 6% of sampled ideas clear it
+  // purely by where they were drawn from. No steering, no takeoff.
+  function computeGeometry(){
+    G.axisX   = 0.205 * W;
+    G.meanY   = 0.500 * H;
+    G.sigmaY  = 0.125 * H;
+    G.bulge   = 0.135 * W;
+    G.axisTop = G.meanY - 3.4 * G.sigmaY;
+    G.axisBot = G.meanY + 3.25 * G.sigmaY;
+
+    G.ground  = 0.930 * H;
+    G.wallL   = 0.795 * W;
+    G.wallW   = 0.018 * W;
+    G.wallTop = G.meanY - 1.55 * G.sigmaY;
+
+    G.rIdea = 0.0072 * W;
+    G.rPile = 0.0082 * W;
+
+    G.spawnMin = G.meanY - 3.2 * G.sigmaY; // upper clamp (top tail)
+    G.spawnMax = G.meanY + 3.0 * G.sigmaY; // lower clamp
+
+    // pile slots: heap with its right edge flush against the wall
+    var prevFilled = 0;
+    for (var s = 0; s < slots.length; s++) if (slots[s].filled) prevFilled++;
+    slots = [];
+    var rows = 9, r = G.rPile;
+    for (var j = 0; j < rows; j++){
+      var count = rows - j;
+      for (var k = 0; k < count; k++){
+        slots.push({
+          x: G.wallL - r - k * (r * 2.04),
+          y: G.ground - r - j * (r * 1.78),
+          filled: false
+        });
+      }
+    }
+    pile = [];
+    var refill = Math.min(prevFilled, slots.length);
+    for (var i = 0; i < refill; i++){
+      slots[i].filled = true;
+      pile.push({ x: slots[i].x, y: slots[i].y });
+    }
+  }
+
+  function resize(){
+    var rect = canvas.parentElement.getBoundingClientRect();
+    dpr = window.devicePixelRatio || 1;
+    W = rect.width;
+    H = rect.height;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    computeGeometry();
+    if (!running) draw();
+  }
+  window.addEventListener("resize", resize);
+
+  // ---------- particles ----------
+  function bulgeAt(y){
+    var d = (y - G.meanY) / G.sigmaY;
+    return G.bulge * Math.exp(-0.5 * d * d);
+  }
+
+  function spawn(){
+    // a proper draw from the normal: rejection-sample within the plotted
+    // range so the tails aren't piled up by clamping, then emerge exactly
+    // at the curve's edge at that height
+    var y0;
+    do {
+      y0 = G.meanY + randn() * G.sigmaY;
+    } while (y0 < G.spawnMin || y0 > G.spawnMax);
+    particles.push({
+      x: G.axisX + bulgeAt(y0),
+      y: y0,
+      baseY: y0,
+      vx: (0.115 + 0.055 * Math.random()) * W,
+      vy: 0,
+      counted: false,
+      state: "flying",
+      slot: null,
+      phase: Math.random() * Math.PI * 2,
+      age: 0,
+      alpha: 1,
+      trail: []
+    });
+    launched++;
+  }
+
+  function nextSlot(){
+    for (var i = 0; i < slots.length; i++)
+      if (!slots[i].filled) return slots[i];
+    return null;
+  }
+
+  function update(dt){
+    time += dt;
+    spawnTimer -= dt;
+    if (spawnTimer <= 0){
+      spawn();
+      spawnTimer = 0.32 + Math.random() * 0.22;
+    }
+    if (labelPulse > 0) labelPulse = Math.max(0, labelPulse - dt);
+
+    var g = 2.4 * H;
+
+    for (var i = particles.length - 1; i >= 0; i--){
+      var p = particles[i];
+      p.age += dt;
+
+      if (p.state === "flying"){
+        p.trail.push({ x: p.x, y: p.y });
+        if (p.trail.length > 15) p.trail.shift();
+
+        p.x += p.vx * dt;
+        // a whisper of bob; the cruise height is fixed by the sample
+        p.y = p.baseY + Math.sin(time * 2.1 + p.phase) * 0.0025 * H;
+
+        if (p.x + G.rIdea >= G.wallL && !p.counted){
+          if (p.baseY < G.wallTop){
+            // the sampled quality beats the hurdle: it flies over
+            p.counted = true;
+            cleared++;
+            labelPulse = 0.7;
+            flashStats();
+            burst(G.wallL + G.wallW * 0.5, p.y);
+          } else {
+            // the common case: the sample falls short of the hurdle
+            p.x = G.wallL - G.rIdea;
+            p.state = "falling";
+            p.vx = -(0.015 + Math.random() * 0.03) * W;
+            p.vy = -(0.02 + Math.random() * 0.05) * H;
+            p.slot = nextSlot();
+            if (p.slot) p.slot.filled = true;
+            p.trail = [];
+            puffs.push({ x: G.wallL - G.rIdea, y: p.y, t: 0 });
+          }
+        }
+        if (p.x > W + 0.05 * W){ particles.splice(i, 1); continue; }
+
+      } else if (p.state === "falling"){
+        p.vy += g * dt;
+        p.vx *= Math.pow(0.2, dt);
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        if (p.slot){
+          p.x += (p.slot.x - p.x) * Math.min(1, 3.2 * dt);
+          if (p.y >= p.slot.y){
+            pile.push({ x: p.slot.x, y: p.slot.y });
+            particles.splice(i, 1);
+            continue;
+          }
+        } else {
+          p.alpha -= 1.6 * dt;
+          var top = G.ground - 9 * G.rPile * 1.78;
+          if (p.y > top) p.y = top;
+          if (p.alpha <= 0){ particles.splice(i, 1); continue; }
+        }
+        if (p.y > G.ground){ particles.splice(i, 1); continue; }
+      }
+    }
+
+    for (var j = puffs.length - 1; j >= 0; j--){
+      puffs[j].t += dt * 2.4;
+      if (puffs[j].t >= 1) puffs.splice(j, 1);
+    }
+    for (var k = sparks.length - 1; k >= 0; k--){
+      var sp = sparks[k];
+      sp.t += dt * 1.8;
+      sp.x += sp.vx * dt;
+      sp.y += sp.vy * dt;
+      if (sp.t >= 1) sparks.splice(k, 1);
+    }
+  }
+
+  function burst(x, y){
+    for (var i = 0; i < 7; i++){
+      var a = Math.random() * Math.PI * 2;
+      var s = (0.02 + Math.random() * 0.045) * W;
+      sparks.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: 0 });
+    }
+  }
+
+  var flashTimer = null;
+  function flashStats(){
+    statsEl.classList.add("flash");
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(function(){ statsEl.classList.remove("flash"); }, 700);
+  }
+
+  // ---------- drawing ----------
+  function text(lines, x, y, size, opts){
+    opts = opts || {};
+    ctx.font = (opts.weight || 400) + " " + size + "px -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif";
+    ctx.fillStyle = opts.color || COLORS.label;
+    ctx.textAlign = opts.align || "left";
+    ctx.textBaseline = "alphabetic";
+    var lh = size * 1.22;
+    for (var i = 0; i < lines.length; i++)
+      ctx.fillText(lines[i], x, y + i * lh);
+  }
+
+  function drawBackdrop(){
+    var s = W / 1264;
+    var breathe = 1 + 0.02 * Math.sin(time * 1.6);
+
+    // the quality distribution
+    ctx.beginPath();
+    ctx.moveTo(G.axisX, G.axisBot);
+    var y;
+    for (y = G.axisBot; y >= G.axisTop; y -= 2){
+      ctx.lineTo(G.axisX + bulgeAt(y) * breathe, y);
+    }
+    ctx.lineTo(G.axisX, G.axisTop);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.curve;
+    ctx.fill();
+
+    // dashed line marking the hurdle height across the field: the bar an
+    // idea's quality must beat, read directly off the distribution's tail
+    ctx.save();
+    ctx.strokeStyle = COLORS.dash;
+    ctx.lineWidth = Math.max(1, 1.4 * s);
+    ctx.setLineDash([6 * s, 7 * s]);
+    ctx.beginPath();
+    ctx.moveTo(G.axisX, G.wallTop);
+    ctx.lineTo(G.wallL, G.wallTop);
+    ctx.stroke();
+    ctx.restore();
+
+    // axis with arrow
+    ctx.strokeStyle = COLORS.ink;
+    ctx.lineWidth = Math.max(1.4, 2 * s);
+    ctx.beginPath();
+    ctx.moveTo(G.axisX, G.axisBot);
+    ctx.lineTo(G.axisX, G.axisTop - 0.015 * H);
+    ctx.stroke();
+    var ah = 0.011 * W;
+    var tipY = G.axisTop - 0.015 * H;
+    ctx.beginPath();
+    ctx.moveTo(G.axisX, tipY - ah * 0.7);
+    ctx.lineTo(G.axisX - ah * 0.55, tipY + ah);
+    ctx.lineTo(G.axisX + ah * 0.55, tipY + ah);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.ink;
+    ctx.fill();
+
+    // labels
+    text(["Higher quality"], G.axisX - 0.012 * W, G.axisTop - 0.038 * H, 19 * s,
+         { weight: 600 });
+    text(["Lower quality"], G.axisX - 0.012 * W, G.axisBot + 0.045 * H, 19 * s,
+         { weight: 600 });
+    text(["Raw ideas"], 0.505 * W, 0.660 * H, 20 * s);
+    text(["Quality", "hurdle"], 0.838 * W, 0.560 * H, 20 * s);
+
+    var pulse = labelPulse > 0
+      ? 1 + 0.10 * Math.sin((0.7 - labelPulse) / 0.7 * Math.PI)
+      : 1;
+    ctx.save();
+    ctx.translate(0.900 * W, G.wallTop - 0.085 * H);
+    ctx.scale(pulse, pulse);
+    text(["Exceptional", "ideas"], 0, 0, 20 * s,
+         { align: "center",
+           weight: labelPulse > 0 ? 600 : 400,
+           color: labelPulse > 0 ? COLORS.orange : COLORS.label });
+    ctx.restore();
+
+    // ground
+    ctx.strokeStyle = COLORS.ground;
+    ctx.lineWidth = 0.012 * H;
+    ctx.beginPath();
+    ctx.moveTo(0.315 * W, G.ground + 0.006 * H);
+    ctx.lineTo(W, G.ground + 0.006 * H);
+    ctx.stroke();
+
+    // wall
+    ctx.fillStyle = COLORS.wall;
+    ctx.fillRect(G.wallL, G.wallTop, G.wallW, G.ground - G.wallTop);
+    ctx.fillStyle = COLORS.wallEdge;
+    ctx.fillRect(G.wallL, G.wallTop, G.wallW * 0.28, G.ground - G.wallTop);
+  }
+
+  function drawPile(){
+    ctx.lineWidth = Math.max(1, 1.4 * W / 1264);
+    ctx.strokeStyle = COLORS.pileEdge;
+    ctx.fillStyle = COLORS.ideaFill;
+    for (var i = 0; i < pile.length; i++){
+      ctx.beginPath();
+      ctx.arc(pile[i].x, pile[i].y, G.rPile, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  function drawParticles(){
+    for (var i = 0; i < particles.length; i++){
+      var p = particles[i];
+      var r = G.rIdea * Math.min(1, p.age * 5);
+      var hot = p.counted; // ignites once it has cleared the hurdle
+
+      if (p.trail.length > 1){
+        for (var t = 1; t < p.trail.length; t++){
+          var f = t / p.trail.length;
+          ctx.strokeStyle = hot ? COLORS.orangeHi : COLORS.idea;
+          ctx.globalAlpha = f * f * (hot ? 0.85 : 0.55) * p.alpha;
+          ctx.lineWidth = f * r * 1.5;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(p.trail[t - 1].x, p.trail[t - 1].y);
+          ctx.lineTo(p.trail[t].x, p.trail[t].y);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.globalAlpha = p.alpha;
+      if (hot){
+        ctx.shadowColor = COLORS.orange;
+        ctx.shadowBlur = r * 2.4;
+        ctx.fillStyle = COLORS.orange;
+      } else {
+        ctx.fillStyle = COLORS.ideaFill;
+      }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = Math.max(1, 1.5 * W / 1264);
+      ctx.strokeStyle = hot ? COLORS.orange : COLORS.idea;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawEffects(){
+    for (var i = 0; i < puffs.length; i++){
+      var pf = puffs[i];
+      ctx.globalAlpha = (1 - pf.t) * 0.6;
+      ctx.strokeStyle = COLORS.puff;
+      ctx.lineWidth = Math.max(1, 1.6 * W / 1264);
+      ctx.beginPath();
+      ctx.arc(pf.x, pf.y, G.rIdea * (1 + pf.t * 3.2), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    for (var k = 0; k < sparks.length; k++){
+      var sp = sparks[k];
+      ctx.globalAlpha = 1 - sp.t;
+      ctx.fillStyle = COLORS.orangeHi;
+      ctx.beginPath();
+      ctx.arc(sp.x, sp.y, G.rIdea * 0.4 * (1 - sp.t), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    drawBackdrop();
+    drawPile();
+    drawParticles();
+    drawEffects();
+  }
+
+  function updateStats(){
+    var rate = launched > 0 ? (100 * cleared / launched).toFixed(1) : "0.0";
+    statsEl.textContent = launched + " sampled \u00B7 " + cleared +
+                          " cleared \u00B7 " + rate + "%";
+  }
+
+  // ---------- main loop ----------
+  var last = null;
+  function frame(ts){
+    if (!running) return;
+    if (last === null) last = ts;
+    var dt = Math.min(0.05, (ts - last) / 1000) * speedSteps[speedIdx];
+    last = ts;
+    update(dt);
+    draw();
+    updateStats();
+    requestAnimationFrame(frame);
+  }
+
+  function setRunning(on){
+    running = on;
+    playBtn.textContent = on ? "Pause" : "Play";
+    if (on){ last = null; requestAnimationFrame(frame); }
+  }
+
+  playBtn.addEventListener("click", function(){ setRunning(!running); });
+  speedBtn.addEventListener("click", function(){
+    speedIdx = (speedIdx + 1) % speedSteps.length;
+    speedBtn.textContent = "Speed " + speedSteps[speedIdx] + "\u00D7";
+  });
+  resetBtn.addEventListener("click", function(){
+    particles = []; pile = []; puffs = []; sparks = [];
+    launched = 0; cleared = 0; spawnTimer = 0.3; labelPulse = 0;
+    for (var i = 0; i < slots.length; i++) slots[i].filled = false;
+    updateStats();
+    if (!running) draw();
+  });
+
+  // parent deck can pause/resume this iframe (reuses the Pause/Play path)
+  window.addEventListener("message", function(e){
+    if (e.data === "deck:pause"){ if (running) setRunning(false); }
+    else if (e.data === "deck:play"){ if (!running) setRunning(true); }
+  });
+
+  // ---------- boot ----------
+  resize();
+
+  if (reduceMotion){
+    for (var i = 0; i < 16 && i < slots.length; i++){
+      slots[i].filled = true;
+      pile.push({ x: slots[i].x, y: slots[i].y });
+    }
+    var stillYs = [0.44, 0.52, 0.58, 0.64, 0.71];
+    for (var j = 0; j < stillYs.length; j++){
+      particles.push({
+        x: (0.34 + j * 0.085) * W, y: stillYs[j] * H, baseY: stillYs[j] * H,
+        vx: 0, vy: 0, counted: false, state: "flying", slot: null,
+        phase: 0, age: 1, alpha: 1,
+        trail: [{ x: (0.34 + j * 0.085) * W - 0.05 * W, y: stillYs[j] * H },
+                { x: (0.34 + j * 0.085) * W, y: stillYs[j] * H }]
+      });
+    }
+    var exY = (0.500 - 1.9 * 0.125); // a top-tail sample, above the wall
+    particles.push({
+      x: 0.89 * W, y: exY * H, baseY: exY * H, vx: 0, vy: 0,
+      counted: true, state: "flying", slot: null, phase: 0, age: 1, alpha: 1,
+      trail: [{ x: 0.81 * W, y: exY * H }, { x: 0.89 * W, y: exY * H }]
+    });
+    running = false;
+    playBtn.textContent = "Play";
+    draw();
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+</body>
+</html>
