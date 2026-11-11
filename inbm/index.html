@@ -135,8 +135,28 @@
   a.row:hover .arrow{ transform:translateX(4px); }
   a.row:focus-visible{ outline:2px solid var(--true); outline-offset:2px; }
 
-  /* coming-soon rows are muted */
+  /* coming-soon rows are muted and not clickable */
   .row.soon .title{ color:var(--muted); font-weight:500; }
+  .row.soon .num{ color:var(--muted); }
+  .row.soon .status{ color:var(--muted); font-weight:400; }
+  .row.soon .dot{ background:var(--hair); }
+  .row.soon .arrow{ display:none; }
+  a.row.soon{ cursor:default; }
+  a.row.soon:hover{ background:transparent; }
+
+  /* instructor-only controls (hidden unless unlocked) */
+  .rel{
+    font:inherit; font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;
+    margin-left:.6rem; padding:.2rem .6rem; border-radius:999px; cursor:pointer;
+    border:1px solid var(--hair); background:transparent; color:var(--muted);
+  }
+  .rel.on{ background:var(--true); border-color:var(--true); color:#fff; }
+  .im-banner{ background:#131312; color:#fff; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; padding:.5rem 1rem; text-align:center; }
+  #imToggle{
+    font:inherit; font-size:.72rem; letter-spacing:.06em; padding:.4rem .9rem; border-radius:999px;
+    border:1px solid var(--hair); background:transparent; color:var(--muted); cursor:pointer;
+  }
+  #imToggle.on{ border-color:var(--true); color:var(--true); }
 
   /* ---- footer ---- */
   footer{
@@ -173,15 +193,15 @@
         <p class="day-name">Wednesday</p>
         <span class="day-date">20 January 2027</span>
       </div>
-      <a class="row" href="session-01.html">
+      <a class="row" data-id="s01" href="session-01.html">
         <span class="num">01</span>
         <span class="title">Introduction and Four Myths</span>
-        <span class="status"><span class="dot"></span>Live <span class="arrow">→</span></span>
+        <span class="status"><span class="dot"></span><span class="st">Live</span> <span class="arrow">→</span><button class="rel" type="button" hidden></button></span>
       </a>
-      <a class="row" href="session-02.html">
+      <a class="row" data-id="s02" href="session-02.html">
         <span class="num">02</span>
         <span class="title">Problem Framing &amp; the Idea Factory</span>
-        <span class="status"><span class="dot"></span>Live <span class="arrow">→</span></span>
+        <span class="status"><span class="dot"></span><span class="st">Live</span> <span class="arrow">→</span><button class="rel" type="button" hidden></button></span>
       </a>
     </section>
 
@@ -191,10 +211,10 @@
         <p class="day-name">Friday</p>
         <span class="day-date">22 January 2027</span>
       </div>
-      <a class="row" href="session-0304.html">
+      <a class="row" data-id="s03" href="session-0304.html">
         <span class="num">03-04</span>
         <span class="title">Team Pitches &amp; Value Creation Analysis</span>
-        <span class="status"><span class="dot"></span>Live <span class="arrow">→</span></span>
+        <span class="status"><span class="dot"></span><span class="st">Live</span> <span class="arrow">→</span><button class="rel" type="button" hidden></button></span>
       </a>
     </section>
 
@@ -204,10 +224,10 @@
         <p class="day-name">Wednesday</p>
         <span class="day-date">27 January 2027</span>
       </div>
-      <a class="row" href="session-0304.html">
-        <span class="num">04</span>
-        <span class="title">Evidence, Customer Discovery &amp; AI MVPs</span>
-        <span class="status"><span class="dot"></span>Live <span class="arrow">→</span></span>
+      <a class="row" data-id="s05" href="session-05.html">
+        <span class="num">05</span>
+        <span class="title">Venture Risk Management and Customer Discovery</span>
+        <span class="status"><span class="dot"></span><span class="st">Live</span> <span class="arrow">→</span><button class="rel" type="button" hidden></button></span>
       </a>
     </section>
 
@@ -217,10 +237,10 @@
         <p class="day-name">Friday</p>
         <span class="day-date">29 January 2027</span>
       </div>
-      <a class="row" href="session-05.html">
-        <span class="num">05</span>
+      <a class="row" data-id="s0607" href="session-0607.html">
+        <span class="num">06-07</span>
         <span class="title">Peer Review, Presentations &amp; Wrap-Up</span>
-        <span class="status"><span class="dot"></span>Live <span class="arrow">→</span></span>
+        <span class="status"><span class="dot"></span><span class="st">Live</span> <span class="arrow">→</span><button class="rel" type="button" hidden></button></span>
       </a>
     </section>
 
@@ -229,22 +249,109 @@
       <div class="day-head">
         <p class="day-name">Resources</p>
       </div>
-      <a class="row" href="torneio-instructions.pdf" target="_blank" rel="noopener">
+      <a class="row" data-id="r1" href="torneio-instructions.pdf" target="_blank" rel="noopener">
         <span class="num">↓</span>
         <span class="title">Torneio — Tournament Instructions</span>
-        <span class="status"><span class="dot"></span>PDF <span class="arrow">↗</span></span>
+        <span class="status"><span class="dot"></span><span class="st">PDF</span> <span class="arrow">↗</span><button class="rel" type="button" hidden></button></span>
       </a>
-      <a class="row" href="inbm-pitch-top-10.pdf" target="_blank" rel="noopener">
+      <!-- Controlled by the instructor mapping: students see it only once 'r2' is in PUBLISHED below.
+           (data-pending, if added to this row, keeps it inactive for everyone.) -->
+      <a class="row" data-id="r2" href="inbm-pitch-top-10.pdf" target="_blank" rel="noopener">
         <span class="num">↓</span>
         <span class="title">Top 10 Student Pitches</span>
-        <span class="status"><span class="dot"></span>PDF <span class="arrow">↗</span></span>
+        <span class="status"><span class="dot"></span><span class="st">PDF</span> <span class="arrow">↗</span><button class="rel" type="button" hidden></button></span>
       </a>
     </section>
 
     <footer>
       <span>Stephen E. Chick · INSEAD</span>
       <a href="https://sechick.github.io/">sechick.github.io</a>
+      <button id="imToggle" type="button" hidden>Instructor mode · Off</button>
     </footer>
   </main>
+<script>
+(function(){
+  // Sessions/resources listed here are visible to EVERYONE (committed to the site).
+  // The Release buttons (instructor mode) only affect this browser. To publish for students,
+  // add the id here, then commit + push.
+  var PUBLISHED = ['s01','s02','s03','s05','s0607','r1'];
+
+  // Instructor controls are hidden from students. Unlock in YOUR browser by opening
+  //   .../inbm/#admin=<passphrase>      (lock again with  #admin=off)
+  // Only the SHA-256 hash of the passphrase is stored here. This hides the controls; it is
+  // not server-side security (deck URLs remain reachable to anyone who knows them).
+  var ADMIN_HASH = 'cb9411fd990945c36d71844151b43f0612ed197abc4ca532d79424c2de2b4c17';
+  var KEY = 'inbm-course-v1', ADMIN_KEY = 'inbm-admin';
+
+  var state = { instructorMode:false, released:{} };
+  try{ var raw = localStorage.getItem(KEY); if(raw){ var d = JSON.parse(raw); state.instructorMode = !!d.instructorMode; state.released = d.released || {}; } }catch(e){}
+  var canAdmin = false;
+
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  function render(){
+    var im = canAdmin && state.instructorMode;
+    document.querySelectorAll('a.row[data-id]').forEach(function(row){
+      var id = row.getAttribute('data-id');
+      var pending = row.hasAttribute('data-pending');
+      var rel = PUBLISHED.indexOf(id) >= 0 || !!state.released[id];
+      var open = !pending && (im || rel);
+      if(!row.hasAttribute('data-href')) row.setAttribute('data-href', row.getAttribute('href') || '');
+      if(open) row.setAttribute('href', row.getAttribute('data-href')); else row.removeAttribute('href');
+      row.classList.toggle('soon', !open);
+      row.setAttribute('aria-disabled', open ? 'false' : 'true');
+      var st = row.querySelector('.st');
+      var isPdf = /\.pdf$/i.test(row.getAttribute('data-href'));
+      st.textContent = open ? (rel || !im ? (isPdf ? 'PDF' : 'Live') : 'Draft') : (pending && im ? 'Not ready' : 'Coming soon');
+      var btn = row.querySelector('.rel');
+      btn.hidden = !(im && !pending);
+      btn.textContent = rel ? 'Released' : 'Release';
+      btn.classList.toggle('on', rel);
+    });
+    var t = document.getElementById('imToggle');
+    t.hidden = !canAdmin;
+    t.textContent = im ? 'Instructor mode · On' : 'Instructor mode · Off';
+    t.classList.toggle('on', im);
+    var b = document.getElementById('imBanner');
+    if(im && !b){
+      b = document.createElement('div'); b.id = 'imBanner'; b.className = 'im-banner';
+      b.textContent = 'Instructor mode · students see only released sessions';
+      document.body.insertBefore(b, document.body.firstChild);
+    } else if(!im && b){ b.remove(); }
+  }
+
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('.rel');
+    if(btn){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.closest('a.row').getAttribute('data-id');
+      state.released[id] = !state.released[id]; save(); render(); return;
+    }
+    var row = e.target.closest && e.target.closest('a.row.soon');
+    if(row){ e.preventDefault(); }
+  }, true);
+  document.getElementById('imToggle').addEventListener('click', function(){ state.instructorMode = !state.instructorMode; save(); render(); });
+
+  async function checkAdmin(){
+    try{
+      var m = (location.hash || '').match(/^#admin=(.*)$/);
+      if(m){
+        var pw = decodeURIComponent(m[1]);
+        if(pw === 'off'){ localStorage.removeItem(ADMIN_KEY); }
+        else if(window.crypto && crypto.subtle){
+          var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+          var hex = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+          if(hex === ADMIN_HASH) localStorage.setItem(ADMIN_KEY, ADMIN_HASH);
+        }
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+      canAdmin = localStorage.getItem(ADMIN_KEY) === ADMIN_HASH;
+    }catch(e){}
+    render();
+  }
+  render();          // student view immediately (no flash of draft content)
+  checkAdmin();
+})();
+</script>
 </body>
 </html>
