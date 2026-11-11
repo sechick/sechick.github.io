@@ -271,10 +271,14 @@
   </main>
 <script>
 (function(){
-  // Sessions/resources listed here are visible to EVERYONE (committed to the site).
-  // The Release buttons (instructor mode) only affect this browser. To publish for students,
-  // add the id here, then commit + push.
+  // What students can see lives in release.json (same folder). Instructor mode's Release buttons
+  // edit that file in the GitHub repo (a commit via the GitHub API, using a personal access token
+  // stored only in this browser); students see the change once GitHub Pages redeploys (~1 minute).
+  // PUBLISHED below is only the fallback if release.json cannot be loaded.
   var PUBLISHED = ['s01','s02','s03','s05','s0607','r1'];
+  var published = PUBLISHED.slice();
+  var saving = '';
+  var REPO = 'sechick/sechick.github.io', REL_PATH = 'inbm/release.json', TOK_KEY = 'inbm-gh-token';
 
   // Instructor controls are hidden from students. Unlock in YOUR browser by opening
   //   .../inbm/#admin=<passphrase>      (lock again with  #admin=off)
@@ -283,8 +287,8 @@
   var ADMIN_HASH = 'cb9411fd990945c36d71844151b43f0612ed197abc4ca532d79424c2de2b4c17';
   var KEY = 'inbm-course-v1', ADMIN_KEY = 'inbm-admin';
 
-  var state = { instructorMode:false, released:{} };
-  try{ var raw = localStorage.getItem(KEY); if(raw){ var d = JSON.parse(raw); state.instructorMode = !!d.instructorMode; state.released = d.released || {}; } }catch(e){}
+  var state = { instructorMode:false };
+  try{ var raw = localStorage.getItem(KEY); if(raw){ var d = JSON.parse(raw); state.instructorMode = !!d.instructorMode; } }catch(e){}
   var canAdmin = false;
 
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
@@ -294,7 +298,7 @@
     document.querySelectorAll('a.row[data-id]').forEach(function(row){
       var id = row.getAttribute('data-id');
       var pending = row.hasAttribute('data-pending');
-      var rel = PUBLISHED.indexOf(id) >= 0 || !!state.released[id];
+      var rel = published.indexOf(id) >= 0;
       var open = !pending && (im || rel);
       if(!row.hasAttribute('data-href')) row.setAttribute('data-href', row.getAttribute('href') || '');
       if(open) row.setAttribute('href', row.getAttribute('data-href')); else row.removeAttribute('href');
@@ -305,7 +309,7 @@
       st.textContent = open ? (rel || !im ? (isPdf ? 'PDF' : 'Live') : 'Draft') : (pending && im ? 'Not ready' : 'Coming soon');
       var btn = row.querySelector('.rel');
       btn.hidden = !(im && !pending);
-      btn.textContent = rel ? 'Released' : 'Release';
+      btn.textContent = saving === id ? 'Saving…' : (rel ? 'Released' : 'Release');
       btn.classList.toggle('on', rel);
     });
     var t = document.getElementById('imToggle');
@@ -324,13 +328,56 @@
     var btn = e.target.closest && e.target.closest('.rel');
     if(btn){
       e.preventDefault(); e.stopPropagation();
-      var id = btn.closest('a.row').getAttribute('data-id');
-      state.released[id] = !state.released[id]; save(); render(); return;
+      publish(btn.closest('a.row').getAttribute('data-id')); return;
     }
     var row = e.target.closest && e.target.closest('a.row.soon');
     if(row){ e.preventDefault(); }
   }, true);
   document.getElementById('imToggle').addEventListener('click', function(){ state.instructorMode = !state.instructorMode; save(); render(); });
+
+  async function loadRelease(isAdmin){
+    try{
+      var data = null, tok = isAdmin ? localStorage.getItem(TOK_KEY) : null;
+      if(tok){   // instructor: read straight from the repo so a fresh edit shows immediately
+        var r = await fetch('https://api.github.com/repos/'+REPO+'/contents/'+REL_PATH+'?ref=main', { headers:{ Authorization:'Bearer '+tok, Accept:'application/vnd.github.raw+json' }, cache:'no-store' });
+        if(r.ok) data = await r.json();
+      }
+      if(!data){
+        var r2 = await fetch('release.json?ts=' + Date.now(), { cache:'no-store' });
+        if(r2.ok) data = await r2.json();
+      }
+      if(data && Array.isArray(data.published)){ published = data.published; render(); }
+    }catch(e){}
+  }
+
+  async function publish(id){
+    if(saving) return;
+    var tok = null;
+    try{ tok = localStorage.getItem(TOK_KEY); }catch(e){}
+    if(!tok){
+      tok = (prompt('To release/unrelease from here, paste a GitHub fine-grained personal access token\n(repository sechick/sechick.github.io, permission: Contents = Read and write).\nIt is stored only in this browser.') || '').trim();
+      if(!tok) return;
+      try{ localStorage.setItem(TOK_KEY, tok); }catch(e){}
+    }
+    saving = id; render();
+    try{
+      var api = 'https://api.github.com/repos/'+REPO+'/contents/'+REL_PATH;
+      var hdr = { Authorization:'Bearer '+tok, Accept:'application/vnd.github+json' };
+      // start from the repo's latest file so nothing is overwritten
+      var g = await fetch(api+'?ref=main', { headers:hdr, cache:'no-store' });
+      if(g.status === 401 || g.status === 403){ try{ localStorage.removeItem(TOK_KEY); }catch(e){} throw new Error('GitHub rejected the token (it has been cleared). Click again to enter a new one.'); }
+      var list = [], sha;
+      if(g.ok){ var j = await g.json(); sha = j.sha; try{ var c = JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))))); if(Array.isArray(c.published)) list = c.published; }catch(e){} }
+      var on = list.indexOf(id) < 0;
+      var next = on ? list.concat([id]) : list.filter(function(x){ return x !== id; });
+      var body = { message:(on?'Release ':'Unrelease ')+id+' (instructor mode)', content:btoa(unescape(encodeURIComponent(JSON.stringify({ published:next }, null, 2)+'\n'))), branch:'main' };
+      if(sha) body.sha = sha;
+      var p = await fetch(api, { method:'PUT', headers:Object.assign({ 'Content-Type':'application/json' }, hdr), body:JSON.stringify(body) });
+      if(!p.ok){ var t = await p.text(); throw new Error('GitHub error '+p.status+': '+t.slice(0,200)); }
+      published = next;
+    }catch(e){ alert('Could not save: ' + e.message); }
+    saving = ''; render();
+  }
 
   async function checkAdmin(){
     try{
@@ -348,9 +395,11 @@
       canAdmin = localStorage.getItem(ADMIN_KEY) === ADMIN_HASH;
     }catch(e){}
     render();
+    return canAdmin;
   }
   render();          // student view immediately (no flash of draft content)
-  checkAdmin();
+  loadRelease(false);
+  checkAdmin().then(function(ok){ if(ok) loadRelease(true); });
 })();
 </script>
 </body>

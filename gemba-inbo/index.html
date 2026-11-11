@@ -279,9 +279,13 @@ class Component extends DCLogic {
     this.key = 'inbo-course-v1';
     this.sessionIds = ['s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s11','s12','s13','s14'];
     this.handoutIds = ['h1','h2','h3','h4'];
-    // Sessions listed here are released for EVERYONE (committed to the site).
-    // The Release buttons in Instructor mode only affect this browser (localStorage).
-    // To publish a session to students: add its id, e.g. ['s08','s09'], then commit + push.
+    // What students can see lives in release.json (same folder). Instructor mode's Release /
+    // Hidden buttons edit that file in the GitHub repo (commit via the GitHub API, using a
+    // personal access token stored only in this browser) - students see the change once
+    // GitHub Pages redeploys (about a minute). These are only the fallback if release.json can't load.
+    this.repo = 'sechick/sechick.github.io';
+    this.relPath = 'gemba-inbo/release.json';
+    this.tokKey = 'inbo-gh-token';
     this.published = ['s08'];
     this.publishedHandouts = [];
     // Instructor controls are hidden from students. To unlock them in YOUR browser, open
@@ -289,7 +293,55 @@ class Component extends DCLogic {
     // The page only stores the SHA-256 hash of the passphrase (below). To change the passphrase,
     // compute a new hash and paste it here. This hides the controls; it is not server-side security.
     this.adminHash = '83abb95c3cac89c879f46369c608123ce652418e54d49a19c0feb896d039b5d1';
-    this.state = { instructorMode:false, canAdmin:false, released:{}, handouts:{}, loaded:false };
+    this.state = { instructorMode:false, canAdmin:false, pubS:this.published.slice(), pubH:this.publishedHandouts.slice(), saving:'', loaded:false };
+  }
+  async loadRelease(isAdmin){
+    try{
+      let data = null;
+      const tok = isAdmin ? localStorage.getItem(this.tokKey) : null;
+      if(tok){   // instructor: read straight from the repo so a fresh edit shows immediately
+        const r = await fetch('https://api.github.com/repos/'+this.repo+'/contents/'+this.relPath+'?ref=main', { headers:{ Authorization:'Bearer '+tok, Accept:'application/vnd.github.raw+json' }, cache:'no-store' });
+        if(r.ok) data = await r.json();
+      }
+      if(!data){
+        const r = await fetch('release.json?ts=' + Date.now(), { cache:'no-store' });
+        if(r.ok) data = await r.json();
+      }
+      if(data) this.setState({ pubS:Array.isArray(data.sessions)?data.sessions:[], pubH:Array.isArray(data.handouts)?data.handouts:[] });
+    }catch(e){}
+  }
+  async publish(kind, id){
+    if(this.state.saving) return;
+    let tok = null;
+    try{ tok = localStorage.getItem(this.tokKey); }catch(e){}
+    if(!tok){
+      tok = (prompt('To release/unrelease from here, paste a GitHub fine-grained personal access token\n(repository sechick/sechick.github.io, permission: Contents = Read and write).\nIt is stored only in this browser.') || '').trim();
+      if(!tok) return;
+      try{ localStorage.setItem(this.tokKey, tok); }catch(e){}
+    }
+    this.setState({ saving:id });
+    try{
+      const api = 'https://api.github.com/repos/'+this.repo+'/contents/'+this.relPath;
+      const hdr = { Authorization:'Bearer '+tok, Accept:'application/vnd.github+json' };
+      // start from the repo's latest file so we never overwrite someone else's change
+      const g = await fetch(api+'?ref=main', { headers:hdr, cache:'no-store' });
+      if(g.status === 401 || g.status === 403){ try{ localStorage.removeItem(this.tokKey); }catch(e){} throw new Error('GitHub rejected the token (it has been cleared). Click again to enter a new one.'); }
+      let cur = { sessions:[], handouts:[] }, sha;
+      if(g.ok){ const j = await g.json(); sha = j.sha; try{ cur = JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))))); }catch(e){} }
+      const key = kind === 's' ? 'sessions' : 'handouts';
+      const list = Array.isArray(cur[key]) ? cur[key] : [];
+      const on = list.indexOf(id) < 0;
+      const next = { sessions:Array.isArray(cur.sessions)?cur.sessions:[], handouts:Array.isArray(cur.handouts)?cur.handouts:[] };
+      next[key] = on ? list.concat([id]) : list.filter(x=>x!==id);
+      const body = { message:(on?'Release ':'Unrelease ')+id+' (instructor mode)', content:btoa(unescape(encodeURIComponent(JSON.stringify(next,null,2)+'\n'))), branch:'main' };
+      if(sha) body.sha = sha;
+      const p = await fetch(api, { method:'PUT', headers:{ ...hdr, 'Content-Type':'application/json' }, body:JSON.stringify(body) });
+      if(!p.ok){ const t = await p.text(); throw new Error('GitHub error '+p.status+': '+t.slice(0,200)); }
+      this.setState({ pubS:next.sessions, pubH:next.handouts, saving:'' });
+    }catch(e){
+      this.setState({ saving:'' });
+      alert('Could not save: ' + e.message);
+    }
   }
   async checkAdmin(){
     let ok = false;
@@ -308,28 +360,29 @@ class Component extends DCLogic {
       ok = localStorage.getItem('inbo-admin') === this.adminHash;
     }catch(e){}
     this.setState(prev=>({ canAdmin:ok, instructorMode: ok && prev.instructorMode }));
+    return ok;
   }
-  componentDidMount(){ this.applyAccent(); this.load(); this.checkAdmin(); }
+  componentDidMount(){ this.applyAccent(); this.load(); this.loadRelease(false); this.checkAdmin().then(ok=>{ if(ok) this.loadRelease(true); }); }
   componentDidUpdate(prev){ if(prev.accent !== this.props.accent) this.applyAccent(); }
   applyAccent(){ if(this.props.accent){ try{ document.documentElement.style.setProperty('--blue', this.props.accent); }catch(e){} } }
   load(){
     try{
       const raw = localStorage.getItem(this.key);
-      if(raw){ const d = JSON.parse(raw); this.setState({ instructorMode:!!d.instructorMode, released:d.released||{}, handouts:d.handouts||{}, loaded:true }); return; }
+      if(raw){ const d = JSON.parse(raw); this.setState({ instructorMode:!!d.instructorMode, loaded:true }); return; }
     }catch(e){}
     this.setState({ loaded:true });
   }
-  persist(n){ try{ localStorage.setItem(this.key, JSON.stringify({ instructorMode:n.instructorMode, released:n.released, handouts:n.handouts })); }catch(e){} }
+  persist(n){ try{ localStorage.setItem(this.key, JSON.stringify({ instructorMode:n.instructorMode })); }catch(e){} }
   update(patch){ this.setState(prev=>{ const n={...prev,...patch}; this.persist(n); return n; }); }
   toggleInstructor(){ this.update({ instructorMode:!this.state.instructorMode }); }
-  toggleRelease(id){ this.update({ released:{ ...this.state.released, [id]:!this.state.released[id] } }); }
-  toggleHandout(id){ this.update({ handouts:{ ...this.state.handouts, [id]:!this.state.handouts[id] } }); }
+  toggleRelease(id){ this.publish('s', id); }
+  toggleHandout(id){ this.publish('h', id); }
   deckPath(id){ return 'decks/inbo-' + id.slice(1) + '.html'; }
   renderVals(){
     const im = this.state.instructorMode && this.state.canAdmin;
     const s = {};
     this.sessionIds.forEach(id=>{
-      const rel = !!this.state.released[id] || this.published.indexOf(id) >= 0;
+      const rel = this.state.pubS.indexOf(id) >= 0;
       const open = im || rel;
       s[id] = {
         href: open ? this.deckPath(id) : undefined,
@@ -338,7 +391,7 @@ class Component extends DCLogic {
         statusColor: rel ? 'var(--blueb)' : (im ? 'var(--amber)' : 'var(--faint)'),
         arrow: open ? '→' : '',
         showToggle: im,
-        toggleLabel: rel ? 'Released' : 'Release',
+        toggleLabel: this.state.saving === id ? 'Saving…' : (rel ? 'Released' : 'Release'),
         togBorder: rel ? 'var(--blue)' : 'var(--hair)',
         togColor: rel ? '#fff' : 'var(--muted)',
         togBg: rel ? 'var(--blue)' : 'transparent',
@@ -348,12 +401,12 @@ class Component extends DCLogic {
     const h = {};
     let anyVisible = false;
     this.handoutIds.forEach(id=>{
-      const vis = !!this.state.handouts[id] || this.publishedHandouts.indexOf(id) >= 0;
+      const vis = this.state.pubH.indexOf(id) >= 0;
       if(vis) anyVisible = true;
       h[id] = {
         show: im || vis,
         titleColor: vis ? 'var(--ink)' : 'var(--faint)',
-        toggleLabel: vis ? 'Visible' : 'Hidden',
+        toggleLabel: this.state.saving === id ? 'Saving…' : (vis ? 'Visible' : 'Hidden'),
         togBorder: vis ? 'var(--blue)' : 'var(--hair)',
         togColor: vis ? '#fff' : 'var(--muted)',
         togBg: vis ? 'var(--blue)' : 'transparent',
