@@ -1,0 +1,17 @@
+# Keep line endings as LF in the repo AND in the working tree on every OS,
+# so Git / GitHub Desktop stop warning about LF -> CRLF conversion.
+* text=auto eol=lf
+
+# Binary files: never touch
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.mp4  binary
+*.mov  binary
+*.m4v  binary
+*.woff binary
+*.woff2 binary
