@@ -279,6 +279,11 @@ class Component extends DCLogic {
     this.key = 'inbo-course-v1';
     this.sessionIds = ['s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s11','s12','s13','s14'];
     this.handoutIds = ['h1','h2','h3','h4'];
+    // Sessions listed here are released for EVERYONE (committed to the site).
+    // The Release buttons in Instructor mode only affect this browser (localStorage).
+    // To publish a session to students: add its id, e.g. ['s08','s09'], then commit + push.
+    this.published = ['s08'];
+    this.publishedHandouts = [];
     this.state = { instructorMode:false, released:{}, handouts:{}, loaded:false };
   }
   componentDidMount(){ this.applyAccent(); this.load(); }
@@ -301,7 +306,7 @@ class Component extends DCLogic {
     const im = this.state.instructorMode;
     const s = {};
     this.sessionIds.forEach(id=>{
-      const rel = !!this.state.released[id];
+      const rel = !!this.state.released[id] || this.published.indexOf(id) >= 0;
       const open = im || rel;
       s[id] = {
         href: open ? this.deckPath(id) : undefined,
@@ -320,7 +325,7 @@ class Component extends DCLogic {
     const h = {};
     let anyVisible = false;
     this.handoutIds.forEach(id=>{
-      const vis = !!this.state.handouts[id];
+      const vis = !!this.state.handouts[id] || this.publishedHandouts.indexOf(id) >= 0;
       if(vis) anyVisible = true;
       h[id] = {
         show: im || vis,

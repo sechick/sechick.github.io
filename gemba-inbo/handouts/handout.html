@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INBO handout</title>
+<!--
+  2-slides-per-page handout generator.
+  Open:   handouts/handout.html?deck=inbo-08        (add &notes=1 for note lines)
+  Then:   Ctrl/Cmd+P -> Destination "Save as PDF" -> Paper A4 (or Letter),
+          Margins "None", tick "Background graphics" -> Save.
+  Loads ../decks/<deck>.html, copies its styles and slides, shows them scaled.
+-->
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#e9e9e6;font-family:system-ui,sans-serif;color:#131312}
+  #bar{position:sticky;top:0;z-index:5;background:#131312;color:#fff;padding:10px 18px;font-size:14px;display:flex;gap:16px;align-items:center}
+  #bar button{font:inherit;padding:6px 14px;border:0;border-radius:6px;background:#fff;color:#131312;cursor:pointer}
+  #bar span{opacity:.75}
+  .page{width:210mm;height:297mm;margin:12px auto;background:#fff;padding:14mm 15mm 10mm;display:flex;flex-direction:column;justify-content:space-between;break-after:page;page-break-after:always;overflow:hidden;position:relative}
+  .slot{width:180mm}
+  .frame{width:180mm;height:101.25mm;position:relative;overflow:hidden;border:.3mm solid #cfcfc8}
+  .frame > .hs{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
+  .cap{font:8pt/1.2 ui-monospace,monospace;color:#71716A;margin:1.5mm 0 0;display:flex;justify-content:space-between}
+  .lines{margin-top:2mm}
+  .lines i{display:block;border-bottom:.25mm solid #cfcfc8;height:6.5mm}
+  .hdr{position:absolute;top:6mm;left:15mm;right:15mm;font:8pt ui-monospace,monospace;color:#71716A;display:flex;justify-content:space-between}
+  @media print{
+    html,body{background:#fff}
+    #bar{display:none}
+    .page{margin:0;box-shadow:none}
+  }
+  /* force every slide to its fully revealed, end-of-animation state */
+  .hs [data-reveal]{opacity:1 !important;visibility:visible !important;transition:none !important}
+  .hs *,.hs *::before,.hs *::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;transition-duration:0s !important}
+  .hs{opacity:1 !important;visibility:visible !important;transform-origin:0 0}
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+</style>
+</head>
+<body>
+<div id="bar"><button onclick="window.print()">Print / Save as PDF</button><span id="status">Loading…</span></div>
+<div id="out"></div>
+<script>
+(async function(){
+  const q = new URLSearchParams(location.search);
+  const deck = (q.get('deck') || 'inbo-08').replace(/[^a-z0-9-]/gi,'');
+  const notes = q.get('notes') === '1';
+  const st = document.getElementById('status');
+  try{
+    const html = await (await fetch('../decks/' + deck + '.html')).text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    document.title = (doc.title || deck) + ' — handout';
+
+    // copy fonts + styles (resolve relative urls against the decks folder)
+    const base = new URL('../decks/', location.href).href;
+    doc.querySelectorAll('link[rel=stylesheet]').forEach(l=>{
+      const n = document.createElement('link'); n.rel='stylesheet'; n.href = new URL(l.getAttribute('href'), base).href; document.head.appendChild(n);
+    });
+    doc.querySelectorAll('style').forEach(s=>{
+      const n = document.createElement('style');
+      n.textContent = s.textContent.replace(/url\((['"]?)(?!data:|https?:|\/\/|#)([^)'"]+)\1\)/g,(m,qt,u)=>'url('+new URL(u,base).href+')');
+      document.head.appendChild(n);
+    });
+    // our rules must win over deck page-level rules (html/body background, @page)
+    const fix = document.createElement('style');
+    fix.textContent='@page{size:A4 portrait;margin:0}html,body{margin:0 !important;height:auto !important;overflow:visible !important}body{background:#e9e9e6 !important}@media print{body{background:#fff !important}}';
+    document.head.appendChild(fix);
+
+    const secs = Array.from(doc.querySelectorAll('deck-stage > section')).filter(s=>!s.hasAttribute('data-deck-skip'));
+    const out = document.getElementById('out');
+    const scale = (180 / 25.4 * 96) / 1920;       // 180 mm frame width in CSS px
+    const title = (doc.title || deck).replace(/\s+—\s+INBO$/,'');
+    const total = secs.length;
+
+    function absolutize(root){
+      root.querySelectorAll('[src],[poster]').forEach(el=>{
+        ['src','poster'].forEach(a=>{ const v=el.getAttribute(a); if(v && !/^(data:|https?:|\/\/|#)/.test(v)) el.setAttribute(a,new URL(v,base).href); });
+      });
+      root.querySelectorAll('[style*="url("]').forEach(el=>{
+        el.setAttribute('style', el.getAttribute('style').replace(/url\((['"]?)(?!data:|https?:|\/\/|#)([^)'"]+)\1\)/g,(m,qt,u)=>'url('+new URL(u,base).href+')'));
+      });
+      root.querySelectorAll('script,video,audio,iframe').forEach(el=>el.remove());
+    }
+
+    for(let i=0;i<total;i+=2){
+      const page = document.createElement('div'); page.className='page';
+      page.innerHTML = '<div class="hdr"><span>INBO · '+title+'</span><span>INSEAD GEMBA</span></div><div style="height:4mm"></div>';
+      const col = document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;justify-content:space-around;flex:1';
+      for(let j=i;j<Math.min(i+2,total);j++){
+        const slot = document.createElement('div'); slot.className='slot';
+        const frame = document.createElement('div'); frame.className='frame';
+        const wrap = document.createElement('div'); wrap.className='hs'; wrap.style.transform='scale('+scale+')';
+        const s = secs[j].cloneNode(true);
+        s.setAttribute('data-deck-active','');
+        s.style.cssText += ';position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:1;visibility:visible;transform:none';
+        absolutize(s);
+        wrap.appendChild(s); frame.appendChild(wrap); slot.appendChild(frame);
+        const cap = document.createElement('div'); cap.className='cap';
+        cap.innerHTML='<span>'+(secs[j].getAttribute('data-label')||'')+'</span><span>'+(j+1)+' / '+total+'</span>';
+        slot.appendChild(cap);
+        if(notes){ const l=document.createElement('div'); l.className='lines'; l.innerHTML='<i></i><i></i><i></i>'; slot.appendChild(l); }
+        col.appendChild(slot);
+      }
+      page.appendChild(col);
+      out.appendChild(page);
+    }
+    st.textContent = total + ' slides · ' + Math.ceil(total/2) + ' pages · then Print → Save as PDF (A4, margins None, Background graphics on)';
+  }catch(e){ st.textContent = 'Could not load deck: ' + e.message + ' (open via http(s), not file://)'; }
+})();
+</script>
+</body>
+</html>
