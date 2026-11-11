@@ -265,7 +265,7 @@ html,body{margin:0}
 
       <footer style="margin-top:64px;padding-top:34px;border-top:1px solid var(--hair);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px">
         <div style="font-family:var(--sans);font-size:16px;color:var(--muted)">Steve Chick · INSEAD · <a href="https://sechick.github.io/" target="_blank" style="color:var(--blueb);text-decoration:none">sechick.github.io</a></div>
-        <span onClick="{{ toggleInstructor }}" role="button" style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:{{ instructorTogColor }};cursor:pointer;padding:8px 15px;border-radius:999px;white-space:nowrap;border:1px solid {{ instructorTogBorder }}" style-hover="border-color:var(--blue)">{{ instructorLabel }}</span>
+        <sc-if value="{{ canAdmin }}" hint-placeholder-val="{{ false }}"><span onClick="{{ toggleInstructor }}" role="button" style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:{{ instructorTogColor }};cursor:pointer;padding:8px 15px;border-radius:999px;white-space:nowrap;border:1px solid {{ instructorTogBorder }}" style-hover="border-color:var(--blue)">{{ instructorLabel }}</span></sc-if>
       </footer>
 
     </main>
@@ -284,9 +284,32 @@ class Component extends DCLogic {
     // To publish a session to students: add its id, e.g. ['s08','s09'], then commit + push.
     this.published = ['s08'];
     this.publishedHandouts = [];
-    this.state = { instructorMode:false, released:{}, handouts:{}, loaded:false };
+    // Instructor controls are hidden from students. To unlock them in YOUR browser, open
+    //   .../gemba-inbo/#admin=<passphrase>      (lock again with  #admin=off)
+    // The page only stores the SHA-256 hash of the passphrase (below). To change the passphrase,
+    // compute a new hash and paste it here. This hides the controls; it is not server-side security.
+    this.adminHash = '83abb95c3cac89c879f46369c608123ce652418e54d49a19c0feb896d039b5d1';
+    this.state = { instructorMode:false, canAdmin:false, released:{}, handouts:{}, loaded:false };
   }
-  componentDidMount(){ this.applyAccent(); this.load(); }
+  async checkAdmin(){
+    let ok = false;
+    try{
+      const m = (location.hash || '').match(/^#admin=(.*)$/);
+      if(m){
+        const pw = decodeURIComponent(m[1]);
+        if(pw === 'off'){ localStorage.removeItem('inbo-admin'); }
+        else if(window.crypto && crypto.subtle){
+          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+          const hex = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+          if(hex === this.adminHash) localStorage.setItem('inbo-admin', this.adminHash);
+        }
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+      ok = localStorage.getItem('inbo-admin') === this.adminHash;
+    }catch(e){}
+    this.setState(prev=>({ canAdmin:ok, instructorMode: ok && prev.instructorMode }));
+  }
+  componentDidMount(){ this.applyAccent(); this.load(); this.checkAdmin(); }
   componentDidUpdate(prev){ if(prev.accent !== this.props.accent) this.applyAccent(); }
   applyAccent(){ if(this.props.accent){ try{ document.documentElement.style.setProperty('--blue', this.props.accent); }catch(e){} } }
   load(){
@@ -303,7 +326,7 @@ class Component extends DCLogic {
   toggleHandout(id){ this.update({ handouts:{ ...this.state.handouts, [id]:!this.state.handouts[id] } }); }
   deckPath(id){ return 'decks/inbo-' + id.slice(1) + '.html'; }
   renderVals(){
-    const im = this.state.instructorMode;
+    const im = this.state.instructorMode && this.state.canAdmin;
     const s = {};
     this.sessionIds.forEach(id=>{
       const rel = !!this.state.released[id] || this.published.indexOf(id) >= 0;
@@ -339,6 +362,7 @@ class Component extends DCLogic {
     });
     return {
       instructorMode: im,
+      canAdmin: this.state.canAdmin,
       toggleInstructor: ()=>this.toggleInstructor(),
       instructorLabel: im ? 'Instructor mode · On' : 'Instructor mode · Off',
       instructorTogColor: im ? 'var(--blue)' : 'var(--muted)',
