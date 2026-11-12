@@ -5,54 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>INBM handout</title>
 <!--
-  INBM: 2-slides-per-page handout generator (separate from the gemba-inbo one).
+  INBM: A4 handout, exactly two slides per page (top and bottom), each as wide as the margins allow.
     inbm/handouts/handout.html?deck=session-02            preview
     inbm/handouts/handout.html?deck=session-02&notes=1    add ruled note lines under each slide
-    inbm/handouts/handout.html?deck=session-02&paper=letter
   Fully automatic PDF:  run inbm/handouts/make-handout.ps1 (Windows) or make-handout.sh (Mac/Linux).
-  By hand: Print -> Save as PDF -> margins None -> Background graphics on.
+  By hand: Print -> Save as PDF -> A4, margins None, Background graphics on.
   Decks are read from the parent folder (inbm/session-*.html); PDFs are written here (inbm/handouts/).
+  Source notes (.pnote) and other print-only extras from the decks are NOT shown.
+  NOTE: every class used by this page is prefixed "h-" so it can never collide with a deck's own
+  classes (decks use .frame, .cap, .page ... inside their slides).
 -->
 <style>
-  @page { size: A4 portrait; margin: 0; }
+  @page { size: 210mm 297mm; margin: 0; }
   *{box-sizing:border-box}
-  html,body{margin:0;background:#e9e9e6;font-family:system-ui,sans-serif;color:#131312}
-  #bar{position:sticky;top:0;z-index:5;background:#131312;color:#fff;padding:10px 18px;font-size:14px;display:flex;gap:16px;align-items:center}
-  #bar button{font:inherit;padding:6px 14px;border:0;border-radius:6px;background:#fff;color:#131312;cursor:pointer}
-  #bar span{opacity:.8}
-  .page{width:210mm;height:297mm;margin:12px auto;background:#fff;padding:14mm 15mm 10mm;display:flex;flex-direction:column;justify-content:space-between;break-after:page;page-break-after:always;overflow:hidden;position:relative}
-  body.letter .page{width:8.5in;height:11in}
-  .slot{width:180mm}
-  .frame{width:180mm;height:101.25mm;position:relative;overflow:hidden;border:.3mm solid #cfcfc8;background:#fff}
-  .frame > .hs{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
-  .cap{font:8pt/1.2 ui-monospace,Consolas,monospace;color:#71716A;margin:1.5mm 0 0;display:flex;justify-content:space-between}
-  .lines{margin-top:2mm}
-  .lines i{display:block;border-bottom:.25mm solid #cfcfc8;height:6.5mm}
-  .hdr{position:absolute;top:6mm;left:15mm;right:15mm;font:8pt ui-monospace,Consolas,monospace;color:#71716A;display:flex;justify-content:space-between}
+  html,body{margin:0;padding:0;background:#e9e9e6;font-family:system-ui,sans-serif;color:#131312}
+  #h-bar{position:sticky;top:0;z-index:5;background:#131312;color:#fff;padding:10px 18px;font-size:14px;display:flex;gap:16px;align-items:center}
+  #h-bar button{font:inherit;padding:6px 14px;border:0;border-radius:6px;background:#fff;color:#131312;cursor:pointer}
+  #h-bar span{opacity:.8}
+
+  /* one sheet = one A4 page; absolute positions, 1 mm of slack so it never spills onto a 2nd page.
+     Slides are 190 mm wide (10 mm side margins), 16:9 => 106.9 mm tall. */
+  .h-page{position:relative;display:block;width:210mm;height:296mm;margin:12px auto;background:#fff;overflow:hidden;
+          break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid}
+  .h-page:last-child{break-after:auto;page-break-after:auto}
+  .h-slot{position:absolute;left:10mm;width:190mm}
+  .h-slot.a{top:20mm}
+  .h-slot.b{top:166mm}
+  body.h-withnotes .h-slot.a{top:17mm}
+  body.h-withnotes .h-slot.b{top:152mm}
+  .h-frame{width:190mm;height:106.875mm;position:relative;overflow:hidden;border:.3mm solid #cfcfc8;background:#fff}
+  .h-frame > .h-scale{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
+  .h-cap{font:8pt/1.2 ui-monospace,Consolas,monospace;color:#71716A;margin:1.5mm 0 0;display:flex;justify-content:space-between}
+  .h-lines{margin-top:2mm}
+  .h-lines i{display:block;border-bottom:.25mm solid #cfcfc8;height:6.5mm}
+  .h-hdr{position:absolute;top:9mm;left:10mm;right:10mm;font:8pt ui-monospace,Consolas,monospace;color:#71716A;display:flex;justify-content:space-between}
   @media print{
-    html,body{background:#fff !important}
-    #bar{display:none}
-    .page{margin:0}
+    html,body{background:#fff !important;margin:0 !important;padding:0 !important}
+    #h-bar{display:none !important}
+    .h-page{margin:0 !important}
   }
   /* every slide shown fully revealed, at the end of its animations */
-  .hs [data-reveal]{opacity:1 !important;visibility:visible !important;transition:none !important}
-  .hs *,.hs *::before,.hs *::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;transition-duration:0s !important}
-  .hs{opacity:1 !important;visibility:visible !important}
-  .hs button{display:none !important}
+  .h-scale [data-reveal]{opacity:1 !important;visibility:visible !important;transition:none !important}
+  /* no animations at all: elements simply sit in their final, natural state (more reliable in PDF than fast-forwarding) */
+  .h-scale *,.h-scale *::before,.h-scale *::after{animation:none !important;transition:none !important;will-change:auto !important}
+  .h-scale{opacity:1 !important;visibility:visible !important}
+  .h-scale button{display:none !important}
+  /* no source/credit notes, speaker notes or other print-only extras inside the slide images */
+  .h-scale .pnote,.h-scale [data-speaker-notes],.h-scale aside,.h-scale .notes,.h-scale .speaker-notes{display:none !important}
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </style>
 </head>
 <body>
-<div id="bar"><button onclick="window.print()">Print / Save as PDF</button><span id="status">Loading…</span></div>
-<div id="out"></div>
+<div id="h-bar"><button onclick="window.print()">Print / Save as PDF</button><span id="h-status">Loading…</span></div>
+<div id="h-out"></div>
 <script>
 (async function(){
   const q = new URLSearchParams(location.search);
   const deck = (q.get('deck') || 'session-01').replace(/[^a-z0-9-]/gi,'');
   const notes = q.get('notes') === '1';
-  const letter = q.get('paper') === 'letter';
-  if(letter){ document.body.classList.add('letter'); const p=document.createElement('style'); p.textContent='@page{size:Letter portrait;margin:0}'; document.head.appendChild(p); }
-  const st = document.getElementById('status');
+  if(notes) document.body.classList.add('h-withnotes');
+  const st = document.getElementById('h-status');
   const isUrl = v => /^(data:|https?:|\/\/|#|blob:)/i.test(v);
   try{
     const base = new URL('../', location.href).href;            // the inbm folder
@@ -66,31 +78,34 @@
       const n = document.createElement('link'); n.rel='stylesheet'; n.href = new URL(l.getAttribute('href'), base).href; document.head.appendChild(n);
     });
     doc.querySelectorAll('style').forEach(s=>{
-      const n = document.createElement('style'); n.textContent = fixCssUrls(s.textContent); document.head.appendChild(n);
+      // drop any @page rule from the deck so ours (A4) always wins
+      const css = fixCssUrls(s.textContent).replace(/@page\s*[^{]*\{[^}]*\}/g,'');
+      const n = document.createElement('style'); n.textContent = css; document.head.appendChild(n);
     });
+    // our page-level rules go LAST so they override the deck's
     const fix = document.createElement('style');
-    fix.textContent='html,body{margin:0 !important;height:auto !important;overflow:visible !important}body{background:#e9e9e6 !important}@media print{body{background:#fff !important}}';
+    fix.textContent='@page{size:210mm 297mm;margin:0}html,body{margin:0 !important;padding:0 !important;height:auto !important;overflow:visible !important}body{background:#e9e9e6 !important}@media print{body{background:#fff !important}}';
     document.head.appendChild(fix);
 
     const secs = Array.from(doc.querySelectorAll('deck-stage > section')).filter(s=>!s.hasAttribute('data-deck-skip'));
-    const out = document.getElementById('out');
-    const scale = (180 / 25.4 * 96) / 1920;                  // 180 mm frame width in CSS px
+    const out = document.getElementById('h-out');
+    const scale = (190 / 25.4 * 96) / 1920;                  // 190 mm frame width in CSS px
     const title = (doc.title || deck).replace(/^INBM\s*[—·:\-]?\s*/,'');
     const total = secs.length;
 
     for(let i=0;i<total;i+=2){
-      const page = document.createElement('div'); page.className='page';
-      page.innerHTML = '<div class="hdr"><span>INBM · '+title+'</span><span>INSEAD</span></div><div style="height:4mm"></div>';
-      const col = document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;justify-content:space-around;flex:1';
+      const page = document.createElement('div'); page.className='h-page';
+      page.innerHTML = '<div class="h-hdr"><span>INBM · '+title+'</span><span>INSEAD</span></div>';
       for(let j=i;j<Math.min(i+2,total);j++){
-        const slot = document.createElement('div'); slot.className='slot';
-        const frame = document.createElement('div'); frame.className='frame';
-        const wrap = document.createElement('div'); wrap.className='hs'; wrap.style.transform='scale('+scale+')';
+        const slot = document.createElement('div'); slot.className='h-slot ' + (j===i ? 'a' : 'b');
+        const frame = document.createElement('div'); frame.className='h-frame';
+        const wrap = document.createElement('div'); wrap.className='h-scale'; wrap.style.zoom = scale;   // zoom (not transform): the layout box shrinks too, so the printer never fragments it across pages
         // importNode (not cloneNode) so the nodes belong to THIS document and images actually load
         const s = document.importNode(secs[j], true);
         s.setAttribute('data-deck-active','');
         s.style.cssText += ';position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:1;visibility:visible;transform:none';
-        s.querySelectorAll('script,video,audio,iframe,canvas').forEach(el=>el.remove());
+        s.querySelectorAll('script,video,audio,iframe,canvas,.pnote,aside,[data-speaker-notes]').forEach(el=>el.remove());
+        s.removeAttribute('data-speaker-notes');
         s.querySelectorAll('[style*="url("]').forEach(el=>el.setAttribute('style', fixCssUrls(el.getAttribute('style'))));
         s.querySelectorAll('img').forEach(img=>{
           const v = img.getAttribute('src');
@@ -99,13 +114,12 @@
         });
         s.querySelectorAll('image[href],use[href]').forEach(el=>{ const v=el.getAttribute('href'); if(v && !isUrl(v)) el.setAttribute('href', new URL(v,base).href); });
         wrap.appendChild(s); frame.appendChild(wrap); slot.appendChild(frame);
-        const cap = document.createElement('div'); cap.className='cap';
+        const cap = document.createElement('div'); cap.className='h-cap';
         cap.innerHTML='<span>'+(secs[j].getAttribute('data-label')||'')+'</span><span>'+(j+1)+' / '+total+'</span>';
         slot.appendChild(cap);
-        if(notes){ const l=document.createElement('div'); l.className='lines'; l.innerHTML='<i></i><i></i><i></i>'; slot.appendChild(l); }
-        col.appendChild(slot);
+        if(notes){ const l=document.createElement('div'); l.className='h-lines'; l.innerHTML='<i></i><i></i><i></i>'; slot.appendChild(l); }
+        page.appendChild(slot);
       }
-      page.appendChild(col);
       out.appendChild(page);
     }
 
@@ -118,10 +132,11 @@
       if(img.complete && img.naturalWidth) return fin();
       img.addEventListener('load', fin, {once:true});
       img.addEventListener('error', () => { console.warn('image failed', img.src); fin(); }, {once:true});
+      setTimeout(fin, 20000);
     })));
     try{ await Promise.race([document.fonts.ready, new Promise(r=>setTimeout(r,4000))]); }catch(e){}
     const failed = imgs.filter(i=>!i.naturalWidth).length;
-    st.textContent = total + ' slides · ' + Math.ceil(total/2) + ' pages · ' + imgs.length + ' images' + (failed? ' ('+failed+' failed to load)':'') + ' — Print → Save as PDF (margins None, Background graphics on)';
+    st.textContent = total + ' slides · ' + Math.ceil(total/2) + ' A4 pages · ' + imgs.length + ' images' + (failed? ' ('+failed+' failed to load)':'') + ' — Print → Save as PDF (A4, margins None, Background graphics on)';
     document.documentElement.setAttribute('data-ready','1');
     if(q.get('auto') === '1') setTimeout(()=>window.print(), 300);
   }catch(e){ st.textContent = 'Could not load deck: ' + e.message + ' (open via http(s), or use the make-handout script)'; }
